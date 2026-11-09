@@ -19,7 +19,7 @@ Contribuições são bem-vindas: correcções, melhorias, traduções, testes co
 
 1. Os *pull requests* são feitos para o ramo **`unstable`**. O `main` só recebe o que já foi verificado no `unstable`.
 2. Uma alteração por *pull request*, com uma descrição do que muda e porquê.
-3. Cada ficheiro fica na pasta onde é instalado (ver o [README.pt.md](README.pt.md#organização-do-repositório)).
+3. Cada ficheiro fica na pasta onde é instalado (ver o [documento técnico](docs/TECNICO.md#português)).
 4. Textos das janelas: sempre nas quatro línguas (PT, EN, ES, FR), na tabela de textos de cada ferramenta.
 5. Datas DD/MM/AAAA e horas HH:MM em 24 h.
 6. Não são permitidos segredos no código: chaves, passwords ou endereços internos.
@@ -50,7 +50,7 @@ Contributions are welcome: fixes, improvements, translations, tests with other r
 
 1. Pull requests go to the **`unstable`** branch. `main` only receives what has already been checked on `unstable`.
 2. One change per pull request, with a description of what changes and why.
-3. Each file stays in the folder where it is installed (see the [README](README.md#repository-layout)).
+3. Each file stays in the folder where it is installed (see the [technical document](docs/TECNICO.md#english)).
 4. Window texts: always in the four languages (PT, EN, ES, FR), in each tool's text table.
 5. Dates DD/MM/YYYY and times HH:MM in 24 h.
 6. No secrets in the code: keys, passwords or internal addresses.
@@ -81,7 +81,7 @@ Las contribuciones son bienvenidas: correcciones, mejoras, traducciones, pruebas
 
 1. Los *pull requests* se hacen a la rama **`unstable`**. `main` solo recibe lo que ya se ha verificado en `unstable`.
 2. Un cambio por *pull request*, con una descripción de lo que cambia y por qué.
-3. Cada archivo queda en la carpeta donde se instala (ver el [README.es.md](README.es.md#organización-del-repositorio)).
+3. Cada archivo queda en la carpeta donde se instala (ver el [documento técnico](docs/TECNICO.md#español)).
 4. Textos de las ventanas: siempre en los cuatro idiomas (PT, EN, ES, FR), en la tabla de textos de cada herramienta.
 5. Fechas DD/MM/AAAA y horas HH:MM en 24 h.
 6. No se permiten secretos en el código: claves, contraseñas o direcciones internas.
@@ -112,7 +112,7 @@ Les contributions sont les bienvenues : corrections, améliorations, traductions
 
 1. Les *pull requests* se font sur la branche **`unstable`**. `main` ne reçoit que ce qui a déjà été vérifié sur `unstable`.
 2. Une modification par *pull request*, avec une description de ce qui change et pourquoi.
-3. Chaque fichier reste dans le dossier où il est installé (voir le [README.fr.md](README.fr.md#organisation-du-dépôt)).
+3. Chaque fichier reste dans le dossier où il est installé (voir le [document technique](docs/TECNICO.md#français)).
 4. Textes des fenêtres : toujours dans les quatre langues (PT, EN, ES, FR), dans la table de textes de chaque outil.
 5. Dates JJ/MM/AAAA et heures HH:MM sur 24 h.
 6. Aucun secret dans le code : clés, mots de passe ou adresses internes.
