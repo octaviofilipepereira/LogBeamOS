@@ -1,0 +1,22 @@
+#!/bin/sh
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: abre o Direwolf (corre num terminal; o atalho do menu é "x-terminal-emulator -e logbeamos-direwolf").
+# Sem ~/direwolf.conf, cria-a a partir do exemplo do próprio Direwolf: sem ela, o Direwolf fechava-se no mesmo
+# instante e a janela abria e fechava (no PC do autor isso deitava o Cinnamon abaixo, 08/11/2026).
+# No fim, a janela fica aberta até se carregar em Enter, para se ler o que o Direwolf escreveu.
+CONF="$HOME/direwolf.conf"
+if [ ! -f "$CONF" ]; then
+  python3 -I -c 'import sys; sys.path.insert(0, "/usr/local/lib/logbeamos/equipamento"); import lb_radio; lb_radio.direwolf_base(lb_radio.CAMINHOS["direwolf"])'
+fi
+cd "$HOME" || exit 1
+direwolf -c "$CONF" "$@"
+case "${LANGUAGE:-${LANG:-en}}" in
+  pt*) m="O Direwolf terminou. Carregue em Enter para fechar a janela." ;;
+  es*) m="Direwolf ha terminado. Pulse Intro para cerrar la ventana." ;;
+  fr*) m="Direwolf s'est arrêté. Appuyez sur Entrée pour fermer la fenêtre." ;;
+  *)   m="Direwolf has stopped. Press Enter to close the window." ;;
+esac
+printf '\n%s\n' "$m"
+read -r _

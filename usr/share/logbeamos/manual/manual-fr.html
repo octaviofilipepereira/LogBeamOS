@@ -1,0 +1,141 @@
+<!doctype html>
+<!--
+  Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+  © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+  Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manuel de LogBeamOS</title>
+<link rel="stylesheet" href="manual.css">
+</head>
+<body>
+<main>
+<header>
+  <img src="logbeam.png" alt="">
+  <div><h1>Manuel de LogBeamOS</h1><p class="nota">Distribution Linux pour radioamateurs</p></div>
+</header>
+<nav class="linguas"><a href="manual-pt.html">Português</a><a href="manual-en.html">English</a><a href="manual-es.html">Español</a><strong>Français</strong></nav>
+<nav class="indice">
+  <a href="#inicio">1. Premiers pas</a>
+  <a href="#radio">2. Brancher la radio</a>
+  <a href="#programas">3. Quel logiciel pour quoi</a>
+  <a href="#actualizar">4. Mettre à jour</a>
+  <a href="#windows">5. À côté de Windows</a>
+  <a href="#problemas">6. Problèmes courants</a>
+</nav>
+
+<section id="inicio">
+<h2>1. Premiers pas</h2>
+<ul>
+  <li>LogBeamOS démarre sur la clé USB sans rien installer sur l'ordinateur. Au premier démarrage, il est demandé si vous voulez votre propre utilisateur et mot de passe ; sans eux, la session s'ouvre toute seule.</li>
+  <li>Ce que vous faites sur la clé (réglages, journaux, fichiers) y reste enregistré et s'y retrouve au démarrage suivant.</li>
+  <li>Sur le bureau : le dossier <strong>Logiciels Radioamateur</strong> (tous les logiciels), <strong>Radio et Matériel</strong>, <strong>Mettre à jour LogBeamOS</strong>, <strong>LogBeam Uplink</strong> et ce manuel. Les logiciels sont aussi dans le menu, dans le groupe <em>Radio amateur</em>.</li>
+  <li>Pour éteindre : menu → bouton rouge. Ne retirez pas la clé pendant que LogBeamOS fonctionne.</li>
+</ul>
+<p><a class="botao" href="logbeamos:programas">Ouvrir les Logiciels Radioamateur</a></p>
+</section>
+
+<section id="radio">
+<h2>2. Brancher la radio</h2>
+<ol>
+  <li><strong>Branchez la radio en USB.</strong> Pour la plupart des radios, aucun pilote n'est à installer : Linux l'a déjà.</li>
+  <li><strong>Ouvrez Radio et Matériel.</strong> Il affiche la radio, le port CAT, la carte son de la radio et le port COM correspondant pour N1MM+ et Log4OM.</li>
+  <li><strong>Tester le CAT :</strong> choisissez le modèle ; avec la vitesse <em>Automatique</em>, la vitesse à laquelle la radio répond est recherchée. Le test lit seulement la fréquence : il n'émet jamais.</li>
+  <li><strong>Configurer les logiciels… :</strong> choisissez la radio dans la liste et cliquez sur <em>Configurer</em>. WSJT-X, JTDX, Fldigi, Not1MM et Direwolf utilisent alors la radio en même temps, avec le son de la radio et le PTT par le CAT. Une copie des réglages de chaque logiciel est gardée avant de les changer.</li>
+  <li><strong>N1MM+ et Log4OM :</strong> dans les réglages CAT de chacun, choisissez le port COM indiqué dans Radio et Matériel. Tant que N1MM+ est ouvert, les autres logiciels n'ont pas de CAT ; à sa fermeture, ils le retrouvent.</li>
+</ol>
+<p class="nota">La vitesse CAT doit être la même dans le menu de la radio (par exemple, <em>CAT RATE</em> sur les Yaesu).</p>
+<p><a class="botao" href="logbeamos:equipamento">Ouvrir Radio et Matériel</a></p>
+</section>
+
+<section id="programas">
+<h2>3. Quel logiciel pour quoi</h2>
+<table>
+  <tr><th>Pour…</th><th>Logiciel</th></tr>
+  <tr><td>FT8, FT4, WSPR</td><td>WSJT-X ou JTDX · avec FT2 : Decodium · carte des stations entendues : GridTracker2</td></tr>
+  <tr><td>Messages au clavier à signal faible</td><td>JS8Call</td></tr>
+  <tr><td>RTTY, PSK, Olivia et autres modes numériques</td><td>Fldigi (avec Flrig, Flmsg et Flamp)</td></tr>
+  <tr><td>Concours</td><td>N1MM+ (celui de Windows, via Wine) ou Not1MM</td></tr>
+  <tr><td>Carnet de trafic (logbook)</td><td>Log4OM (via Wine), CQRLOG ou KLog · envoi vers logbeam.org : LogBeam Uplink · envoi vers Wavelog : WaveLogGate</td></tr>
+  <tr><td>APRS</td><td>Direwolf (le modem par la carte son) et Xastir (la carte) ; Xastir lance Direwolf tout seul et s'y connecte</td></tr>
+  <tr><td>Winlink (courrier par radio)</td><td>Pat</td></tr>
+  <tr><td>Satellites</td><td>Gpredict (prévisions et poursuite) · images des satellites météo : SatDump</td></tr>
+  <tr><td>Récepteurs SDR</td><td>Gqrx ou SDR++ · expériences : GNU Radio</td></tr>
+  <tr><td>Voix numérique et images</td><td>FreeDV · SSTV : QSSTV</td></tr>
+  <tr><td>Radios Icom et Kenwood à distance</td><td>wfview</td></tr>
+  <tr><td>Programmation des radios DMR</td><td>qdmr</td></tr>
+  <tr><td>DMR sans radio (BrandMeister)</td><td>VoxDMR (facultatif : s'installe par <a href="logbeamos:actualizar">Mettre à jour LogBeamOS</a> ; demande votre ID DMR et le mot de passe hotspot BrandMeister)</td></tr>
+  <tr><td>EchoLink</td><td>Qtel (le routeur doit laisser passer les ports UDP 5198–5199 et TCP 5200, ou utilisez un proxy EchoLink)</td></tr>
+  <tr><td>Simulation d'antennes</td><td>xnec2c</td></tr>
+  <tr><td>Analyse des bandes</td><td>4ham Spectrum Analysis</td></tr>
+</table>
+<p class="nota">Dans Xastir, avant d'émettre : indiquez votre indicatif (Xastir le demande la première fois), changez <em>MYCALL</em> dans le fichier <code>direwolf.conf</code> de votre dossier personnel et activez l'émission dans <em>Interfaces</em>. Par défaut, Xastir ne fait que recevoir.</p>
+<p><a class="botao" href="logbeamos:xastir">Ouvrir Xastir (APRS)</a> <a class="botao" href="logbeamos:programas">Ouvrir les Logiciels Radioamateur</a></p>
+</section>
+
+<section id="actualizar">
+<h2>4. Mettre à jour</h2>
+<ul>
+  <li><strong>Mettre à jour LogBeamOS</strong> affiche les logiciels radio et le système d'exploitation, avec la version installée, la version disponible et la taille à télécharger.</li>
+  <li>Les outils de LogBeamOS (cet outil de mise à jour, <strong>Radio et Matériel</strong> et ce manuel) et <strong>LogBeam Uplink</strong> se mettent aussi à jour ici. Ils viennent du dépôt de LogBeamOS sur logbeam.org, qui est signé.</li>
+  <li>Cochez ce que vous voulez mettre à jour. Chaque logiciel a sa case ; le <em>Système d'exploitation</em> s'ouvre avec la flèche et chaque paquet peut aussi être choisi. Raccourcis : <em>Radio</em>, <em>Système</em>, <em>Tout</em>, <em>Rien</em>.</li>
+  <li>Cliquez sur <em>Mettre à jour la sélection</em>. Pendant la mise à jour s'affichent ce qui est téléchargé, les Mo, la vitesse et le temps restant.</li>
+  <li>N1MM+, Log4OM et GridTracker2 se mettent à jour tout seuls.</li>
+  <li>Sur la clé USB, aucun mot de passe n'est demandé ; sur LogBeamOS installé, celui de l'utilisateur est demandé.</li>
+  <li>Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour.</li>
+</ul>
+<p><a class="botao" href="logbeamos:actualizar">Ouvrir Mettre à jour LogBeamOS</a></p>
+</section>
+
+<section id="windows">
+<h2>5. Installer à côté de Windows</h2>
+<h3>D'abord, dans Windows</h3>
+<ol>
+  <li><strong>Sauvegardez vos données.</strong></li>
+  <li><strong>Lancez « Preparar o Windows.cmd »</strong> par clic droit → <em>Exécuter en tant qu'administrateur</em>. Il se trouve à la racine de l'ISO : avant d'écrire la clé USB, ouvrez l'ISO dans Windows par un double clic. Il désactive le démarrage rapide et, si le lecteur C: est chiffré, commence à le déchiffrer ; avant d'installer, attendez que le pourcentage chiffré atteigne 0 %. Cela peut aussi se faire à la main : <a href="logbeamos:antes">Avant d'installer</a>.</li>
+</ol>
+<h3>Installer</h3>
+<ol start="3">
+  <li>Démarrez sur la clé USB et ouvrez <em>Installer LogBeamOS</em>. Pour le type d'installation, choisissez d'installer à côté de Windows et faites glisser le séparateur : 40 Go suffisent pour LogBeamOS.</li>
+  <li>Ensuite, au démarrage de l'ordinateur, un menu avec LogBeamOS et Windows s'affiche pendant 10 secondes. Le dernier choix est mémorisé.</li>
+</ol>
+<h3>Retirer LogBeamOS</h3>
+<ol start="5">
+  <li>Dans Windows, dans une console administrateur : <code>bcdedit /set {fwbootmgr} displayorder {bootmgr} /addfirst</code>. L'ordinateur démarre alors directement sur Windows.</li>
+  <li>Gestion des disques : supprimez les partitions de LogBeamOS (celles qui suivent C: et n'ont pas de lettre ; jamais la partition EFI ni celle de récupération). Puis clic droit sur C: → <em>Étendre le volume</em>.</li>
+  <li>Facultatif, pour supprimer aussi le démarrage de LogBeamOS, dans la même console :
+    <ul>
+      <li><code>bcdedit /enum firmware</code> affiche les entrées de démarrage ; supprimez celles qui ont <code>\EFI\ubuntu</code> dans le chemin avec <code>bcdedit /delete {identifiant}</code> ;</li>
+      <li><code>mountvol S: /S</code> et <code>rmdir /S /Q S:\EFI\ubuntu</code> ;</li>
+      <li>si <code>S:\EFI\Boot\fbx64.efi</code> existe, l'installateur a remplacé le démarrage de secours du disque : <code>copy /Y S:\EFI\Microsoft\Boot\bootmgfw.efi S:\EFI\Boot\bootx64.efi</code> et <code>del S:\EFI\Boot\fbx64.efi S:\EFI\Boot\mmx64.efi</code> ;</li>
+      <li>pour finir, <code>mountvol S: /D</code>.</li>
+    </ul></li>
+</ol>
+</section>
+
+<section id="problemas">
+<h2>6. Problèmes courants</h2>
+<dl>
+  <dt>La clé USB ne démarre pas : « Unable to find a medium containing a live file system »</dt>
+  <dd>Retirez la clé, attendez 5 secondes, rebranchez-la et redémarrez.</dd>
+  <dt>Windows demande de formater la clé USB</dt>
+  <dd>Annulez toujours. C'est la partie de la clé où sont gardées vos données LogBeamOS, que Windows ne sait pas lire.</dd>
+  <dt>Un logiciel est bloqué</dt>
+  <dd>Ouvrez le Moniteur système (icône dans la barre), onglet <em>Processus</em>, clic droit sur le logiciel → <em>Terminer</em>.</dd>
+  <dt>Le bureau a planté (« mode de secours »)</dt>
+  <dd>Appuyez sur Ctrl+Alt+Échap pour le relancer, ou fermez la session et rouvrez-la.</dd>
+  <dt>La radio ne répond pas au CAT</dt>
+  <dd>Dans Radio et Matériel, vérifiez le modèle et utilisez la vitesse <em>Automatique</em> ; vérifiez que le CAT est activé dans le menu de la radio et fermez les logiciels qui utilisent le port.</dd>
+  <dt>Pas de son de la radio dans WSJT-X ou Direwolf</dt>
+  <dd>Dans Radio et Matériel → <em>Configurer les logiciels…</em>, choisissez le son de la radio.</dd>
+  <dt>Direwolf se ferme tout de suite</dt>
+  <dd>La fenêtre reste ouverte avec l'explication. Les réglages sont dans le fichier <code>direwolf.conf</code> de votre dossier personnel.</dd>
+</dl>
+<p><a class="botao" href="logbeamos:monitor">Ouvrir le Moniteur système</a></p>
+</section>
+</main>
+</body>
+</html>

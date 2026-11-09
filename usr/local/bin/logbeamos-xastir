@@ -1,0 +1,37 @@
+#!/bin/sh
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: abre o Xastir ligado ao Direwolf (interface "AGWPE em rede", 127.0.0.1, porta 8000).
+# - Se o Xastir ainda não tiver configuração, começa com essa interface, ligada ao arrancar e a tentar de novo se cair.
+#   A transmissão fica desligada (TXMT:0): o Xastir só transmite depois de o utilizador o pedir nas interfaces.
+# - Se o Direwolf não estiver a correr, abre-o primeiro (na janela dele) e espera que aceite ligações.
+CNF="$HOME/.xastir/config/xastir.cnf"
+if [ ! -s "$CNF" ]; then
+  mkdir -p "$(dirname "$CNF")"
+  cat > "$CNF" <<'EOF'
+DEVICE0_TYPE:12
+DEVICE0_NAME:
+DEVICE0_RADIO_PORT:0
+DEVICE0_INTERFACE_COMMENT:Direwolf
+DEVICE0_HOST:127.0.0.1
+DEVICE0_PASSWD:
+DEVICE0_SPEED:8000
+DEVICE0_TXMT:0
+DEVICE0_RELAY_DIGIPEAT:0
+DEVICE0_RECONN:1
+DEVICE0_ONSTARTUP:1
+EOF
+fi
+if ! pgrep -u "$(id -u)" -x direwolf >/dev/null; then
+  x-terminal-emulator -e logbeamos-direwolf &
+  i=0
+  while [ $i -lt 15 ] && ! ss -ltn 2>/dev/null | grep -q ':8000 '; do sleep 1; i=$((i + 1)); done
+fi
+# Na língua da sessão (o Xastir tem português, espanhol e francês; de resto, inglês)
+case "${LANGUAGE:-${LANG:-en}}" in
+  pt*) set -- -l Portuguese "$@" ;;
+  es*) set -- -l Spanish "$@" ;;
+  fr*) set -- -l French "$@" ;;
+esac
+exec xastir "$@"

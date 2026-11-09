@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Update LogBeamOS
+Name[pt]=Actualizar LogBeamOS
+Name[es]=Actualizar LogBeamOS
+Name[fr]=Mettre à jour LogBeamOS
+Comment=Updates the amateur radio programs and the operating system
+Comment[pt]=Actualiza os programas de rádio e o sistema operativo
+Comment[es]=Actualiza los programas de radio y el sistema operativo
+Comment[fr]=Met à jour les logiciels de radio et le système d'exploitation
+Exec=logbeamos-actualizar
+Icon=/usr/share/logbeamos/actualizar.png
+Terminal=false
+Categories=HamRadio;

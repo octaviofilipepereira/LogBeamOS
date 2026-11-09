@@ -1,0 +1,903 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: "Rádio e Equipamento". Mostra o que está ligado por USB e explica como usar cada coisa:
+# rádios e cabos de CAT (porta no Linux e COM no Wine), placas de som, receptores SDR, GPS e outros.
+# O teste do CAT só lê a frequência do rádio: nunca transmite (RTS e DTR ficam desligados, salvo o RTS do
+# controlo de fluxo nos rádios que o usam).
+import glob
+import grp
+import os
+import re
+import subprocess
+import sys
+import threading
+
+# --- Textos (PT, EN, ES, FR)
+TXT = {
+    "pt": {
+        "titulo": "Rádio e Equipamento", "sub": "O que está ligado a este computador e como usá-lo",
+        "radios": "Rádios e cabos de CAT", "som": "Placas de som", "sdr": "Receptores SDR", "outros": "Outros equipamentos",
+        "verif": "Verificações", "nada": "Nada ligado por USB. Ligue o rádio ou o cabo: a lista actualiza-se sozinha.",
+        "porta": "Porta {p} · no N1MM+ e no Log4OM: {c}", "porta_cat": "CAT: porta {p} · no N1MM+ e no Log4OM: {c}",
+        "porta_ptt": "PTT (RTS): porta {p} · no N1MM+ e no Log4OM: {c}",
+        "nativos": "WSJT-X, JTDX, Fldigi, Flrig e Not1MM: rádio «{m}», porta {p}, {b} bps",
+        "nativos_sem": "WSJT-X, JTDX, Fldigi, Flrig e Not1MM: escolha o modelo do rádio e a porta {p}",
+        "som_radio": "Som do rádio: «{n}». Escolha-o como entrada e saída de som no WSJT-X, JTDX e Fldigi.",
+        "som_pc": "Placa de som do computador", "som_usb": "Placa de som USB (provavelmente a do rádio ou da interface)",
+        "chip": "Cabo ou rádio com chip {c}", "yaesu": "Provavelmente um rádio Yaesu (FT-991A, FTDX10, FT-710, FTDX101…)",
+        "digirig": "Interface Digirig (CAT e som)", "signalink": "SignaLink USB (só som; o PTT é por VOX)",
+        "testar": "Testar CAT", "modelo": "Modelo:", "velocidade": "Velocidade:",
+        "a_testar": "A testar… (só leitura, sem transmitir)", "ok_cat": "O rádio responde: {f}",
+        "falhou": "O rádio não respondeu. Confirme que está ligado e a velocidade do CAT no menu do rádio.",
+        "ok_vel": "O rádio responde a {b} bps: {f}. Use esta velocidade nos programas.",
+        "ocupada": "A porta está a ser usada por: {q}. Feche esse programa para testar.",
+        "sdr_uso": "Use-o no Gqrx, SDR++ ou SatDump.",
+        "sdr_tv": "O controlador de TV do Linux está a usar este receptor. Desligue-o e volte a ligá-lo; se continuar, reinicie o computador.",
+        "sem_acesso": "Sem permissão para usar este equipamento. Reinicie o computador.",
+        "gps": "Receptor GPS: dá a hora certa ao computador (importante no FT8)",
+        "gps_porta": "Porta {p}", "outro": "Equipamento USB",
+        "dialout_ok": "As portas série estão acessíveis a este utilizador.",
+        "dialout_mal": "Este utilizador não tem acesso às portas série.", "corrigir": "Corrigir",
+        "corrigido": "Corrigido. Termine a sessão e volte a entrar para fazer efeito.",
+        "wine": "No N1MM+ e no Log4OM as portas COM3, COM4… correspondem às portas acima pela mesma ordem.",
+    },
+    "en": {
+        "titulo": "Radio and Equipment", "sub": "What is connected to this computer and how to use it",
+        "radios": "Radios and CAT cables", "som": "Sound cards", "sdr": "SDR receivers", "outros": "Other equipment",
+        "verif": "Checks", "nada": "Nothing connected by USB. Plug in the radio or the cable: the list updates itself.",
+        "porta": "Port {p} · in N1MM+ and Log4OM: {c}", "porta_cat": "CAT: port {p} · in N1MM+ and Log4OM: {c}",
+        "porta_ptt": "PTT (RTS): port {p} · in N1MM+ and Log4OM: {c}",
+        "nativos": "WSJT-X, JTDX, Fldigi, Flrig and Not1MM: radio “{m}”, port {p}, {b} bps",
+        "nativos_sem": "WSJT-X, JTDX, Fldigi, Flrig and Not1MM: choose the radio model and port {p}",
+        "som_radio": "Radio sound: “{n}”. Choose it as audio input and output in WSJT-X, JTDX and Fldigi.",
+        "som_pc": "Computer sound card", "som_usb": "USB sound card (probably the radio's or the interface's)",
+        "chip": "Cable or radio with {c} chip", "yaesu": "Probably a Yaesu radio (FT-991A, FTDX10, FT-710, FTDX101…)",
+        "digirig": "Digirig interface (CAT and sound)", "signalink": "SignaLink USB (sound only; PTT by VOX)",
+        "testar": "Test CAT", "modelo": "Model:", "velocidade": "Speed:",
+        "a_testar": "Testing… (read only, no transmission)", "ok_cat": "The radio answers: {f}",
+        "falhou": "The radio did not answer. Check that it is on and the CAT speed in the radio menu.",
+        "ok_vel": "The radio answers at {b} bps: {f}. Use this speed in the programs.",
+        "ocupada": "The port is in use by: {q}. Close that program to test.",
+        "sdr_uso": "Use it in Gqrx, SDR++ or SatDump.",
+        "sdr_tv": "The Linux TV driver is using this receiver. Unplug it and plug it in again; if it persists, restart the computer.",
+        "sem_acesso": "No permission to use this equipment. Restart the computer.",
+        "gps": "GPS receiver: keeps the computer clock right (important for FT8)",
+        "gps_porta": "Port {p}", "outro": "USB equipment",
+        "dialout_ok": "The serial ports are accessible to this user.",
+        "dialout_mal": "This user has no access to the serial ports.", "corrigir": "Fix",
+        "corrigido": "Fixed. Log out and back in for it to take effect.",
+        "wine": "In N1MM+ and Log4OM, ports COM3, COM4… match the ports above in the same order.",
+    },
+    "es": {
+        "titulo": "Radio y Equipo", "sub": "Lo que está conectado a este ordenador y cómo usarlo",
+        "radios": "Radios y cables CAT", "som": "Tarjetas de sonido", "sdr": "Receptores SDR", "outros": "Otros equipos",
+        "verif": "Comprobaciones", "nada": "Nada conectado por USB. Conecte la radio o el cable: la lista se actualiza sola.",
+        "porta": "Puerto {p} · en N1MM+ y Log4OM: {c}", "porta_cat": "CAT: puerto {p} · en N1MM+ y Log4OM: {c}",
+        "porta_ptt": "PTT (RTS): puerto {p} · en N1MM+ y Log4OM: {c}",
+        "nativos": "WSJT-X, JTDX, Fldigi, Flrig y Not1MM: radio «{m}», puerto {p}, {b} bps",
+        "nativos_sem": "WSJT-X, JTDX, Fldigi, Flrig y Not1MM: elija el modelo de radio y el puerto {p}",
+        "som_radio": "Sonido de la radio: «{n}». Elíjalo como entrada y salida de sonido en WSJT-X, JTDX y Fldigi.",
+        "som_pc": "Tarjeta de sonido del ordenador", "som_usb": "Tarjeta de sonido USB (probablemente la de la radio o la interfaz)",
+        "chip": "Cable o radio con chip {c}", "yaesu": "Probablemente una radio Yaesu (FT-991A, FTDX10, FT-710, FTDX101…)",
+        "digirig": "Interfaz Digirig (CAT y sonido)", "signalink": "SignaLink USB (solo sonido; PTT por VOX)",
+        "testar": "Probar CAT", "modelo": "Modelo:", "velocidade": "Velocidad:",
+        "a_testar": "Probando… (solo lectura, sin transmitir)", "ok_cat": "La radio responde: {f}",
+        "falhou": "La radio no respondió. Compruebe que está encendida y la velocidad CAT en el menú de la radio.",
+        "ok_vel": "La radio responde a {b} bps: {f}. Use esta velocidad en los programas.",
+        "ocupada": "El puerto está en uso por: {q}. Cierre ese programa para probar.",
+        "sdr_uso": "Úselo en Gqrx, SDR++ o SatDump.",
+        "sdr_tv": "El controlador de TV de Linux está usando este receptor. Desconéctelo y vuelva a conectarlo; si sigue, reinicie el ordenador.",
+        "sem_acesso": "Sin permiso para usar este equipo. Reinicie el ordenador.",
+        "gps": "Receptor GPS: mantiene la hora correcta del ordenador (importante en FT8)",
+        "gps_porta": "Puerto {p}", "outro": "Equipo USB",
+        "dialout_ok": "Los puertos serie son accesibles para este usuario.",
+        "dialout_mal": "Este usuario no tiene acceso a los puertos serie.", "corrigir": "Corregir",
+        "corrigido": "Corregido. Cierre la sesión y vuelva a entrar para que tenga efecto.",
+        "wine": "En N1MM+ y Log4OM, los puertos COM3, COM4… corresponden a los puertos de arriba en el mismo orden.",
+    },
+    "fr": {
+        "titulo": "Radio et Matériel", "sub": "Ce qui est branché sur cet ordinateur et comment l'utiliser",
+        "radios": "Radios et câbles CAT", "som": "Cartes son", "sdr": "Récepteurs SDR", "outros": "Autres matériels",
+        "verif": "Vérifications", "nada": "Rien de branché en USB. Branchez la radio ou le câble : la liste se met à jour seule.",
+        "porta": "Port {p} · dans N1MM+ et Log4OM : {c}", "porta_cat": "CAT : port {p} · dans N1MM+ et Log4OM : {c}",
+        "porta_ptt": "PTT (RTS) : port {p} · dans N1MM+ et Log4OM : {c}",
+        "nativos": "WSJT-X, JTDX, Fldigi, Flrig et Not1MM : radio « {m} », port {p}, {b} bps",
+        "nativos_sem": "WSJT-X, JTDX, Fldigi, Flrig et Not1MM : choisissez le modèle de radio et le port {p}",
+        "som_radio": "Son de la radio : « {n} ». Choisissez-le comme entrée et sortie audio dans WSJT-X, JTDX et Fldigi.",
+        "som_pc": "Carte son de l'ordinateur", "som_usb": "Carte son USB (probablement celle de la radio ou de l'interface)",
+        "chip": "Câble ou radio avec puce {c}", "yaesu": "Probablement une radio Yaesu (FT-991A, FTDX10, FT-710, FTDX101…)",
+        "digirig": "Interface Digirig (CAT et son)", "signalink": "SignaLink USB (son seulement ; PTT par VOX)",
+        "testar": "Tester le CAT", "modelo": "Modèle :", "velocidade": "Vitesse :",
+        "a_testar": "Test en cours… (lecture seule, sans émettre)", "ok_cat": "La radio répond : {f}",
+        "falhou": "La radio n'a pas répondu. Vérifiez qu'elle est allumée et la vitesse CAT dans le menu de la radio.",
+        "ok_vel": "La radio répond à {b} bps : {f}. Utilisez cette vitesse dans les logiciels.",
+        "ocupada": "Le port est utilisé par : {q}. Fermez ce logiciel pour tester.",
+        "sdr_uso": "Utilisez-le dans Gqrx, SDR++ ou SatDump.",
+        "sdr_tv": "Le pilote TV de Linux utilise ce récepteur. Débranchez-le et rebranchez-le ; si cela continue, redémarrez l'ordinateur.",
+        "sem_acesso": "Pas d'autorisation pour utiliser ce matériel. Redémarrez l'ordinateur.",
+        "gps": "Récepteur GPS : garde l'heure de l'ordinateur exacte (important en FT8)",
+        "gps_porta": "Port {p}", "outro": "Matériel USB",
+        "dialout_ok": "Les ports série sont accessibles à cet utilisateur.",
+        "dialout_mal": "Cet utilisateur n'a pas accès aux ports série.", "corrigir": "Corriger",
+        "corrigido": "Corrigé. Fermez la session et reconnectez-vous pour que cela prenne effet.",
+        "wine": "Dans N1MM+ et Log4OM, les ports COM3, COM4… correspondent aux ports ci-dessus dans le même ordre.",
+    },
+}
+# Configurar os programas (rádio partilhado pelo rigctld)
+TXT_CFG = {
+    "pt": {
+        "configurar": "Configurar os programas…", "cfg_titulo": "Configurar o rádio nos programas",
+        "cfg_expl": "O rádio fica partilhado: o WSJT-X, o JTDX, o Fldigi e o Not1MM passam a usá-lo ao mesmo tempo. "
+                    "O PTT é por CAT. Antes de mudar, é guardada uma cópia da configuração de cada programa.",
+        "cfg_radio": "Rádio:", "cfg_porta": "Porta:", "cfg_som": "Som do rádio:", "cfg_som_nao": "Não alterar",
+        "cfg_programas": "Programas:", "cfg_btn": "Configurar", "cancelar": "Cancelar", "fechar": "Fechar",
+        "cfg_n1mm": "N1MM+: no Configurer escolha a {c}, {b} bps e o rádio {m}. Enquanto o N1MM+ estiver aberto, "
+                    "os outros programas ficam sem CAT; quando fecha, a partilha volta sozinha.",
+        "cfg_log4om": "Log4OM: ainda não é configurado por aqui; escolha a {c} nas definições de CAT.",
+        "cfg_abertos": "Feche primeiro: {p}. Ao fechar, gravariam a configuração antiga.",
+        "cfg_a_fazer": "A configurar…", "cfg_freq": "Partilha ligada. O rádio responde: {f}.",
+        "cfg_sem_freq": "Partilha ligada, mas o rádio ainda não respondeu. Confirme que está ligado e a velocidade do CAT.",
+        "cfg_com_som": "{p}: configurado, com o som do rádio", "cfg_sem_som": "{p}: configurado",
+        "cfg_erro": "{p}: erro ({e})", "cfg_modelo_mal": "Escolha o modelo do rádio na lista.",
+        "partilhado": "Partilhado com os programas: {m}, {b} bps (127.0.0.1:4532)",
+        "partilha_parada": "Partilha configurada ({m}), mas parada: o rádio está desligado ou o N1MM+ está aberto.",
+        "desligar_partilha": "Desligar a partilha", "ok_partilha": "O rádio responde pela partilha: {f}",
+    },
+    "en": {
+        "configurar": "Set up the programs…", "cfg_titulo": "Set up the radio in the programs",
+        "cfg_expl": "The radio is shared: WSJT-X, JTDX, Fldigi and Not1MM use it at the same time. "
+                    "PTT is by CAT. A copy of each program's settings is kept before changing them.",
+        "cfg_radio": "Radio:", "cfg_porta": "Port:", "cfg_som": "Radio sound:", "cfg_som_nao": "Do not change",
+        "cfg_programas": "Programs:", "cfg_btn": "Set up", "cancelar": "Cancel", "fechar": "Close",
+        "cfg_n1mm": "N1MM+: in the Configurer choose {c}, {b} bps and the radio {m}. While N1MM+ is open, "
+                    "the other programs have no CAT; when it closes, sharing resumes by itself.",
+        "cfg_log4om": "Log4OM: not set up from here yet; choose {c} in its CAT settings.",
+        "cfg_abertos": "Close first: {p}. When closing, they would save the old settings.",
+        "cfg_a_fazer": "Setting up…", "cfg_freq": "Sharing is on. The radio answers: {f}.",
+        "cfg_sem_freq": "Sharing is on, but the radio has not answered yet. Check that it is on and the CAT speed.",
+        "cfg_com_som": "{p}: set up, with the radio sound", "cfg_sem_som": "{p}: set up",
+        "cfg_erro": "{p}: error ({e})", "cfg_modelo_mal": "Choose the radio model from the list.",
+        "partilhado": "Shared with the programs: {m}, {b} bps (127.0.0.1:4532)",
+        "partilha_parada": "Sharing is set up ({m}) but stopped: the radio is off or N1MM+ is open.",
+        "desligar_partilha": "Stop sharing", "ok_partilha": "The radio answers through sharing: {f}",
+    },
+    "es": {
+        "configurar": "Configurar los programas…", "cfg_titulo": "Configurar la radio en los programas",
+        "cfg_expl": "La radio queda compartida: WSJT-X, JTDX, Fldigi y Not1MM la usan al mismo tiempo. "
+                    "El PTT es por CAT. Antes de cambiar, se guarda una copia de la configuración de cada programa.",
+        "cfg_radio": "Radio:", "cfg_porta": "Puerto:", "cfg_som": "Sonido de la radio:", "cfg_som_nao": "No cambiar",
+        "cfg_programas": "Programas:", "cfg_btn": "Configurar", "cancelar": "Cancelar", "fechar": "Cerrar",
+        "cfg_n1mm": "N1MM+: en el Configurer elija {c}, {b} bps y la radio {m}. Mientras N1MM+ esté abierto, "
+                    "los demás programas no tienen CAT; al cerrarlo, la compartición vuelve sola.",
+        "cfg_log4om": "Log4OM: aún no se configura desde aquí; elija {c} en sus ajustes de CAT.",
+        "cfg_abertos": "Cierre primero: {p}. Al cerrarse, guardarían la configuración antigua.",
+        "cfg_a_fazer": "Configurando…", "cfg_freq": "Compartición activa. La radio responde: {f}.",
+        "cfg_sem_freq": "Compartición activa, pero la radio aún no respondió. Compruebe que está encendida y la velocidad CAT.",
+        "cfg_com_som": "{p}: configurado, con el sonido de la radio", "cfg_sem_som": "{p}: configurado",
+        "cfg_erro": "{p}: error ({e})", "cfg_modelo_mal": "Elija el modelo de radio en la lista.",
+        "partilhado": "Compartida con los programas: {m}, {b} bps (127.0.0.1:4532)",
+        "partilha_parada": "Compartición configurada ({m}), pero detenida: la radio está apagada o N1MM+ está abierto.",
+        "desligar_partilha": "Dejar de compartir", "ok_partilha": "La radio responde a través de la compartición: {f}",
+    },
+    "fr": {
+        "configurar": "Configurer les logiciels…", "cfg_titulo": "Configurer la radio dans les logiciels",
+        "cfg_expl": "La radio est partagée : WSJT-X, JTDX, Fldigi et Not1MM l'utilisent en même temps. "
+                    "Le PTT passe par le CAT. Une copie des réglages de chaque logiciel est gardée avant de les changer.",
+        "cfg_radio": "Radio :", "cfg_porta": "Port :", "cfg_som": "Son de la radio :", "cfg_som_nao": "Ne pas changer",
+        "cfg_programas": "Logiciels :", "cfg_btn": "Configurer", "cancelar": "Annuler", "fechar": "Fermer",
+        "cfg_n1mm": "N1MM+ : dans le Configurer choisissez {c}, {b} bps et la radio {m}. Tant que N1MM+ est ouvert, "
+                    "les autres logiciels n'ont pas de CAT ; à sa fermeture, le partage reprend tout seul.",
+        "cfg_log4om": "Log4OM : pas encore configuré d'ici ; choisissez {c} dans ses réglages CAT.",
+        "cfg_abertos": "Fermez d'abord : {p}. En se fermant, ils enregistreraient les anciens réglages.",
+        "cfg_a_fazer": "Configuration…", "cfg_freq": "Partage actif. La radio répond : {f}.",
+        "cfg_sem_freq": "Partage actif, mais la radio n'a pas encore répondu. Vérifiez qu'elle est allumée et la vitesse CAT.",
+        "cfg_com_som": "{p} : configuré, avec le son de la radio", "cfg_sem_som": "{p} : configuré",
+        "cfg_erro": "{p} : erreur ({e})", "cfg_modelo_mal": "Choisissez le modèle de radio dans la liste.",
+        "partilhado": "Partagée avec les logiciels : {m}, {b} bps (127.0.0.1:4532)",
+        "partilha_parada": "Partage configuré ({m}), mais arrêté : la radio est éteinte ou N1MM+ est ouvert.",
+        "desligar_partilha": "Arrêter le partage", "ok_partilha": "La radio répond par le partage : {f}",
+    },
+}
+# 0.3.10: velocidade automática, Direwolf no "Configurar", outros aparelhos USB
+TXT_V10 = {
+    "pt": {
+        "automatica": "Automática",
+        "cfg_expl": "O rádio fica partilhado: o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM e o Direwolf passam a usá-lo ao "
+                    "mesmo tempo. O PTT é por CAT. Antes de mudar, é guardada uma cópia da configuração de cada programa.",
+        "cfg_n1mm_auto": "N1MM+: no Configurer escolha a {c}, a velocidade do CAT do rádio e o rádio {m}. Enquanto o "
+                         "N1MM+ estiver aberto, os outros programas ficam sem CAT; quando fecha, a partilha volta sozinha.",
+        "cfg_a_procurar": "À procura da velocidade do CAT… (só leitura, sem transmitir)",
+        "cfg_vel": "Velocidade do CAT: {b} bps.",
+        "cfg_sem_vel": "O rádio não respondeu a nenhuma velocidade. Confirme que está ligado e o CAT ligado no menu "
+                       "do rádio, ou escolha a velocidade à mão.",
+        "usb_outros": "Outros aparelhos USB ({n})",
+        "usb_outros_expl": "Ligados, mas sem uso no rádio (teclado, rato, pens…). Se um cabo ou interface de rádio só "
+                           "aparecer aqui, o Linux não lhe encontrou porta série nem placa de som.",
+    },
+    "en": {
+        "automatica": "Automatic",
+        "cfg_expl": "The radio is shared: WSJT-X, JTDX, Decodium, Fldigi, Not1MM and Direwolf use it at the same time. "
+                    "PTT is by CAT. A copy of each program's settings is kept before changing them.",
+        "cfg_n1mm_auto": "N1MM+: in the Configurer choose {c}, the radio's CAT speed and the radio {m}. While N1MM+ "
+                         "is open, the other programs have no CAT; when it closes, sharing resumes by itself.",
+        "cfg_a_procurar": "Looking for the CAT speed… (read only, no transmission)",
+        "cfg_vel": "CAT speed: {b} bps.",
+        "cfg_sem_vel": "The radio did not answer at any speed. Check that it is on and CAT is enabled in the radio's "
+                       "menu, or choose the speed by hand.",
+        "usb_outros": "Other USB devices ({n})",
+        "usb_outros_expl": "Connected, but not used for radio (keyboard, mouse, USB drives…). If a radio cable or "
+                           "interface only shows up here, Linux found no serial port or sound card on it.",
+    },
+    "es": {
+        "automatica": "Automática",
+        "cfg_expl": "La radio queda compartida: WSJT-X, JTDX, Decodium, Fldigi, Not1MM y Direwolf la usan al mismo tiempo. "
+                    "El PTT es por CAT. Antes de cambiar, se guarda una copia de la configuración de cada programa.",
+        "cfg_n1mm_auto": "N1MM+: en el Configurer elija {c}, la velocidad CAT de la radio y la radio {m}. Mientras "
+                         "N1MM+ esté abierto, los demás programas no tienen CAT; al cerrarlo, la compartición vuelve sola.",
+        "cfg_a_procurar": "Buscando la velocidad CAT… (solo lectura, sin transmitir)",
+        "cfg_vel": "Velocidad CAT: {b} bps.",
+        "cfg_sem_vel": "La radio no respondió a ninguna velocidad. Compruebe que está encendida y el CAT activado en "
+                       "el menú de la radio, o elija la velocidad a mano.",
+        "usb_outros": "Otros dispositivos USB ({n})",
+        "usb_outros_expl": "Conectados, pero sin uso para la radio (teclado, ratón, memorias USB…). Si un cable o "
+                           "interfaz de radio solo aparece aquí, Linux no le encontró puerto serie ni tarjeta de sonido.",
+    },
+    "fr": {
+        "automatica": "Automatique",
+        "cfg_expl": "La radio est partagée : WSJT-X, JTDX, Decodium, Fldigi, Not1MM et Direwolf l'utilisent en même temps. "
+                    "Le PTT passe par le CAT. Une copie des réglages de chaque logiciel est gardée avant de les changer.",
+        "cfg_n1mm_auto": "N1MM+ : dans le Configurer choisissez {c}, la vitesse CAT de la radio et la radio {m}. Tant "
+                         "que N1MM+ est ouvert, les autres logiciels n'ont pas de CAT ; à sa fermeture, le partage reprend tout seul.",
+        "cfg_a_procurar": "Recherche de la vitesse CAT… (lecture seule, sans émettre)",
+        "cfg_vel": "Vitesse CAT : {b} bps.",
+        "cfg_sem_vel": "La radio n'a répondu à aucune vitesse. Vérifiez qu'elle est allumée et le CAT activé dans son "
+                       "menu, ou choisissez la vitesse à la main.",
+        "usb_outros": "Autres périphériques USB ({n})",
+        "usb_outros_expl": "Branchés, mais sans usage radio (clavier, souris, clés USB…). Si un câble ou une interface "
+                           "radio n'apparaît qu'ici, Linux n'y a trouvé ni port série ni carte son.",
+    },
+}
+for _l in TXT:
+    TXT[_l].update(TXT_CFG[_l])
+    TXT[_l].update(TXT_V10[_l])
+LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
+T = TXT.get(LINGUA, TXT["en"])
+
+sys.path.insert(0, "/usr/local/lib/logbeamos/equipamento")
+import lb_radio  # noqa: E402
+
+# --- Conhecimento: modelos (número no Hamlib, velocidade habitual), chips, SDR e GPS
+MODELOS = {
+    "IC-7300": (3073, 19200), "IC-705": (3085, 19200), "IC-9700": (3081, 19200), "IC-7610": (3078, 19200),
+    "IC-7100": (3070, 19200), "IC-7000": (3060, 19200),
+    "FT-991A": (1035, 38400), "FT-991": (1035, 38400), "FTDX10": (1042, 38400), "FT-710": (1049, 38400),
+    "FT-891": (1036, 38400), "FTDX101D": (1040, 38400), "FT-817": (1020, 38400), "FT-818": (1041, 38400),
+    "FT-857": (1022, 38400), "FT-897": (1023, 38400), "FT-450": (1027, 38400), "FT-950": (1028, 38400),
+    "FT-2000": (1029, 38400), "TS-590SG": (2037, 115200), "TS-890S": (2041, 115200), "TS-2000": (2014, 57600),
+    "TS-480": (2028, 57600), "K3": (2029, 38400), "KX3": (2045, 38400), "KX2": (2044, 38400), "K4": (2047, 38400),
+    "X6100": (3087, 19200), "G90": (3088, 19200),
+}
+FABRICANTE = {"IC": "Icom", "FT": "Yaesu", "TS": "Kenwood", "K": "Elecraft", "X": "Xiegu", "G": "Xiegu"}
+VELOCIDADES = [4800, 9600, 19200, 38400, 57600, 115200]
+CHIPS = {("10c4", "ea60"): "CP210x", ("10c4", "ea70"): "CP2105", ("10c4", "ea71"): "CP2108", ("0403", "6001"): "FTDI",
+         ("0403", "6010"): "FTDI", ("0403", "6014"): "FTDI", ("0403", "6015"): "FTDI", ("1a86", "7523"): "CH340",
+         ("1a86", "55d4"): "CH9102", ("067b", "2303"): "Prolific"}
+SDR = {("0bda", "2838"): "RTL-SDR", ("0bda", "2832"): "RTL-SDR", ("1d50", "60a1"): "Airspy", ("03eb", "800c"): "Airspy HF+",
+       ("1d50", "6089"): "HackRF One", ("04d8", "fb56"): "FUNcube Dongle Pro+", ("04d8", "fb31"): "FUNcube Dongle",
+       ("0456", "b673"): "ADALM-Pluto", ("1d50", "6108"): "LimeSDR", ("0403", "601f"): "LimeSDR Mini"}
+RE_MODELO = re.compile(r"\b(IC-?\d{3,4}[A-Z]?|FT-?DX-?\d{2,3}[A-Z]?|FT-?\d{3}[A-Z]?|TS-?\d{3}[A-Z]{0,2}|KX[23]|K[34]|X6100|G90)\b", re.I)
+
+
+def le(caminho):
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as f:
+            return f.read().strip()
+    except OSError:
+        return ""
+
+
+def normaliza(m):
+    """'IC7300' → 'IC-7300'; 'FTDX-10' → 'FTDX10'; devolve a chave de MODELOS ou o texto encontrado."""
+    m = m.upper().replace(" ", "")
+    m = re.sub(r"^(IC|FT|TS)(\d)", r"\1-\2", m)
+    m = m.replace("FT-DX", "FTDX").replace("FTDX-", "FTDX")
+    for k in MODELOS:
+        if k == m or m.startswith(k + "-"):
+            return k
+    return m
+
+
+# --- Recolha (sem root): /sys e /proc
+def portas_wine():
+    """Mesma ordem do /usr/local/lib/logbeamos/wine-env.sh: ttyUSB e depois ttyACM, a partir de COM3."""
+    lista = sorted(glob.glob("/dev/ttyUSB[0-9]*")) + sorted(glob.glob("/dev/ttyACM[0-9]*"))
+    return {p: f"COM{n}" for n, p in enumerate(lista[:10], start=3)}
+
+
+def em_uso(porta):
+    quem = set()
+    for fd in glob.glob("/proc/[0-9]*/fd/*"):
+        try:
+            if os.readlink(fd) == porta:
+                quem.add(le(fd.split("/fd/")[0] + "/comm"))
+        except OSError:
+            pass
+    return sorted(quem)
+
+
+def recolhe():
+    disp = []
+    for d in sorted(glob.glob("/sys/bus/usb/devices/*")):
+        if not os.path.exists(d + "/idVendor") or le(d + "/bDeviceClass") == "09":
+            continue
+        nome = os.path.basename(d)
+        ttys, cartas = [], []
+        for intf in sorted(glob.glob(d + "/" + nome + ":*")):
+            n = intf.rsplit(".", 1)[-1]
+            for t in glob.glob(intf + "/ttyUSB*") + glob.glob(intf + "/tty/tty*"):
+                ttys.append((int(n) if n.isdigit() else 0, "/dev/" + os.path.basename(t)))
+            for c in glob.glob(intf + "/sound/card*"):
+                cartas.append(os.path.basename(c)[4:])
+        disp.append({
+            "id": nome, "pai": nome.rsplit(".", 1)[0] if "." in nome else nome.split("-")[0],
+            "vid": le(d + "/idVendor"), "pid": le(d + "/idProduct"), "fab": le(d + "/manufacturer"),
+            "prod": le(d + "/product"), "serie": le(d + "/serial"), "ttys": sorted(ttys),
+            "cartas": sorted(set(cartas)), "bus": le(d + "/busnum"), "dev": le(d + "/devnum"),
+        })
+    cartas = {}
+    for c in glob.glob("/proc/asound/card[0-9]*"):
+        n = c.rsplit("card", 1)[1]
+        cartas[n] = le(c + "/id")
+    nomes = {}
+    for linha in le("/proc/asound/cards").splitlines():
+        m = re.match(r"\s*(\d+)\s+\[[^\]]*\]:\s*.*? - (.*)", linha)
+        if m:
+            nomes[m.group(1)] = m.group(2).strip()
+    return disp, cartas, nomes
+
+
+def assinatura():
+    return sorted(glob.glob("/sys/bus/usb/devices/*")) + sorted(glob.glob("/dev/tty[UA][SC][BM]*")) + \
+        sorted(glob.glob("/proc/asound/card[0-9]*"))
+
+
+def restantes(disp, sdrs, outros):
+    """Aparelhos USB sem uso no rádio: sem porta série nem som, e que não são SDR nem GPS (teclado, rato, pens…)."""
+    usados = {d["id"] for _, d in sdrs} | {d["id"] for _, d in outros}
+    return [d for d in disp if not d["ttys"] and not d["cartas"] and d["id"] not in usados]
+
+
+def classifica(disp, cartas, nomes):
+    """Agrupa por aparelho: um rádio com hub interno (CAT + som) aparece como um só."""
+    radios, sons, sdrs, outros = [], [], [], []
+    som_usb = {}
+    for d in disp:
+        for c in d["cartas"]:
+            som_usb[c] = d
+    por_pai = {}
+    for d in disp:
+        por_pai.setdefault(d["pai"], []).append(d)
+    usados = set()
+    for d in disp:
+        chave = (d["vid"], d["pid"])
+        texto = " ".join([d["fab"], d["prod"], d["serie"]])
+        if chave in SDR or d["vid"] == "1df7":
+            sdrs.append((SDR.get(chave, "SDRplay"), d))
+            continue
+        if d["vid"] == "1546" or re.search(r"GPS|GNSS", texto, re.I):
+            outros.append(("gps", d))
+            continue
+        if not d["ttys"]:
+            continue
+        m = RE_MODELO.search(texto)
+        irmaos = [x for x in por_pai.get(d["pai"], []) if x is not d and x["cartas"]] if "." in d["id"] else []
+        som = None
+        if d["cartas"]:
+            som = d["cartas"][0]
+        elif irmaos:
+            som = irmaos[0]["cartas"][0]
+            usados.add(irmaos[0]["id"])
+        tipo = "radio" if m else ("yaesu" if chave == ("10c4", "ea70") else "chip")
+        if not m and chave == ("10c4", "ea60") and irmaos and irmaos[0]["vid"] == "0d8c":
+            tipo = "digirig"
+        if d["vid"] == "0c26":
+            tipo = "radio"
+        radios.append({"d": d, "tipo": tipo, "modelo": normaliza(m.group(1)) if m else "", "som": som,
+                       "chip": CHIPS.get(chave, d["prod"] or f"{d['vid']}:{d['pid']}")})
+        if d["cartas"]:
+            usados.add(d["id"])
+    for n in sorted(cartas, key=int):
+        d = som_usb.get(n)
+        if d and d["id"] in usados:
+            continue
+        if d and d["vid"] == "08bb" and d["pid"] == "2904":
+            sons.append((nomes.get(n, cartas[n]), "signalink"))
+        elif d:
+            sons.append((nomes.get(n, cartas[n]), "usb"))
+        else:
+            sons.append((nomes.get(n, cartas[n]), "pc"))
+    return radios, sons, sdrs, outros
+
+
+# --- Teste do CAT: só lê a frequência (nunca PTT)
+def le_frequencia(modelo, porta, velocidade):
+    cmd = ["rigctl", "-m", str(modelo), "-r", porta, "-s", str(velocidade), *lb_radio.opcoes_serie(modelo),
+           "-C", "timeout=800", "-C", "retry=0", "f"]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+    except subprocess.TimeoutExpired:
+        return None
+    m = re.search(r"^(\d{4,})$", r.stdout, re.M)
+    return int(m.group(1)) if m and r.returncode == 0 else None
+
+
+def mhz(hz):
+    t = f"{hz / 1e6:.4f}".rstrip("0").rstrip(".")
+    return (t.replace(".", ",") if LINGUA in ("pt", "es", "fr") else t) + " MHz"
+
+
+def ordem_velocidades(primeira=None):
+    """A velocidade indicada (escolhida ou a habitual do modelo) primeiro, depois as outras, das mais usadas às menos."""
+    return ([primeira] if primeira else []) + [v for v in lb_radio.VELOCIDADES if v != primeira]
+
+
+def descobre_velocidade(modelo, porta, primeira=None):
+    """Experimenta as velocidades até o rádio responder (só lê a frequência). Devolve (velocidade, frequência)."""
+    for v in ordem_velocidades(primeira):
+        f = le_frequencia(modelo, porta, v)
+        if f:
+            return v, f
+    return None, None
+
+
+def testa_cat(modelo, porta, velocidade=None, habitual=None):
+    """Com velocidade escolhida, tenta essa e depois as outras; com velocidade automática (None), começa pela
+    habitual do modelo."""
+    quem = em_uso(porta)
+    if quem == ["rigctld"] and lb_radio.partilha_activa():
+        f = lb_radio.frequencia_partilha(4)
+        return T["ok_partilha"].format(f=mhz(f)) if f else T["falhou"]
+    if quem:
+        return T["ocupada"].format(q=", ".join(quem))
+    v, f = descobre_velocidade(modelo, porta, velocidade or habitual)
+    if not f:
+        return T["falhou"]
+    if velocidade and v == velocidade:
+        return T["ok_cat"].format(f=mhz(f))
+    return T["ok_vel"].format(b=v, f=mhz(f))
+
+
+def tem_dialout():
+    try:
+        return grp.getgrnam("dialout").gr_gid in os.getgroups()
+    except KeyError:
+        return True
+
+
+def sdr_bloqueado():
+    return os.path.exists("/sys/module/dvb_usb_rtl28xxu")
+
+
+# --- Janela
+def janela():
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import GLib, Gtk
+
+    def etiqueta(texto, marca=False, cor=None):
+        l = Gtk.Label(xalign=0, wrap=True, selectable=True, can_focus=False)  # copiável, sem ficar seleccionado ao abrir
+        t = GLib.markup_escape_text(texto)
+        if marca:
+            t = f"<b>{t}</b>"
+        if cor:
+            t = f"<span foreground='{cor}'>{t}</span>"
+        l.set_markup(t)
+        return l
+
+    class Janela(Gtk.Window):
+        def __init__(self):
+            super().__init__(title=T["titulo"])
+            self.set_default_size(780, 600)
+            self.set_border_width(14)
+            ic = "/usr/share/logbeamos/equipamento.png"
+            if os.path.exists(ic):
+                self.set_icon_from_file(ic)
+            caixa = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            self.add(caixa)
+            l = Gtk.Label(xalign=0)
+            l.set_markup(f"<span size='x-large' weight='bold'>{T['titulo']}</span>")
+            caixa.pack_start(l, False, False, 0)
+            caixa.pack_start(Gtk.Label(label=T["sub"], xalign=0), False, False, 0)
+            rol = Gtk.ScrolledWindow(vexpand=True)
+            self.corpo = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            rol.add(self.corpo)
+            caixa.pack_start(rol, True, True, 0)
+            self.ass = None
+            self.resto_aberto = False
+            self.actualiza()
+            GLib.timeout_add_seconds(2, self.actualiza)
+            self.connect("destroy", Gtk.main_quit)
+
+        def seccao(self, titulo):
+            l = Gtk.Label(xalign=0)
+            l.set_markup(f"<span size='large' weight='bold'>{GLib.markup_escape_text(titulo)}</span>")
+            l.set_margin_top(8)
+            self.corpo.pack_start(l, False, False, 0)
+
+        def cartao(self):
+            q = Gtk.Frame()
+            b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            b.set_border_width(10)
+            q.add(b)
+            self.corpo.pack_start(q, False, False, 0)
+            return b
+
+        def actualiza(self):
+            a = assinatura()
+            if a == self.ass:
+                return True
+            self.ass = a
+            for c in self.corpo.get_children():
+                self.corpo.remove(c)
+            disp, cartas, nomes = recolhe()
+            radios, sons, sdrs, outros = classifica(disp, cartas, nomes)
+            com = portas_wine()
+            if not any(d for d in disp):
+                self.corpo.pack_start(etiqueta(T["nada"]), False, False, 0)
+
+            if radios:
+                self.seccao(T["radios"])
+            for r in radios:
+                d, b = r["d"], self.cartao()
+                if r["tipo"] == "radio" and r["modelo"]:
+                    pre = r["modelo"].split("-")[0].rstrip("0123456789") or r["modelo"][:2]
+                    titulo = f"{FABRICANTE.get(pre, FABRICANTE.get(pre[:2], ''))} {r['modelo']}".strip()
+                elif r["tipo"] == "radio":
+                    titulo = "Icom"
+                elif r["tipo"] == "yaesu":
+                    titulo = T["yaesu"]
+                elif r["tipo"] == "digirig":
+                    titulo = T["digirig"]
+                else:
+                    titulo = T["chip"].format(c=r["chip"])
+                b.pack_start(etiqueta(titulo, True), False, False, 0)
+                ttys = [p for _, p in d["ttys"]]
+                if r["tipo"] == "yaesu" and len(ttys) >= 2:
+                    b.pack_start(etiqueta(T["porta_cat"].format(p=ttys[0], c=com.get(ttys[0], "—"))), False, False, 0)
+                    b.pack_start(etiqueta(T["porta_ptt"].format(p=ttys[1], c=com.get(ttys[1], "—"))), False, False, 0)
+                else:
+                    for p in ttys:
+                        b.pack_start(etiqueta(T["porta"].format(p=p, c=com.get(p, "—"))), False, False, 0)
+                cat = ttys[0] if ttys else None
+                info = MODELOS.get(r["modelo"])
+                if cat and info:
+                    b.pack_start(etiqueta(T["nativos"].format(m=r["modelo"], p=cat, b=info[1])), False, False, 0)
+                elif cat:
+                    b.pack_start(etiqueta(T["nativos_sem"].format(p=cat)), False, False, 0)
+                if r["som"] is not None:
+                    b.pack_start(etiqueta(T["som_radio"].format(n=nomes.get(r["som"], cartas.get(r["som"], "")))),
+                                 False, False, 0)
+                if cat:
+                    b.pack_start(self.teste(cat, r["modelo"]), False, False, 0)
+                    cfg = lb_radio.configuracao()
+                    if cfg and os.path.realpath(cfg.get("porta", "")) == os.path.realpath(cat):
+                        if lb_radio.partilha_activa():
+                            b.pack_start(etiqueta("✔ " + T["partilhado"].format(m=cfg["nome"], b=cfg["velocidade"]),
+                                                  cor="#2ea043"), False, False, 0)
+                        else:
+                            b.pack_start(etiqueta(T["partilha_parada"].format(m=cfg["nome"]), cor="#d29922"),
+                                         False, False, 0)
+                    lin = Gtk.Box(spacing=8)
+                    bc = Gtk.Button(label=T["configurar"])
+                    bc.connect("clicked", lambda _b, c=cat, r=r: self.configurar(c, r, com.get(c, "—")))
+                    lin.pack_start(bc, False, False, 0)
+                    if cfg and os.path.realpath(cfg.get("porta", "")) == os.path.realpath(cat):
+                        bd = Gtk.Button(label=T["desligar_partilha"])
+                        bd.connect("clicked", lambda _b: (lb_radio.desliga_partilha(), self.refaz()))
+                        lin.pack_start(bd, False, False, 0)
+                    b.pack_start(lin, False, False, 0)
+
+            if sons:
+                self.seccao(T["som"])
+            for nome, tipo in sons:
+                b = self.cartao()
+                b.pack_start(etiqueta(nome, True), False, False, 0)
+                b.pack_start(etiqueta(T["signalink"] if tipo == "signalink" else
+                                      T["som_usb"] if tipo == "usb" else T["som_pc"]), False, False, 0)
+
+            if sdrs:
+                self.seccao(T["sdr"])
+            for nome, d in sdrs:
+                b = self.cartao()
+                b.pack_start(etiqueta(nome + (f" · {d['prod']}" if d["prod"] and d["prod"] not in nome else ""), True),
+                             False, False, 0)
+                b.pack_start(etiqueta(T["sdr_uso"]), False, False, 0)
+                if nome == "RTL-SDR" and sdr_bloqueado():
+                    b.pack_start(etiqueta(T["sdr_tv"], cor="#d29922"), False, False, 0)
+                no = f"/dev/bus/usb/{int(d['bus'] or 0):03d}/{int(d['dev'] or 0):03d}"
+                if os.path.exists(no) and not os.access(no, os.R_OK | os.W_OK):
+                    b.pack_start(etiqueta(T["sem_acesso"], cor="#d29922"), False, False, 0)
+
+            if outros:
+                self.seccao(T["outros"])
+            for tipo, d in outros:
+                b = self.cartao()
+                b.pack_start(etiqueta(d["prod"] or T["outro"], True), False, False, 0)
+                b.pack_start(etiqueta(T["gps"]), False, False, 0)
+                for _, p in d["ttys"]:
+                    b.pack_start(etiqueta(T["gps_porta"].format(p=p)), False, False, 0)
+
+            resto = restantes(disp, sdrs, outros)
+            if resto:
+                exp = Gtk.Expander(label=T["usb_outros"].format(n=len(resto)), expanded=self.resto_aberto)
+                exp.connect("notify::expanded", lambda e, _p: setattr(self, "resto_aberto", e.get_expanded()))
+                exp.set_margin_top(8)
+                b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+                b.set_border_width(10)
+                b.pack_start(etiqueta(T["usb_outros_expl"]), False, False, 0)
+                for d in resto:
+                    nome = " ".join(x for x in (d["fab"], d["prod"]) if x) or T["outro"]
+                    b.pack_start(etiqueta(f"• {nome}  ({d['vid']}:{d['pid']})"), False, False, 0)
+                exp.add(b)
+                self.corpo.pack_start(exp, False, False, 0)
+
+            self.seccao(T["verif"])
+            b = self.cartao()
+            if tem_dialout():
+                b.pack_start(etiqueta("✔ " + T["dialout_ok"], cor="#2ea043"), False, False, 0)
+            else:
+                lin = Gtk.Box(spacing=8)
+                lin.pack_start(etiqueta("✖ " + T["dialout_mal"], cor="#d29922"), False, False, 0)
+                bt = Gtk.Button(label=T["corrigir"])
+                bt.connect("clicked", self.corrige_dialout)
+                lin.pack_end(bt, False, False, 0)
+                b.pack_start(lin, False, False, 0)
+            if com:
+                b.pack_start(etiqueta(T["wine"]), False, False, 0)
+            self.corpo.show_all()
+            return True
+
+        def teste(self, porta, modelo):
+            caixa = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            lin = Gtk.Box(spacing=8)
+            lin.pack_start(Gtk.Label(label=T["modelo"]), False, False, 0)
+            cm = Gtk.ComboBoxText()
+            for k in sorted(MODELOS):
+                cm.append(k, k)
+            cm.set_active_id(modelo if modelo in MODELOS else "IC-7300")
+            lin.pack_start(cm, False, False, 0)
+            lin.pack_start(Gtk.Label(label=T["velocidade"]), False, False, 0)
+            cv = Gtk.ComboBoxText()
+            cv.append("auto", T["automatica"])
+            for v in VELOCIDADES:
+                cv.append(str(v), str(v))
+            cv.set_active_id("auto")
+            lin.pack_start(cv, False, False, 0)
+            bt = Gtk.Button(label=T["testar"])
+            lin.pack_start(bt, False, False, 0)
+            res = etiqueta("")
+            caixa.pack_start(lin, False, False, 0)
+            caixa.pack_start(res, False, False, 0)
+
+            def corre(_):
+                bt.set_sensitive(False)
+                res.set_text(T["a_testar"])
+                m, habitual = MODELOS[cm.get_active_id()]
+                v = None if cv.get_active_id() == "auto" else int(cv.get_active_id())
+
+                def trabalho():
+                    t = testa_cat(m, porta, v, habitual)
+                    GLib.idle_add(lambda: (res.set_text(t), bt.set_sensitive(True), False)[2])
+
+                threading.Thread(target=trabalho, daemon=True).start()
+
+            bt.connect("clicked", corre)
+            return caixa
+
+        def refaz(self):
+            self.ass = None
+            self.actualiza()
+
+        def configurar(self, porta, r, com):
+            """Diálogo: rádio, velocidade, som e programas; liga a partilha e configura os programas."""
+            dlg = Gtk.Dialog(title=T["cfg_titulo"], transient_for=self, modal=True)
+            dlg.set_default_size(560, -1)
+            bt_cancelar = dlg.add_button(T["cancelar"], Gtk.ResponseType.CANCEL)
+            bt_ok = dlg.add_button(T["cfg_btn"], Gtk.ResponseType.OK)
+            bt_ok.get_style_context().add_class("suggested-action")
+            area = dlg.get_content_area()
+            area.set_spacing(8)
+            area.set_border_width(12)
+            area.pack_start(etiqueta(T["cfg_expl"]), False, False, 0)
+
+            grelha = Gtk.Grid(column_spacing=10, row_spacing=8)
+            area.pack_start(grelha, False, False, 0)
+            # Rádio: todos os modelos do Hamlib, com procura ao escrever
+            modelos = lb_radio.modelos_hamlib()
+            cm = Gtk.ComboBoxText.new_with_entry()
+            for n, nome in modelos:
+                cm.append(str(n), nome)
+            num = MODELOS.get(r["modelo"], (None, None))[0]
+            cfg = lb_radio.configuracao()
+            if cfg and os.path.realpath(cfg.get("porta", "")) == os.path.realpath(porta):
+                num = cfg["modelo"]
+            if num:
+                cm.set_active_id(str(num))
+            comp = Gtk.EntryCompletion(model=cm.get_model())
+            comp.set_text_column(0)
+            comp.set_match_func(lambda c, chave, it: chave.lower() in (c.get_model()[it][0] or "").lower())
+            cm.get_child().set_completion(comp)
+            cm.set_hexpand(True)
+            grelha.attach(Gtk.Label(label=T["cfg_radio"], xalign=1), 0, 0, 1, 1)
+            grelha.attach(cm, 1, 0, 1, 1)
+            cv = Gtk.ComboBoxText()
+            cv.append("auto", T["automatica"])
+            for v in VELOCIDADES:
+                cv.append(str(v), str(v))
+            # A velocidade que já estava configurada para este rádio; de resto, automática
+            cv.set_active_id(str(cfg["velocidade"]) if cfg and cfg.get("modelo") == num else "auto")
+            grelha.attach(Gtk.Label(label=T["velocidade"], xalign=1), 0, 1, 1, 1)
+            grelha.attach(cv, 1, 1, 1, 1)
+            grelha.attach(Gtk.Label(label=T["cfg_porta"], xalign=1), 0, 2, 1, 1)
+            grelha.attach(etiqueta(f"{lb_radio.porta_fixa(porta)}  ({porta} · {com})"), 1, 2, 1, 1)
+            cs = Gtk.ComboBoxText()
+            cs.append("nao", T["cfg_som_nao"])
+            if r["som"] is not None:
+                _, cartas, nomes = recolhe()
+                cs.append(str(r["som"]), nomes.get(r["som"], cartas.get(r["som"], r["som"])))
+                cs.set_active_id(str(r["som"]))
+            else:
+                cs.set_active_id("nao")
+            grelha.attach(Gtk.Label(label=T["cfg_som"], xalign=1), 0, 3, 1, 1)
+            grelha.attach(cs, 1, 3, 1, 1)
+            grelha.attach(Gtk.Label(label=T["cfg_programas"], xalign=1, yalign=0), 0, 4, 1, 1)
+            caixas = {}
+            cp = Gtk.Box(spacing=12)
+            for chave, nome, _ in lb_radio.PROGRAMAS:
+                caixas[chave] = Gtk.CheckButton(label=nome, active=True)
+                cp.pack_start(caixas[chave], False, False, 0)
+            grelha.attach(cp, 1, 4, 1, 1)
+            notas = etiqueta("")
+            area.pack_start(notas, False, False, 0)
+            resultado = etiqueta("")
+            area.pack_start(resultado, False, False, 0)
+
+            def modelo_escolhido():
+                i = cm.get_active_id()
+                if i:
+                    return int(i)
+                texto = cm.get_child().get_text().strip().lower()
+                for n, nome in modelos:
+                    if nome.lower() == texto:
+                        return n
+                return None
+
+            def actualiza_notas(*_, vel=None):
+                if com == "—":  # porta sem COM no Wine: o N1MM+ e o Log4OM não a vêem
+                    notas.set_text("")
+                    return
+                n = modelo_escolhido()
+                nome = next((x for k, x in modelos if k == n), "—")
+                b = vel or (None if cv.get_active_id() == "auto" else cv.get_active_id())
+                n1mm = T["cfg_n1mm"].format(c=com, b=b, m=nome) if b else T["cfg_n1mm_auto"].format(c=com, m=nome)
+                notas.set_text(n1mm + "\n" + T["cfg_log4om"].format(c=com))
+            cm.connect("changed", actualiza_notas)
+            cv.connect("changed", actualiza_notas)
+            actualiza_notas()
+            dlg.show_all()
+
+            while True:
+                resp = dlg.run()
+                if resp != Gtk.ResponseType.OK:
+                    break
+                n = modelo_escolhido()
+                if not n:
+                    resultado.set_text(T["cfg_modelo_mal"])
+                    continue
+                progs = [k for k, c in caixas.items() if c.get_active()]
+                abertos = [nome for k, nome, _ in lb_radio.PROGRAMAS if k in progs and nome in lb_radio.abertos()]
+                if abertos:
+                    resultado.set_text(T["cfg_abertos"].format(p=", ".join(abertos)))
+                    continue
+                carta = None if cs.get_active_id() == "nao" else cs.get_active_id()
+                auto = cv.get_active_id() == "auto"
+                resultado.set_text(T["cfg_a_procurar"] if auto else T["cfg_a_fazer"])
+                bt_ok.set_sensitive(False)
+                bt_cancelar.set_sensitive(False)
+                fim = {}
+
+                def trabalho():
+                    try:
+                        vel = None if auto else int(cv.get_active_id())
+                        if auto:
+                            # A partilha antiga larga a porta enquanto se procura; se nada responder, volta como estava
+                            activa = lb_radio.partilha_activa()
+                            if activa:
+                                lb_radio.systemctl("stop", lb_radio.SERVICO)
+                            habitual = next((h for k, (m, h) in MODELOS.items() if m == n), None)
+                            vel, _f = descobre_velocidade(n, porta, habitual)
+                            if not vel:
+                                if activa:
+                                    lb_radio.systemctl("start", lb_radio.SERVICO)
+                                fim["sem_vel"] = True
+                        if vel:
+                            fim["vel"] = vel
+                            fim["r"] = lb_radio.configura(n, porta, vel, progs, carta)
+                    except Exception as e:
+                        fim["e"] = str(e)
+                    GLib.idle_add(Gtk.main_quit)
+
+                threading.Thread(target=trabalho, daemon=True).start()
+                Gtk.main()  # espera sem bloquear a janela
+                if fim.get("sem_vel"):
+                    resultado.set_text(T["cfg_sem_vel"])
+                    bt_ok.set_sensitive(True)
+                    bt_cancelar.set_sensitive(True)
+                    continue
+                if "e" in fim:
+                    resultado.set_text(T["cfg_erro"].format(p="rigctld", e=fim["e"]))
+                else:
+                    nome, _fixa, f, res = fim["r"]
+                    nomes = {k: x for k, x, _ in lb_radio.PROGRAMAS}
+                    linhas = [T["cfg_freq"].format(f=mhz(f)) if f else T["cfg_sem_freq"], T["cfg_vel"].format(b=fim["vel"])]
+                    actualiza_notas(vel=fim["vel"])
+                    for k, ok, det in res:
+                        if ok:
+                            linhas.append("✔ " + (T["cfg_com_som"] if det == "som" else T["cfg_sem_som"]).format(p=nomes[k]))
+                        else:
+                            linhas.append("✖ " + T["cfg_erro"].format(p=nomes[k], e=det))
+                    resultado.set_text("\n".join(linhas))
+                bt_ok.hide()
+                bt_cancelar.set_label(T["fechar"])
+                bt_cancelar.set_sensitive(True)
+            dlg.destroy()
+            self.refaz()
+
+        def corrige_dialout(self, bt):
+            u = os.environ.get("USER") or os.getlogin()
+            cmd = ["sudo", "-n", "usermod", "-aG", "dialout", u]
+            if subprocess.run(["sudo", "-n", "true"], capture_output=True).returncode:
+                cmd = ["pkexec", "usermod", "-aG", "dialout", u]
+            if subprocess.run(cmd).returncode == 0:
+                bt.get_parent().get_children()[0].set_text(T["corrigido"])
+                bt.set_sensitive(False)
+
+    Janela().show_all()
+    Gtk.main()
+
+
+if __name__ == "__main__":
+    if "--texto" in sys.argv:  # para ensaios: o mesmo resultado, sem janela
+        disp, cartas, nomes = recolhe()
+        rad, sons, sdrs, outros = classifica(disp, cartas, nomes)
+        print("portas COM:", portas_wine())
+        for r in rad:
+            print("rádio:", r["tipo"], r["modelo"], r["chip"], r["d"]["ttys"], "som", r["som"])
+        print("som:", sons)
+        print("sdr:", [(n, d["id"]) for n, d in sdrs])
+        print("outros:", [(t, d["prod"]) for t, d in outros])
+        print("outros USB:", [(d["fab"], d["prod"], f"{d['vid']}:{d['pid']}") for d in restantes(disp, sdrs, outros)])
+        print("dialout:", tem_dialout())
+        cfg = lb_radio.configuracao()
+        print("partilha:", cfg, "activa" if lb_radio.partilha_activa() else "parada")
+    elif "--configurar" in sys.argv:
+        # para ensaios: logbeamos-equipamento --configurar MODELO PORTA VELOCIDADE|auto [CARTA_SOM|-] [programa,…]
+        a = sys.argv[sys.argv.index("--configurar") + 1:]
+        progs = a[4].split(",") if len(a) > 4 else [k for k, _, _ in lb_radio.PROGRAMAS]
+        carta = a[3] if len(a) > 3 and a[3] != "-" else None
+        vel = None if a[2] == "auto" else int(a[2])
+        if vel is None:
+            vel, _f = descobre_velocidade(int(a[0]), a[1])
+            print("velocidade encontrada:", vel)
+            if not vel:
+                sys.exit(1)
+        nome, fixa, f, res = lb_radio.configura(int(a[0]), a[1], vel, progs, carta)
+        print("rádio:", nome, fixa, "frequência:", f)
+        for r in res:
+            print("programa:", *r)
+    elif "--desligar-partilha" in sys.argv:
+        lb_radio.desliga_partilha()
+    else:
+        janela()

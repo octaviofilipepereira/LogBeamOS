@@ -1,0 +1,103 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: "Manual do LogBeamOS". Janela própria (WebKit) com o manual na língua da sessão, sem precisar de
+# Internet. Os botões do manual são ligações "logbeamos:nome" e abrem as ferramentas desta lista fechada (nunca um
+# comando que venha da página). As ligações para fora (http/https) abrem no navegador.
+# Sem o WebKit, abre o manual no navegador (os botões não funcionam aí).
+import glob
+import os
+import subprocess
+import sys
+
+PASTA = "/usr/share/logbeamos/manual"
+ICONE = "/usr/share/logbeamos/manual.png"
+LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
+if LINGUA not in ("pt", "en", "es", "fr"):
+    LINGUA = "en"
+TITULO = {"pt": "Manual do LogBeamOS", "en": "LogBeamOS Manual", "es": "Manual de LogBeamOS",
+          "fr": "Manuel de LogBeamOS"}[LINGUA]
+
+ACCOES = {
+    "equipamento": ["logbeamos-equipamento"],
+    "actualizar": ["logbeamos-actualizar"],
+    "monitor": ["gnome-system-monitor"],
+    "xastir": ["logbeamos-xastir"],
+    "direwolf": ["x-terminal-emulator", "-e", "logbeamos-direwolf"],
+    "antes": ["xdg-open", "/usr/share/logbeamos/antes-de-instalar.html"],
+}
+
+
+def pasta_programas():
+    """A pasta dos programas de rádio no ambiente de trabalho (encontrada pelo ficheiro .logbeamos-radio)."""
+    r = subprocess.run(["xdg-user-dir", "DESKTOP"], capture_output=True, text=True)
+    d = r.stdout.strip() or os.path.expanduser("~/Desktop")
+    for m in glob.glob(os.path.join(d, "*", ".logbeamos-radio")):
+        return os.path.dirname(m)
+    return d
+
+
+def faz(accao):
+    if accao == "programas":
+        cmd = ["xdg-open", pasta_programas()]
+    elif accao in ACCOES:
+        cmd = ACCOES[accao]
+    else:
+        return
+    try:
+        subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except OSError:
+        pass
+
+
+def pagina(lingua):
+    return os.path.join(PASTA, f"manual-{lingua}.html")
+
+
+def main():
+    try:
+        import gi
+        gi.require_version("Gtk", "3.0")
+        gi.require_version("WebKit2", "4.1")
+        from gi.repository import Gtk, WebKit2
+    except (ImportError, ValueError):
+        os.execvp("xdg-open", ["xdg-open", pagina(LINGUA)])
+
+    w = Gtk.Window(title=TITULO)
+    w.set_default_size(980, 760)
+    if os.path.exists(ICONE):
+        w.set_icon_from_file(ICONE)
+    v = WebKit2.WebView()
+    s = v.get_settings()
+    s.set_enable_javascript(False)
+    s.set_enable_developer_extras(False)
+
+    def decide(_v, decisao, tipo):
+        if tipo not in (WebKit2.PolicyDecisionType.NAVIGATION_ACTION, WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION):
+            return False
+        uri = decisao.get_navigation_action().get_request().get_uri()
+        if uri.startswith("logbeamos:"):
+            faz(uri.split(":", 1)[1].strip("/"))
+            decisao.ignore()
+            return True
+        if uri.startswith(("http://", "https://")):
+            subprocess.Popen(["xdg-open", uri], start_new_session=True)
+            decisao.ignore()
+            return True
+        if uri.startswith("file://") and not uri[7:].split("#")[0].startswith(PASTA + "/"):
+            decisao.ignore()  # só as páginas do manual
+            return True
+        return False
+
+    v.connect("decide-policy", decide)
+    v.connect("context-menu", lambda *_: True)  # sem menu de contexto (recarregar, inspeccionar…)
+    v.load_uri("file://" + pagina(LINGUA))
+    w.add(v)
+    w.connect("destroy", Gtk.main_quit)
+    w.show_all()
+    Gtk.main()
+
+
+if __name__ == "__main__":
+    main()

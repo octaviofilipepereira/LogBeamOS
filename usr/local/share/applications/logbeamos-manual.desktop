@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=LogBeamOS Manual
+Name[pt]=Manual do LogBeamOS
+Name[es]=Manual de LogBeamOS
+Name[fr]=Manuel de LogBeamOS
+Comment=First steps, connecting the radio, which program for what, updating, Windows
+Comment[pt]=Primeiros passos, ligar o rádio, que programa para quê, actualizar, Windows
+Comment[es]=Primeros pasos, conectar la radio, qué programa para qué, actualizar, Windows
+Comment[fr]=Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, Windows
+Exec=logbeamos-manual
+Icon=/usr/share/logbeamos/manual.png
+Terminal=false
+Categories=HamRadio;Documentation;

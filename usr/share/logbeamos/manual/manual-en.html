@@ -1,0 +1,141 @@
+<!doctype html>
+<!--
+  Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+  © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+  Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LogBeamOS Manual</title>
+<link rel="stylesheet" href="manual.css">
+</head>
+<body>
+<main>
+<header>
+  <img src="logbeam.png" alt="">
+  <div><h1>LogBeamOS Manual</h1><p class="nota">Linux distribution for radio amateurs</p></div>
+</header>
+<nav class="linguas"><a href="manual-pt.html">Português</a><strong>English</strong><a href="manual-es.html">Español</a><a href="manual-fr.html">Français</a></nav>
+<nav class="indice">
+  <a href="#inicio">1. First steps</a>
+  <a href="#radio">2. Connecting the radio</a>
+  <a href="#programas">3. Which program for what</a>
+  <a href="#actualizar">4. Updating</a>
+  <a href="#windows">5. Alongside Windows</a>
+  <a href="#problemas">6. Common problems</a>
+</nav>
+
+<section id="inicio">
+<h2>1. First steps</h2>
+<ul>
+  <li>LogBeamOS starts from the USB drive without installing anything on the computer. On the first start you are asked whether you want your own user and password; without them, the session opens by itself.</li>
+  <li>What you do on the USB drive (settings, logs, files) is kept on it and is still there the next time you start.</li>
+  <li>On the desktop: the <strong>Ham Radio Programs</strong> folder (every program), <strong>Radio and Equipment</strong>, <strong>Update LogBeamOS</strong>, <strong>LogBeam Uplink</strong> and this manual. The programs are also in the menu, in the <em>Hamradio</em> group.</li>
+  <li>To switch off: menu → red button. Do not remove the USB drive while LogBeamOS is running.</li>
+</ul>
+<p><a class="botao" href="logbeamos:programas">Open the Ham Radio Programs</a></p>
+</section>
+
+<section id="radio">
+<h2>2. Connecting the radio</h2>
+<ol>
+  <li><strong>Connect the radio by USB.</strong> For most radios there is no driver to install: Linux already has it.</li>
+  <li><strong>Open Radio and Equipment.</strong> It shows the radio, the CAT port, the radio's sound card and the matching COM port for N1MM+ and Log4OM.</li>
+  <li><strong>Test CAT:</strong> choose the model; with the speed set to <em>Automatic</em>, it looks for the speed the radio answers at. The test only reads the frequency: it never transmits.</li>
+  <li><strong>Set up the programs…:</strong> choose the radio from the list and press <em>Set up</em>. WSJT-X, JTDX, Fldigi, Not1MM and Direwolf then use the radio at the same time, with the radio's sound and PTT by CAT. A copy of each program's settings is kept before changing them.</li>
+  <li><strong>N1MM+ and Log4OM:</strong> in each one's CAT settings, choose the COM port shown in Radio and Equipment. While N1MM+ is open, the other programs have no CAT; when it closes, they get it back.</li>
+</ol>
+<p class="nota">The CAT speed must be the same in the radio's menu (for example, <em>CAT RATE</em> on Yaesu radios).</p>
+<p><a class="botao" href="logbeamos:equipamento">Open Radio and Equipment</a></p>
+</section>
+
+<section id="programas">
+<h2>3. Which program for what</h2>
+<table>
+  <tr><th>For…</th><th>Program</th></tr>
+  <tr><td>FT8, FT4, WSPR</td><td>WSJT-X or JTDX · with FT2: Decodium · map of the stations heard: GridTracker2</td></tr>
+  <tr><td>Weak-signal keyboard messaging</td><td>JS8Call</td></tr>
+  <tr><td>RTTY, PSK, Olivia and other digital modes</td><td>Fldigi (with Flrig, Flmsg and Flamp)</td></tr>
+  <tr><td>Contests</td><td>N1MM+ (the Windows one, through Wine) or Not1MM</td></tr>
+  <tr><td>Logbook</td><td>Log4OM (through Wine), CQRLOG or KLog · upload to logbeam.org: LogBeam Uplink · upload to Wavelog: WaveLogGate</td></tr>
+  <tr><td>APRS</td><td>Direwolf (the sound card modem) and Xastir (the map); Xastir starts Direwolf by itself and connects to it</td></tr>
+  <tr><td>Winlink (e-mail over radio)</td><td>Pat</td></tr>
+  <tr><td>Satellites</td><td>Gpredict (predictions and tracking) · weather satellite images: SatDump</td></tr>
+  <tr><td>SDR receivers</td><td>Gqrx or SDR++ · experiments: GNU Radio</td></tr>
+  <tr><td>Digital voice and pictures</td><td>FreeDV · SSTV: QSSTV</td></tr>
+  <tr><td>Remote Icom and Kenwood radios</td><td>wfview</td></tr>
+  <tr><td>Programming DMR radios</td><td>qdmr</td></tr>
+  <tr><td>DMR without a radio (BrandMeister)</td><td>VoxDMR (optional: installed by <a href="logbeamos:actualizar">Update LogBeamOS</a>; asks for your DMR ID and BrandMeister hotspot password)</td></tr>
+  <tr><td>EchoLink</td><td>Qtel (the router must let UDP ports 5198–5199 and TCP port 5200 through, or use an EchoLink proxy)</td></tr>
+  <tr><td>Antenna modelling</td><td>xnec2c</td></tr>
+  <tr><td>Band analysis</td><td>4ham Spectrum Analysis</td></tr>
+</table>
+<p class="nota">In Xastir, before transmitting: enter your callsign (Xastir asks for it the first time), change <em>MYCALL</em> in the <code>direwolf.conf</code> file in your home folder and turn transmitting on under <em>Interfaces</em>. By default, Xastir only receives.</p>
+<p><a class="botao" href="logbeamos:xastir">Open Xastir (APRS)</a> <a class="botao" href="logbeamos:programas">Open the Ham Radio Programs</a></p>
+</section>
+
+<section id="actualizar">
+<h2>4. Updating</h2>
+<ul>
+  <li><strong>Update LogBeamOS</strong> lists the radio programs and the operating system, with the installed version, the available one and the download size.</li>
+  <li>The LogBeamOS tools (this updater, <strong>Radio and Equipment</strong> and this manual) and <strong>LogBeam Uplink</strong> are also updated here. They come from the LogBeamOS repository at logbeam.org, which is signed.</li>
+  <li>Tick what you want to update. Each program has its own box; <em>Operating system</em> opens with the arrow and each package can be chosen too. Shortcuts: <em>Radio</em>, <em>System</em>, <em>All</em>, <em>None</em>.</li>
+  <li>Press <em>Update selected</em>. While updating, it shows what is being downloaded, the MB, the speed and the time left.</li>
+  <li>N1MM+, Log4OM and GridTracker2 update themselves.</li>
+  <li>On the USB drive no password is asked; on an installed LogBeamOS, the user's password is asked.</li>
+  <li>Ten minutes after logging in, a notice appears if there are updates.</li>
+</ul>
+<p><a class="botao" href="logbeamos:actualizar">Open Update LogBeamOS</a></p>
+</section>
+
+<section id="windows">
+<h2>5. Installing alongside Windows</h2>
+<h3>First, in Windows</h3>
+<ol>
+  <li><strong>Back up your data.</strong></li>
+  <li><strong>Run "Preparar o Windows.cmd"</strong> with right-click → <em>Run as administrator</em>. It is at the root of the ISO: before writing the USB drive, open the ISO in Windows with a double-click. It turns off fast startup and, if drive C: is encrypted, starts decrypting it; before installing, wait until the percentage encrypted reaches 0 %. It can also be done by hand: <a href="logbeamos:antes">Before installing</a>.</li>
+</ol>
+<h3>Installing</h3>
+<ol start="3">
+  <li>Start from the USB drive and open <em>Install LogBeamOS</em>. For the installation type, choose to install alongside Windows and drag the divider: 40 GB is enough for LogBeamOS.</li>
+  <li>Afterwards, when the computer starts, a menu with LogBeamOS and Windows is shown for 10 seconds. The last choice is remembered.</li>
+</ol>
+<h3>Removing LogBeamOS</h3>
+<ol start="5">
+  <li>In Windows, in an administrator console: <code>bcdedit /set {fwbootmgr} displayorder {bootmgr} /addfirst</code>. The computer then starts straight into Windows.</li>
+  <li>Disk Management: delete the LogBeamOS partitions (the ones after C: without a drive letter; never the EFI or recovery partition). Then right-click C: → <em>Extend Volume</em>.</li>
+  <li>Optional, to also delete LogBeamOS's boot files, in the same console:
+    <ul>
+      <li><code>bcdedit /enum firmware</code> lists the boot entries; delete the ones with <code>\EFI\ubuntu</code> in the path with <code>bcdedit /delete {identifier}</code>;</li>
+      <li><code>mountvol S: /S</code> and <code>rmdir /S /Q S:\EFI\ubuntu</code>;</li>
+      <li>if <code>S:\EFI\Boot\fbx64.efi</code> exists, the installer replaced the disk's fallback boot file: <code>copy /Y S:\EFI\Microsoft\Boot\bootmgfw.efi S:\EFI\Boot\bootx64.efi</code> and <code>del S:\EFI\Boot\fbx64.efi S:\EFI\Boot\mmx64.efi</code>;</li>
+      <li>finally, <code>mountvol S: /D</code>.</li>
+    </ul></li>
+</ol>
+</section>
+
+<section id="problemas">
+<h2>6. Common problems</h2>
+<dl>
+  <dt>The USB drive does not start: "Unable to find a medium containing a live file system"</dt>
+  <dd>Remove the USB drive, wait 5 seconds, plug it back in and start again.</dd>
+  <dt>Windows asks to format the USB drive</dt>
+  <dd>Always cancel. It is the part of the USB drive where your LogBeamOS data is kept, which Windows cannot read.</dd>
+  <dt>A program is stuck</dt>
+  <dd>Open the System Monitor (icon on the panel), <em>Processes</em> tab, right-click the program → <em>End</em>.</dd>
+  <dt>The desktop crashed ("fallback mode")</dt>
+  <dd>Press Ctrl+Alt+Esc to restart it, or log out and log back in.</dd>
+  <dt>The radio does not answer CAT</dt>
+  <dd>In Radio and Equipment, check the model and use the <em>Automatic</em> speed; check that CAT is enabled in the radio's menu and close the programs using the port.</dd>
+  <dt>No radio sound in WSJT-X or Direwolf</dt>
+  <dd>In Radio and Equipment → <em>Set up the programs…</em>, choose the radio sound.</dd>
+  <dt>Direwolf closes straight away</dt>
+  <dd>The window stays open with the explanation. The settings are in the <code>direwolf.conf</code> file in your home folder.</dd>
+</dl>
+<p><a class="botao" href="logbeamos:monitor">Open the System Monitor</a></p>
+</section>
+</main>
+</body>
+</html>

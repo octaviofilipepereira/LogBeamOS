@@ -1,0 +1,628 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: "Actualizar LogBeamOS". Mostra cada programa de rádio e o sistema operativo, com a versão instalada,
+# a disponível e o tamanho a descarregar. Cada linha tem uma caixa de escolha; o sistema operativo abre-se em
+# pacotes, que também se escolhem um a um (autor, 08/11/2026). Actualiza só o que estiver marcado (pede a password
+# uma vez; na pen não pede) e mostra o progresso: o que está a descarregar, MB, velocidade e tempo que falta.
+# Com --verificar não abre a janela: procura actualizações e, se houver, avisa com uma notificação.
+import os
+import subprocess
+import sys
+import threading
+
+sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
+import lb_actualizar as lb  # noqa: E402
+
+AJUDANTE = "/usr/local/lib/logbeamos/actualizar/actualizar-raiz"
+ICONE = "/usr/share/logbeamos/actualizar.png"
+CACHE = os.path.expanduser("~/.cache/logbeamos-actualizar")
+
+TXT = {
+    "pt": {
+        "titulo": "Actualizar LogBeamOS", "sub": "Programas Radioamador e sistema operativo",
+        "programa": "Programa", "instalada": "Instalada", "disponivel": "Disponível", "estado": "Estado",
+        "tamanho": "Tamanho",
+        "procurar": "A procurar actualizações…", "actualizado": "Actualizado", "nova": "Versão nova",
+        "sozinho": "Actualiza-se sozinho", "opcional": "Não instalado (opcional)", "limite": "Limite do GitHub: tente mais tarde", "sem_rede": "Sem ligação à Internet", "erro": "Erro",
+        "sistema": "Sistema operativo", "pacotes": "{n} pacotes", "nada": "Está tudo actualizado.",
+        "ha": "Há {n} actualizações.", "ha1": "Há 1 actualização.", "b_procurar": "Procurar de novo",
+        "b_marcar": "Marcar:", "b_radio": "Rádio", "b_sistema": "Sistema", "b_tudo": "Tudo", "b_nada": "Nada",
+        "d_radio": "Só os programas de rádio (incluindo o WSJT-X, o Not1MM e o Uplink). O resto do sistema fica como está.",
+        "d_sistema": "Só o sistema operativo. Os programas de rádio ficam como estão.",
+        "d_tudo": "Os programas de rádio e o sistema operativo.", "d_nada": "Desmarca tudo.",
+        "b_actualizar": "Actualizar os marcados", "radio_pac": "Pacotes de rádio",
+        "marcados": "Marcados: {n} · {t} a descarregar", "marcados_sem": "Marcados: {n}", "nenhum": "Nada marcado.",
+        "b_fechar": "Fechar", "detalhes": "Detalhes", "a_actualizar": "A actualizar: {nome}…",
+        "baixar": "A descarregar {p} ({i} de {n})", "baixar1": "A descarregar {p}", "de": "{a} de {b}",
+        "falta": "faltam {t}", "instalar": "A instalar {p}", "a_preparar": "A preparar…",
+        "listas": "A actualizar a lista de pacotes ({i} de {n})",
+        "feito": "Actualização concluída.", "feito_erros": "Actualização concluída com erros. Veja os detalhes.",
+        "reiniciar": "Reinicie o computador para concluir a actualização.",
+        "recusado": "A actualização não foi autorizada.", "n_titulo": "Há actualizações para o LogBeamOS",
+        "n_texto": "{n} actualizações disponíveis.", "n_texto1": "1 actualização disponível.", "n_abrir": "Abrir",
+        "a_correr": "A actualizar. Aguarde até ao fim.",
+    },
+    "en": {
+        "titulo": "Update LogBeamOS", "sub": "Ham Radio Programs and operating system",
+        "programa": "Program", "instalada": "Installed", "disponivel": "Available", "estado": "Status",
+        "tamanho": "Size",
+        "procurar": "Checking for updates…", "actualizado": "Up to date", "nova": "New version",
+        "sozinho": "Updates itself", "opcional": "Not installed (optional)", "limite": "GitHub limit: try again later", "sem_rede": "No Internet connection", "erro": "Error",
+        "sistema": "Operating system", "pacotes": "{n} packages", "nada": "Everything is up to date.",
+        "ha": "{n} updates available.", "ha1": "1 update available.", "b_procurar": "Check again",
+        "b_marcar": "Select:", "b_radio": "Radio", "b_sistema": "System", "b_tudo": "All", "b_nada": "None",
+        "d_radio": "Only the radio programs (including WSJT-X, Not1MM and the Uplink). The rest of the system stays as it is.",
+        "d_sistema": "Only the operating system. The radio programs stay as they are.",
+        "d_tudo": "The radio programs and the operating system.", "d_nada": "Clears every selection.",
+        "b_actualizar": "Update selected", "radio_pac": "Radio packages",
+        "marcados": "Selected: {n} · {t} to download", "marcados_sem": "Selected: {n}", "nenhum": "Nothing selected.",
+        "b_fechar": "Close", "detalhes": "Details", "a_actualizar": "Updating: {nome}…",
+        "baixar": "Downloading {p} ({i} of {n})", "baixar1": "Downloading {p}", "de": "{a} of {b}",
+        "falta": "{t} left", "instalar": "Installing {p}", "a_preparar": "Preparing…",
+        "listas": "Updating the package lists ({i} of {n})",
+        "feito": "Update finished.", "feito_erros": "Update finished with errors. See the details.",
+        "reiniciar": "Restart the computer to finish the update.",
+        "recusado": "The update was not authorised.", "n_titulo": "Updates for LogBeamOS",
+        "n_texto": "{n} updates available.", "n_texto1": "1 update available.", "n_abrir": "Open",
+        "a_correr": "Updating. Please wait until it finishes.",
+    },
+    "es": {
+        "titulo": "Actualizar LogBeamOS", "sub": "Programas de Radioaficionado y sistema operativo",
+        "programa": "Programa", "instalada": "Instalada", "disponivel": "Disponible", "estado": "Estado",
+        "tamanho": "Tamaño",
+        "procurar": "Buscando actualizaciones…", "actualizado": "Actualizado", "nova": "Versión nueva",
+        "sozinho": "Se actualiza solo", "opcional": "No instalado (opcional)", "limite": "Límite de GitHub: inténtelo más tarde", "sem_rede": "Sin conexión a Internet", "erro": "Error",
+        "sistema": "Sistema operativo", "pacotes": "{n} paquetes", "nada": "Todo está actualizado.",
+        "ha": "Hay {n} actualizaciones.", "ha1": "Hay 1 actualización.", "b_procurar": "Buscar de nuevo",
+        "b_marcar": "Marcar:", "b_radio": "Radio", "b_sistema": "Sistema", "b_tudo": "Todo", "b_nada": "Nada",
+        "d_radio": "Solo los programas de radio (incluidos WSJT-X, Not1MM y el Uplink). El resto del sistema queda como está.",
+        "d_sistema": "Solo el sistema operativo. Los programas de radio quedan como están.",
+        "d_tudo": "Los programas de radio y el sistema operativo.", "d_nada": "Desmarca todo.",
+        "b_actualizar": "Actualizar los marcados", "radio_pac": "Paquetes de radio",
+        "marcados": "Marcados: {n} · {t} a descargar", "marcados_sem": "Marcados: {n}", "nenhum": "Nada marcado.",
+        "b_fechar": "Cerrar", "detalhes": "Detalles", "a_actualizar": "Actualizando: {nome}…",
+        "baixar": "Descargando {p} ({i} de {n})", "baixar1": "Descargando {p}", "de": "{a} de {b}",
+        "falta": "faltan {t}", "instalar": "Instalando {p}", "a_preparar": "Preparando…",
+        "listas": "Actualizando la lista de paquetes ({i} de {n})",
+        "feito": "Actualización terminada.", "feito_erros": "Actualización terminada con errores. Vea los detalles.",
+        "reiniciar": "Reinicie el ordenador para terminar la actualización.",
+        "recusado": "La actualización no fue autorizada.", "n_titulo": "Hay actualizaciones para LogBeamOS",
+        "n_texto": "{n} actualizaciones disponibles.", "n_texto1": "1 actualización disponible.", "n_abrir": "Abrir",
+        "a_correr": "Actualizando. Espere hasta el final.",
+    },
+    "fr": {
+        "titulo": "Mettre à jour LogBeamOS", "sub": "Logiciels Radioamateur et système d'exploitation",
+        "programa": "Logiciel", "instalada": "Installée", "disponivel": "Disponible", "estado": "État",
+        "tamanho": "Taille",
+        "procurar": "Recherche des mises à jour…", "actualizado": "À jour", "nova": "Nouvelle version",
+        "sozinho": "Se met à jour seul", "opcional": "Non installé (facultatif)", "limite": "Limite de GitHub : réessayez plus tard", "sem_rede": "Pas de connexion Internet", "erro": "Erreur",
+        "sistema": "Système d'exploitation", "pacotes": "{n} paquets", "nada": "Tout est à jour.",
+        "ha": "{n} mises à jour disponibles.", "ha1": "1 mise à jour disponible.", "b_procurar": "Rechercher à nouveau",
+        "b_marcar": "Cocher :", "b_radio": "Radio", "b_sistema": "Système", "b_tudo": "Tout", "b_nada": "Rien",
+        "d_radio": "Seulement les logiciels radio (y compris WSJT-X, Not1MM et l'Uplink). Le reste du système reste tel quel.",
+        "d_sistema": "Seulement le système d'exploitation. Les logiciels radio restent tels quels.",
+        "d_tudo": "Les logiciels radio et le système d'exploitation.", "d_nada": "Décoche tout.",
+        "b_actualizar": "Mettre à jour la sélection", "radio_pac": "Paquets radio",
+        "marcados": "Cochés : {n} · {t} à télécharger", "marcados_sem": "Cochés : {n}", "nenhum": "Rien de coché.",
+        "b_fechar": "Fermer", "detalhes": "Détails", "a_actualizar": "Mise à jour : {nome}…",
+        "baixar": "Téléchargement de {p} ({i} sur {n})", "baixar1": "Téléchargement de {p}", "de": "{a} sur {b}",
+        "falta": "encore {t}", "instalar": "Installation de {p}", "a_preparar": "Préparation…",
+        "listas": "Mise à jour de la liste des paquets ({i} sur {n})",
+        "feito": "Mise à jour terminée.", "feito_erros": "Mise à jour terminée avec des erreurs. Voir les détails.",
+        "reiniciar": "Redémarrez l'ordinateur pour terminer la mise à jour.",
+        "recusado": "La mise à jour n'a pas été autorisée.", "n_titulo": "Mises à jour pour LogBeamOS",
+        "n_texto": "{n} mises à jour disponibles.", "n_texto1": "1 mise à jour disponible.", "n_abrir": "Ouvrir",
+        "a_correr": "Mise à jour en cours. Patientez jusqu'à la fin.",
+    },
+}
+LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
+T = TXT.get(LINGUA, TXT["en"])
+
+
+def curta(v):
+    """Versão para mostrar: sem época nem sufixos da distribuição."""
+    v = (v or "").split(":")[-1]
+    return v.split("-")[0].split("+")[0].split("~")[0]
+
+
+def falha(e):
+    """Sem rede, limite de pedidos do GitHub esgotado, ou outro erro do servidor."""
+    import urllib.error
+    if lb.limite_github(e):
+        return T["limite"]
+    return T["erro"] if isinstance(e, urllib.error.HTTPError) else T["sem_rede"]
+
+
+def bytes_texto(n):
+    """1234567 → '1,2 MB' (vírgula em PT, ES e FR)."""
+    if n is None or n < 0:
+        return ""
+    if n < 1000 ** 2:
+        t = f"{n / 1000:.0f} kB"
+    elif n < 1000 ** 3:
+        t = f"{n / 1000 ** 2:.1f} MB"
+    else:
+        t = f"{n / 1000 ** 3:.2f} GB"
+    return t.replace(".", ",") if LINGUA in ("pt", "es", "fr") else t
+
+
+def tempo_texto(s):
+    if s < 0:
+        return ""
+    if s < 60:
+        return f"{s} s"
+    if s < 3600:
+        return f"{s // 60} min {s % 60:02d} s"
+    return f"{s // 3600} h {s % 3600 // 60:02d} min"
+
+
+def procura():
+    """Devolve (linhas, total, apt_ok, sistema): linhas são (chave, nome, instalada, disponível, estado, actualizar?,
+    tamanho em bytes); sistema é a lista (pacote, instalada, nova, tamanho) dos pacotes do sistema operativo.
+    "actualizar?" é True (versão nova), False, ou "opcional" (programa opcional por instalar: tem caixa, desmarcada)."""
+    linhas = []
+    sistema = []
+    # Programas do GitHub
+    for item in lb.GITHUB:
+        chave, nome = item[0], item[1]
+        inst = lb.instalada_github(item)
+        opcional = not inst and chave in lb.OPCIONAIS
+        if not inst and item[5] in ("deb", "flatpak") and not opcional:
+            continue  # não instalado: não aparece
+        try:
+            disp, asset = lb.info_github(item)
+            if opcional:
+                if disp:
+                    linhas.append((chave, nome, "", disp, T["opcional"], "opcional", (asset or {}).get("size")))
+                continue
+            nova = lb.mais_recente(disp, inst)
+            tam = (asset or {}).get("size") if nova else None
+            linhas.append((chave, nome, inst, disp or "", T["nova"] if nova else T["actualizado"], nova, tam))
+        except Exception as e:
+            linhas.append((chave, nome, inst, "", falha(e), False, None))
+    # Not1MM
+    inst = lb.versao_not1mm()
+    if inst:
+        try:
+            disp = lb.disponivel_not1mm()
+            nova = lb.mais_recente(disp, inst)
+            linhas.append(("not1mm", "Not1MM", inst, disp, T["nova"] if nova else T["actualizado"], nova, None))
+        except Exception as e:
+            linhas.append(("not1mm", "Not1MM", inst, "", falha(e), False, None))
+    # Pacotes do sistema: os de rádio com nome próprio (um nome pode juntar vários pacotes, como o Hamlib);
+    # os outros, um a um, debaixo de "Sistema operativo"
+    try:
+        pend = lb.apt_pendentes(CACHE)
+        try:
+            tamanhos = lb.apt_tamanhos(CACHE)
+        except Exception:
+            tamanhos = {}
+        pen = lb.na_pen()
+        novos = {p: (i, n) for p, i, n in pend if not (pen and lb.fixo_na_pen(p))}
+        por_nome = {}
+        for pac, nome in lb.PACOTES_RADIO.items():
+            if lb.versao_pacote(pac):
+                por_nome.setdefault(nome, []).append(pac)
+        for nome, pacs in por_nome.items():
+            com_nova = [p for p in pacs if p in novos]
+            inst = lb.versao_pacote(pacs[0])
+            n = novos[com_nova[0]][1] if com_nova else None
+            tam = sum(tamanhos.get(p, 0) for p in com_nova) or None
+            chave = "apt:" + ",".join(com_nova or pacs)
+            linhas.append((chave, nome, curta(inst), curta(n or inst), T["nova"] if n else T["actualizado"],
+                           bool(n), tam))
+        sistema = sorted((p, i, n, tamanhos.get(p)) for p, (i, n) in novos.items() if p not in lb.PACOTES_RADIO)
+        tam = sum(t or 0 for *_, t in sistema) or None
+        linhas.append(("sistema", T["sistema"], "", T["pacotes"].format(n=len(sistema)) if sistema else "",
+                       T["nova"] if sistema else T["actualizado"], bool(sistema), tam))
+        apt_ok = True
+    except Exception:
+        linhas.append(("sistema", T["sistema"], "", "", T["sem_rede"], False, None))
+        apt_ok = False
+    # o que tem versão nova fica no topo; os opcionais por instalar, no fim
+    linhas.sort(key=lambda x: (x[5] is not True, x[5] == "opcional", x[0] == "sistema", x[1].lower()))
+    for chave, nome in lb.SOZINHOS:
+        if not any(x[1] == nome for x in linhas):
+            linhas.append((chave, nome, "", "", T["sozinho"], False, None))
+    total = sum(1 for x in linhas if x[5] is True)
+    return linhas, total, apt_ok, sistema
+
+
+def grupo(chave):
+    """"sistema" (sistema operativo e os seus pacotes) ou "radio" (programas do GitHub, Not1MM e pacotes de rádio)."""
+    return "sistema" if chave == "sistema" or chave.startswith("pac:") else "radio"
+
+
+def argumentos_ajudante(escolha, linhas, sistema):
+    """O que vai para o ajudante, por ordem: sistema (inteiro ou só os pacotes marcados), pacotes de rádio (apt),
+    depois os outros programas (os do GitHub podem precisar das bibliotecas novas).
+    escolha: conjunto das chaves marcadas (programas, "apt:…" e "pac:nome")."""
+    args = []
+    marcados_sis = [p for p, *_ in sistema if "pac:" + p in escolha]
+    if sistema and len(marcados_sis) == len(sistema):
+        args.append("sistema")
+    elif marcados_sis:
+        args.append("pacotes=" + ",".join(marcados_sis))
+    apt_todas = [x[0] for x in linhas if x[0].startswith("apt:") and x[5]]
+    apt_marc = [c for c in apt_todas if c in escolha]
+    if apt_marc and len(apt_marc) == len(apt_todas):
+        args.append("radio")
+    elif apt_marc:
+        args.append("radio=" + ",".join(c[4:] for c in apt_marc))
+    for x in linhas:
+        if x[5] and x[0] in escolha and x[0] != "sistema" and not x[0].startswith("apt:"):
+            args.append(x[0])
+    return args
+
+
+def comando_ajudante(args):
+    if subprocess.run(["sudo", "-n", "true"], capture_output=True).returncode == 0:
+        return ["sudo", "-n", AJUDANTE, *args]
+    return ["pkexec", AJUDANTE, *args]
+
+
+def verificar():
+    """Arranque da sessão: avisa se houver actualizações (sem janela)."""
+    try:
+        _, total, _, _ = procura()
+    except Exception:
+        return
+    if not total:
+        return
+    r = subprocess.run(["notify-send", "--app-name=LogBeamOS", "-i", ICONE, "-A", "abrir=" + T["n_abrir"],
+                        T["n_titulo"], T["n_texto1"] if total == 1 else T["n_texto"].format(n=total)], capture_output=True, text=True)
+    if r.stdout.strip() == "abrir":
+        os.execv(sys.argv[0], [sys.argv[0]])
+
+
+def janela():
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import GLib, GObject, Gtk, Pango
+
+    # Colunas do modelo
+    C_CHAVE, C_MARC, C_ACTIVA, C_INCONS, C_NOME, C_INST, C_DISP, C_TAM, C_EST, C_COR, C_BYTES = range(11)
+
+    class Janela(Gtk.Window):
+        def __init__(self):
+            super().__init__(title=T["titulo"])
+            self.set_default_size(860, 620)
+            self.set_border_width(14)
+            if os.path.exists(ICONE):
+                self.set_icon_from_file(ICONE)
+            self.a_correr = False
+            self.linhas, self.sistema, self.opcionais = [], [], set()
+            self.connect("delete-event", self.ao_fechar)
+
+            caixa = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            self.add(caixa)
+            cab = Gtk.Box(spacing=12)
+            if os.path.exists(ICONE):
+                from gi.repository import GdkPixbuf
+                cab.pack_start(Gtk.Image.new_from_pixbuf(
+                    GdkPixbuf.Pixbuf.new_from_file_at_size(ICONE, 48, 48)), False, False, 0)
+            tit = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            l = Gtk.Label(xalign=0)
+            l.set_markup(f"<span size='x-large' weight='bold'>{T['titulo']}</span>")
+            tit.pack_start(l, False, False, 0)
+            tit.pack_start(Gtk.Label(label=T["sub"], xalign=0), False, False, 0)
+            cab.pack_start(tit, True, True, 0)
+            caixa.pack_start(cab, False, False, 0)
+
+            # chave, marcado, tem caixa, meio marcado, nome, instalada, disponível, tamanho, estado, cor, bytes
+            self.modelo = Gtk.TreeStore(str, bool, bool, bool, str, str, str, str, str, str, GObject.TYPE_INT64)
+            self.vista = Gtk.TreeView(model=self.modelo)
+            rt = Gtk.CellRendererToggle()
+            rt.connect("toggled", self.ao_marcar)
+            col = Gtk.TreeViewColumn("", rt, active=C_MARC, visible=C_ACTIVA, inconsistent=C_INCONS)
+            self.vista.append_column(col)
+            for titulo, c, larg in [(T["programa"], C_NOME, 230), (T["instalada"], C_INST, 120),
+                                    (T["disponivel"], C_DISP, 120), (T["tamanho"], C_TAM, 80), (T["estado"], C_EST, 160)]:
+                r = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END)
+                if c == C_TAM:
+                    r.set_property("xalign", 1.0)
+                col = Gtk.TreeViewColumn(titulo, r, text=c)
+                if c == C_EST:
+                    col.add_attribute(r, "foreground", C_COR)
+                col.set_min_width(larg)
+                col.set_resizable(True)
+                self.vista.append_column(col)
+            self.vista.set_expander_column(self.vista.get_column(1))
+            rol = Gtk.ScrolledWindow(vexpand=True)
+            rol.add(self.vista)
+            caixa.pack_start(rol, True, True, 0)
+
+            marc = Gtk.Box(spacing=6)
+            marc.pack_start(Gtk.Label(label=T["b_marcar"]), False, False, 0)
+            self.b_marc = []
+            for q in ("radio", "sistema", "tudo", "nada"):
+                b = Gtk.Button(label=T["b_" + q])
+                b.set_relief(Gtk.ReliefStyle.NONE)
+                b.set_tooltip_text(T["d_" + q])
+                b.connect("clicked", lambda _b, q=q: self.marca(q))
+                marc.pack_start(b, False, False, 0)
+                self.b_marc.append(b)
+            self.resumo = Gtk.Label(xalign=1)
+            marc.pack_end(self.resumo, False, False, 0)
+            caixa.pack_start(marc, False, False, 0)
+
+            self.estado = Gtk.Label(xalign=0)
+            caixa.pack_start(self.estado, False, False, 0)
+            self.barra = Gtk.ProgressBar(show_text=False)
+            caixa.pack_start(self.barra, False, False, 0)
+            self.detalhe = Gtk.Label(xalign=0, ellipsize=Pango.EllipsizeMode.END)
+            caixa.pack_start(self.detalhe, False, False, 0)
+
+            exp = Gtk.Expander(label=T["detalhes"])
+            self.registo = Gtk.TextView(editable=False, monospace=True, wrap_mode=Gtk.WrapMode.CHAR)
+            rr = Gtk.ScrolledWindow(min_content_height=140)
+            rr.add(self.registo)
+            exp.add(rr)
+            caixa.pack_start(exp, False, False, 0)
+
+            bot = Gtk.Box(spacing=8)
+            self.b_procurar = Gtk.Button(label=T["b_procurar"])
+            self.b_procurar.connect("clicked", lambda *_: self.procurar())
+            self.b_act = Gtk.Button(label=T["b_actualizar"])
+            self.b_act.get_style_context().add_class("suggested-action")
+            self.b_act.connect("clicked", lambda *_: self.actualizar())
+            self.b_fechar = Gtk.Button(label=T["b_fechar"])
+            self.b_fechar.connect("clicked", lambda *_: self.close())
+            bot.pack_start(self.b_procurar, False, False, 0)
+            bot.pack_end(self.b_fechar, False, False, 0)
+            bot.pack_end(self.b_act, False, False, 12)
+            caixa.pack_start(bot, False, False, 0)
+            self.GLib = GLib
+            self.procurar()
+
+        # --- Registo e botões
+        def escreve(self, texto):
+            b = self.registo.get_buffer()
+            b.insert(b.get_end_iter(), texto + "\n")
+            self.registo.scroll_to_iter(b.get_end_iter(), 0, False, 0, 0)
+
+        def botoes(self, activo):
+            self.b_procurar.set_sensitive(activo)
+            self.b_fechar.set_sensitive(activo)
+            for b in self.b_marc:
+                b.set_sensitive(activo)
+            self.b_act.set_sensitive(activo and bool(self.escolha()))
+            self.vista.set_sensitive(activo)
+
+        # --- Lista
+        def mostra(self, linhas, total, sistema):
+            self.linhas, self.sistema = linhas, sistema
+            self.opcionais = {x[0] for x in linhas if x[5] == "opcional"}
+            self.modelo.clear()
+            for chave, nome, inst, disp, est, nova, tam in linhas:
+                cor = "#58a6ff" if nova == "opcional" else "#2ea043" if nova else \
+                    ("#d29922" if est in (T["sem_rede"], T["erro"], T["limite"]) else "#8b949e")
+                it = self.modelo.append(None, [chave, nova is True, bool(nova), False, nome, inst or "—", disp or "—",
+                                               bytes_texto(tam), est, cor, tam or 0])
+                if chave == "sistema":
+                    for pac, i, n, t in sistema:
+                        # Nos pacotes, a versão inteira (sem época): a diferença está muitas vezes só no sufixo
+                        self.modelo.append(it, ["pac:" + pac, True, True, False, pac, i.split(":")[-1], n.split(":")[-1],
+                                                bytes_texto(t), T["nova"], "#2ea043", t or 0])
+            self.estado.set_text((T["ha1"] if total == 1 else T["ha"].format(n=total)) if total else T["nada"])
+            self.barra.set_fraction(0)
+            self.detalhe.set_text("")
+            self.actualiza_resumo()
+            self.botoes(True)
+
+        def linhas_modelo(self):
+            """Todas as linhas com caixa de escolha: (iterador, chave)."""
+            res = []
+            it = self.modelo.get_iter_first()
+            while it:
+                if self.modelo[it][C_ACTIVA]:
+                    res.append((it, self.modelo[it][C_CHAVE]))
+                f = self.modelo.iter_children(it)
+                while f:
+                    res.append((f, self.modelo[f][C_CHAVE]))
+                    f = self.modelo.iter_next(f)
+                it = self.modelo.iter_next(it)
+            return res
+
+        def acerta_sistema(self):
+            """A linha "Sistema operativo" fica marcada, desmarcada ou a meio, conforme os pacotes."""
+            it = self.modelo.get_iter_first()
+            while it:
+                if self.modelo[it][C_CHAVE] == "sistema" and self.modelo.iter_has_child(it):
+                    filhos = []
+                    f = self.modelo.iter_children(it)
+                    while f:
+                        filhos.append(self.modelo[f][C_MARC])
+                        f = self.modelo.iter_next(f)
+                    self.modelo[it][C_MARC] = all(filhos)
+                    self.modelo[it][C_INCONS] = any(filhos) and not all(filhos)
+                it = self.modelo.iter_next(it)
+
+        def ao_marcar(self, _r, caminho):
+            it = self.modelo.get_iter(caminho)
+            novo = not self.modelo[it][C_MARC] or self.modelo[it][C_INCONS]
+            self.modelo[it][C_MARC] = novo
+            self.modelo[it][C_INCONS] = False
+            f = self.modelo.iter_children(it)
+            while f:
+                self.modelo[f][C_MARC] = novo
+                f = self.modelo.iter_next(f)
+            self.acerta_sistema()
+            self.actualiza_resumo()
+
+        def marca(self, quais):
+            for it, chave in self.linhas_modelo():
+                if chave in self.opcionais:  # só se marcam à mão; "Nada" também os desmarca
+                    if quais == "nada":
+                        self.modelo[it][C_MARC] = False
+                    continue
+                g = grupo(chave)
+                self.modelo[it][C_MARC] = quais == "tudo" or quais == g
+            self.acerta_sistema()
+            self.actualiza_resumo()
+
+        def escolha(self):
+            return {chave for it, chave in self.linhas_modelo()
+                    if self.modelo[it][C_MARC] and chave != "sistema"} | \
+                   ({"sistema"} if any(c.startswith("pac:") for it, c in self.linhas_modelo() if self.modelo[it][C_MARC]) else set())
+
+        def actualiza_resumo(self):
+            n, b = 0, 0
+            for it, chave in self.linhas_modelo():
+                if self.modelo[it][C_MARC] and chave != "sistema":
+                    n += 1
+                    b += self.modelo[it][C_BYTES]
+            self.resumo.set_text(T["nenhum"] if not n else
+                                 T["marcados"].format(n=n, t=bytes_texto(b)) if b else T["marcados_sem"].format(n=n))
+            self.b_act.set_sensitive(not self.a_correr and n > 0)
+
+        # --- Procura
+        def procurar(self):
+            self.botoes(False)
+            self.estado.set_text(T["procurar"])
+            self.pulso = self.GLib.timeout_add(120, lambda: (self.barra.pulse(), True)[1])
+
+            def trabalho():
+                try:
+                    linhas, total, _, sistema = procura()
+                except Exception as e:
+                    linhas, total, sistema = [], 0, []
+                    self.GLib.idle_add(self.escreve, str(e))
+                self.GLib.idle_add(self.fim_procura, linhas, total, sistema)
+
+            threading.Thread(target=trabalho, daemon=True).start()
+
+        def fim_procura(self, linhas, total, sistema):
+            self.GLib.source_remove(self.pulso)
+            self.mostra(linhas, total, sistema)
+
+        # --- Actualização
+        def actualizar(self):
+            args = argumentos_ajudante(self.escolha(), self.linhas, self.sistema)
+            if not args:
+                return
+            nomes = {x[0]: x[1] for x in self.linhas}
+            nomes.update({"sistema": T["sistema"], "pacotes": T["sistema"], "radio": T["radio_pac"]})
+            self.a_correr = True
+            self.botoes(False)
+            self.erros = 0
+            self.reiniciar = False
+            passos = len(args)
+            self.feitos = 0
+            self.parte = 0.0          # quanto do passo actual já foi feito (0 a 1)
+            self.com_progresso = False
+            self.detalhe.set_text(T["a_preparar"])
+
+            def pulsa():
+                if not self.com_progresso:
+                    self.barra.pulse()
+                return True
+            self.pulso = self.GLib.timeout_add(150, pulsa)
+
+            def barra():
+                self.barra.set_fraction(min(1.0, (self.feitos + self.parte) / passos))
+
+            def linha(t):
+                if t.startswith("@passo "):
+                    c = t.split()[1]
+                    self.estado.set_text(T["a_actualizar"].format(nome=nomes.get(c, c)))
+                    self.parte, self.com_progresso = 0.0, False
+                    self.detalhe.set_text(T["a_preparar"])
+                elif t.startswith("@listas "):
+                    p = t.split(maxsplit=4)
+                    if len(p) < 5:
+                        return
+                    texto = T["listas"].format(i=p[2], n=p[3])
+                    self.detalhe.set_text(texto + ("" if p[4] == "-" else " · " + p[4]))
+                    self.com_progresso = True
+                    self.parte = 0.15 * min(1.0, int(p[2]) / max(1, int(p[3])))
+                    barra()
+                elif t.startswith("@baixar "):
+                    p = t.split(maxsplit=8)
+                    if len(p) < 9:
+                        return
+                    pct, feito, total, vel, eta = float(p[1]), int(p[2]), int(p[3]), int(p[4]), int(p[5])
+                    i, n, pac = p[6], p[7], p[8]
+                    if pac == "-":
+                        pac = "…"  # o apt ainda não disse qual é o primeiro pacote
+                    um = n in ("0", "1")
+                    partes = [T["baixar1"].format(p=pac) if um else T["baixar"].format(p=pac, i=i, n=n)]
+                    if total > 0 and feito >= 0:
+                        partes.append(T["de"].format(a=bytes_texto(feito), b=bytes_texto(total)))
+                    if vel > 0:
+                        partes.append(bytes_texto(vel) + "/s")
+                    if eta >= 0 and pct < 100:
+                        partes.append(T["falta"].format(t=tempo_texto(eta)))
+                    self.detalhe.set_text(" · ".join(partes))
+                    self.com_progresso = True
+                    self.parte = 0.8 * pct / 100 if um else 0.15 + 0.45 * pct / 100
+                    barra()
+                elif t.startswith("@instalar "):
+                    p = t.split(maxsplit=2)
+                    if len(p) < 3:
+                        return
+                    self.detalhe.set_text(T["instalar"].format(p=p[2]))
+                    self.com_progresso = True
+                    self.parte = 0.6 + 0.4 * float(p[1]) / 100
+                    barra()
+                elif t.startswith("@ok ") or t.startswith("@erro "):
+                    if t.startswith("@erro "):
+                        self.erros += 1
+                    self.feitos += 1
+                    self.parte, self.com_progresso = 0.0, True
+                    barra()
+                    self.detalhe.set_text("")
+                    self.escreve(t[1:])
+                elif t == "@reiniciar":
+                    self.reiniciar = True
+                elif not t.startswith("@"):
+                    self.escreve(t)
+
+            def trabalho():
+                p = subprocess.Popen(comando_ajudante(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                     text=True)
+                for t in p.stdout:
+                    self.GLib.idle_add(linha, t.rstrip())
+                self.GLib.idle_add(self.fim_actualizar, p.wait())
+
+            threading.Thread(target=trabalho, daemon=True).start()
+
+        def fim_actualizar(self, codigo):
+            self.GLib.source_remove(self.pulso)
+            self.a_correr = False
+            self.detalhe.set_text("")
+            if codigo in (126, 127):
+                msg = T["recusado"]
+            elif self.erros or codigo:
+                msg = T["feito_erros"]
+            else:
+                msg = T["feito"]
+            if self.reiniciar:
+                msg += "\n" + T["reiniciar"]
+            d = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.INFO,
+                                  buttons=Gtk.ButtonsType.OK, text=msg)
+            d.run()
+            d.destroy()
+            self.procurar()
+
+        def ao_fechar(self, *_):
+            if self.a_correr:
+                self.estado.set_text(T["a_correr"])
+                return True
+            Gtk.main_quit()
+            return False
+
+    j = Janela()
+    j.show_all()
+    Gtk.main()
+
+
+if __name__ == "__main__":
+    if os.geteuid() == 0:
+        sys.exit("Abra o Actualizar LogBeamOS como utilizador normal.")
+    if "--verificar" in sys.argv:
+        verificar()
+    else:
+        janela()

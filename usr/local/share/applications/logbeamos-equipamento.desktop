@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Radio and Equipment
+Name[pt]=Rádio e Equipamento
+Name[es]=Radio y Equipo
+Name[fr]=Radio et Matériel
+Comment=Detects radios, CAT cables, sound cards and SDR receivers
+Comment[pt]=Detecta rádios, cabos de CAT, placas de som e receptores SDR
+Comment[es]=Detecta radios, cables CAT, tarjetas de sonido y receptores SDR
+Comment[fr]=Détecte radios, câbles CAT, cartes son et récepteurs SDR
+Exec=logbeamos-equipamento
+Icon=/usr/share/logbeamos/equipamento.png
+Terminal=false
+Categories=HamRadio;

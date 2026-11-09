@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=LogBeamOS updates
+Exec=logbeamos-actualizar --verificar
+NoDisplay=true
+X-GNOME-Autostart-Delay=600

@@ -1,0 +1,274 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: ajudante do "Actualizar LogBeamOS". Corre como root (pkexec no disco, sudo na pen).
+# Recebe só os nomes do que actualizar; endereços, versões e somas vêm de lb_actualizar.
+#   sistema        sistema operativo inteiro (os pacotes de rádio ficam retidos, salvo se vier também "radio")
+#   radio          todos os pacotes de rádio com versão nova
+#   radio=a,b      só estes pacotes de rádio
+#   pacotes=a,b    só estes pacotes do sistema (escolhidos na lista)
+#   not1mm, wsjtx, … programas que não vêm por pacote
+# Os nomes de pacotes só são aceites se estiverem entre os que o próprio ajudante vê com versão nova.
+# Escreve para a janela: "@passo chave", "@ok chave versão", "@erro chave texto", "@reiniciar", "@fim",
+#   "@listas pct i n origem" (apt-get update: ficheiro i de n),
+#   "@baixar pct feito total velocidade eta i n pacote" (bytes, bytes/s, segundos; -1 = desconhecido),
+#   "@instalar pct pacote"; o resto é registo.
+import collections
+import os
+import re
+import selectors
+import subprocess
+import sys
+import time
+
+sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
+import lb_actualizar as lb  # noqa: E402
+
+
+def diz(*partes):
+    print(*partes, flush=True)
+
+
+def corre(cmd, env=None):
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
+    ultima = ""
+    for linha in p.stdout:
+        linha = linha.rstrip()
+        if linha:
+            ultima = linha
+            diz(linha)
+    if p.wait():
+        raise RuntimeError(ultima or " ".join(cmd))
+
+
+UNIDADES = {"B": 1, "kB": 1000, "MB": 1000 ** 2, "GB": 1000 ** 3}
+
+
+def em_bytes(numero, unidade):
+    return int(float(numero.replace(",", "")) * UNIDADES.get(unidade, 1))
+
+
+def corre_apt(cmd, env, listas=False):
+    """apt-get com o canal de estado (APT::Status-Fd): a percentagem da transferência (por bytes) e da instalação.
+    O total a descarregar vem da linha "Need to get" e o pacote em curso das linhas "Get:"; a velocidade é a média
+    dos últimos 4 segundos. Com listas=True (apt-get update) diz só o ficheiro i de n e de onde vem."""
+    ler, escrever = os.pipe()
+    p = subprocess.Popen([cmd[0], "-o", f"APT::Status-Fd={escrever}", *cmd[1:]], stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT, env=env, pass_fds=(escrever,))
+    os.close(escrever)
+    sel = selectors.DefaultSelector()
+    sel.register(p.stdout, selectors.EVENT_READ, "saida")
+    sel.register(ler, selectors.EVENT_READ, "estado")
+    resto = {"saida": b"", "estado": b""}
+    abertos = 2
+    total, actual, ultima, enviado = 0, "", "", 0.0
+    amostras = collections.deque()
+
+    def linha_saida(l):
+        nonlocal total, actual, ultima
+        if not l:
+            return
+        ultima = l
+        diz(l)
+        m = re.match(r"^Need to get ([\d.,]+) ([kMG]?B)", l)
+        if m:
+            total = em_bytes(*m.groups())
+        if listas:
+            m = re.match(r"^Get:\d+ \S+?://([^/\s]+)\S* (.+?) \[", l)
+            if m:
+                actual = f"{m.group(1)} {m.group(2)}"
+        else:
+            m = re.match(r"^Get:\d+ \S+ \S+ \S+ (\S+) \S+ \S+ \[", l)
+            if m:
+                actual = m.group(1)
+
+    def linha_estado(l):
+        nonlocal enviado
+        partes = l.split(":", 3)
+        if len(partes) < 4:
+            return
+        tipo, item, pct, desc = partes
+        agora = time.monotonic()
+        try:
+            pct = float(pct)
+        except ValueError:
+            return
+        if tipo == "dlstatus" and listas:
+            m = re.search(r"(\d+) of (\d+)", desc)
+            if m and (agora - enviado >= 0.25 or pct >= 100):
+                enviado = agora
+                diz(f"@listas {pct:.1f} {m.group(1)} {m.group(2)} {actual or '-'}")
+        elif tipo == "dlstatus":
+            feito = int(total * pct / 100) if total else -1
+            if feito >= 0:
+                amostras.append((agora, feito))
+                while amostras and agora - amostras[0][0] > 4:
+                    amostras.popleft()
+            vel = eta = -1
+            if len(amostras) > 1 and amostras[-1][0] > amostras[0][0]:
+                vel = int((amostras[-1][1] - amostras[0][1]) / (amostras[-1][0] - amostras[0][0]))
+                if vel > 0 and total:
+                    eta = int((total - feito) / vel)
+            m = re.search(r"(\d+) of (\d+)", desc)
+            i, n = m.groups() if m else ("0", "0")
+            if agora - enviado >= 0.25 or pct >= 100:
+                enviado = agora
+                diz(f"@baixar {pct:.1f} {feito} {total or -1} {vel} {eta} {i} {n} {actual or '-'}")
+        elif tipo == "pmstatus":
+            if agora - enviado >= 0.25 or pct >= 100:
+                enviado = agora
+                diz(f"@instalar {pct:.1f} {item}")
+
+    while abertos:
+        for chave, _ in sel.select():
+            fonte = chave.fileobj
+            dados = os.read(fonte if isinstance(fonte, int) else fonte.fileno(), 65536)
+            if not dados:
+                sel.unregister(fonte)
+                abertos -= 1
+                if resto[chave.data]:
+                    (linha_saida if chave.data == "saida" else linha_estado)(resto[chave.data].decode("utf-8", "replace").strip())
+                continue
+            resto[chave.data] += dados
+            *linhas, resto[chave.data] = resto[chave.data].split(b"\n")
+            for b in linhas:
+                l = b.decode("utf-8", "replace").rstrip()
+                (linha_saida if chave.data == "saida" else linha_estado)(l)
+    os.close(ler)
+    if p.wait():
+        raise RuntimeError(ultima or " ".join(cmd))
+
+
+ENV = dict(os.environ, DEBIAN_FRONTEND="noninteractive", LC_ALL="C")
+OPC = ["-o", "DPkg::Lock::Timeout=120", "-o", "Dpkg::Options::=--force-confdef", "-o", "Dpkg::Options::=--force-confold"]
+FONTES = []
+LISTAS_ACTUALIZADAS = False
+
+
+def apt_update():
+    """Uma só vez por execução, mesmo que se peçam o sistema e os pacotes de rádio."""
+    global FONTES, LISTAS_ACTUALIZADAS
+    if LISTAS_ACTUALIZADAS:
+        return
+    FONTES = lb.apt_fontes("/run/logbeamos-actualizar")
+    corre_apt(["apt-get", "update", "-q", "-o", "DPkg::Lock::Timeout=120", *FONTES], ENV, listas=True)
+    LISTAS_ACTUALIZADAS = True
+
+
+def com_versao_nova():
+    """Pacotes que o apt actualizaria agora (o ajudante não confia na lista que vem da janela)."""
+    r = subprocess.run(["apt-get", "-s", "-q", *FONTES, "dist-upgrade"], capture_output=True, text=True, env=ENV)
+    return [m.group(1) for m in (re.match(r"^Inst (\S+) \[", l) for l in r.stdout.splitlines()) if m]
+
+
+def retem(padroes):
+    """Retém, só durante a actualização, os pacotes instalados que correspondem aos padrões.
+    Devolve os que reteve, para os soltar no fim (os que já estavam retidos, como o Wine, ficam como estavam)."""
+    if not padroes:
+        return []
+    r = subprocess.run(["dpkg-query", "-W", "-f=${Package} ${Status}\n", *padroes], capture_output=True, text=True)
+    instalados = [l.split()[0] for l in r.stdout.splitlines() if l.endswith(" installed")]
+    ja = set(subprocess.run(["apt-mark", "showhold"], capture_output=True, text=True).stdout.split())
+    novos = [p for p in instalados if p not in ja]
+    if novos:
+        subprocess.run(["apt-mark", "hold", *novos], check=True, stdout=subprocess.DEVNULL)
+    return novos
+
+
+def solta(retidos):
+    if retidos:
+        subprocess.run(["apt-mark", "unhold", *retidos], stdout=subprocess.DEVNULL)
+
+
+def fixos():
+    """Na pen o arranque vem sempre da imagem: kernel, GRUB e shim não se actualizam (o GRUB poderia mexer
+    no disco do PC)."""
+    return list(lb.PEN_FIXOS) if lb.na_pen() else []
+
+
+def sistema(com_radio):
+    """Sistema operativo inteiro. Sem os pacotes de rádio, estes ficam retidos e mantêm a versão que têm."""
+    retidos = retem(fixos() + ([] if com_radio else list(lb.PACOTES_RADIO)))
+    try:
+        apt_update()
+        corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "dist-upgrade"], ENV)
+    finally:
+        solta(retidos)
+    return ""
+
+
+def so_estes(pedidos, de_radio):
+    """Só os pacotes pedidos (de rádio ou do sistema) que têm de facto versão nova; o apt traz apenas as
+    dependências de que precisarem."""
+    apt_update()
+    validos = set(com_versao_nova())
+    if de_radio:
+        validos &= set(lb.PACOTES_RADIO)
+    else:
+        validos -= set(lb.PACOTES_RADIO)
+    pend = [p for p in pedidos if p in validos] if pedidos is not None else sorted(validos)
+    if lb.na_pen():
+        pend = [p for p in pend if not lb.fixo_na_pen(p)]
+    if not pend:
+        return "0"
+    retidos = retem(fixos())
+    try:
+        corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "install", "--only-upgrade", *pend], ENV)
+    finally:
+        solta(retidos)
+    return str(len(pend))
+
+
+def not1mm():
+    env = dict(os.environ, **lb.PIPX)
+    corre(["pipx", "upgrade", "not1mm"], env)
+    corre(["python3", "-I", lb.AJUSTES_NOT1MM])
+    corre(["/opt/pipx/venvs/not1mm/bin/python", "-m", "compileall", "-q", "/opt/pipx/venvs/not1mm/lib"])
+    return lb.versao_not1mm()
+
+
+NOME_PACOTE = re.compile(r"^[a-z0-9][a-z0-9+.\-]+(:[a-z0-9]+)?$")
+
+
+def lista(valor):
+    return [p for p in valor.split(",") if NOME_PACOTE.match(p)]
+
+
+def main():
+    if os.geteuid() != 0:
+        sys.exit("é preciso correr como root")
+    github = {g[0]: g for g in lb.GITHUB}
+    pedidos = []
+    for a in sys.argv[1:]:
+        chave, _, valor = a.partition("=")
+        if chave in ("sistema", "radio", "not1mm", *github) and (not valor or chave == "radio"):
+            pedidos.append((chave, lista(valor) if valor else None))
+        elif chave == "pacotes" and valor:
+            pedidos.append((chave, lista(valor)))
+    chaves = [c for c, _ in pedidos]
+    for c, pacotes in pedidos:
+        diz(f"@passo {c}")
+        try:
+            if c == "sistema":
+                v = sistema(com_radio="radio" in chaves and dict(pedidos)["radio"] is None)
+            elif c == "radio":
+                if "sistema" in chaves and pacotes is None:
+                    v = ""  # já foi com o sistema inteiro (dist-upgrade sem reter os pacotes de rádio)
+                else:
+                    v = so_estes(pacotes, de_radio=True)
+            elif c == "pacotes":
+                v = so_estes(pacotes, de_radio=False)
+            elif c == "not1mm":
+                v = not1mm()
+            else:
+                v = lb.instala_github(github[c], diz)
+            diz(f"@ok {c} {v}")
+        except Exception as e:  # um programa com problemas não impede os outros
+            diz(f"@erro {c} {str(e).splitlines()[-1] if str(e) else type(e).__name__}")
+    if os.path.exists("/var/run/reboot-required"):
+        diz("@reiniciar")
+    diz("@fim")
+
+
+main()

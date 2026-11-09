@@ -1,0 +1,18 @@
+#!/bin/bash
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# N1MM Logger+ (Windows) através do Wine.
+# O N1MM+ fala com o rádio por uma COM. Se o rádio estiver partilhado (rigctld, configurado no "Rádio e Equipamento"),
+# a partilha é desligada enquanto o N1MM+ estiver aberto e volta a ligar-se quando ele fecha.
+. /usr/local/lib/logbeamos/wine-env.sh
+S=logbeamos-rigctld.service
+RETOMA=
+if systemctl --user -q is-active "$S" 2>/dev/null; then
+  systemctl --user stop "$S" && RETOMA=1
+fi
+cd "$WINEPREFIX/drive_c/Program Files (x86)/N1MM Logger+" || exit 1
+wine N1MMLogger.net.exe "$@"
+r=$?
+[ -n "$RETOMA" ] && systemctl --user start "$S"
+exit $r

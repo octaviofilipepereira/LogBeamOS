@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+  © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+  Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+-->
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- LogBeamOS: autorização para o ajudante do "Actualizar LogBeamOS" (password do utilizador, guardada uns minutos) -->
+<policyconfig>
+  <vendor>LogBeamOS</vendor>
+  <vendor_url>https://logbeam.org</vendor_url>
+  <action id="org.logbeamos.actualizar">
+    <description>Update LogBeamOS</description>
+    <description xml:lang="pt">Actualizar o LogBeamOS</description>
+    <description xml:lang="es">Actualizar LogBeamOS</description>
+    <description xml:lang="fr">Mettre à jour LogBeamOS</description>
+    <message>Authentication is required to update the system and the amateur radio programs</message>
+    <message xml:lang="pt">Indique a sua password para actualizar o sistema e os programas de rádio</message>
+    <message xml:lang="es">Introduzca su contraseña para actualizar el sistema y los programas de radio</message>
+    <message xml:lang="fr">Saisissez votre mot de passe pour mettre à jour le système et les logiciels de radio</message>
+    <icon_name>system-software-update</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/lib/logbeamos/actualizar/actualizar-raiz</annotate>
+  </action>
+</policyconfig>
