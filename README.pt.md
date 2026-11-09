@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://logbeam.org"><img alt="logbeam.org" src="https://img.shields.io/badge/site-logbeam.org-2f81f7"></a>
-  <img alt="Linux Mint 22" src="https://img.shields.io/badge/base-Linux%20Mint%2022-87cf3e">
+  <img alt="Ubuntu 24.04 LTS" src="https://img.shields.io/badge/base-Ubuntu%2024.04%20LTS-e95420">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img alt="Licença GPL v3" src="https://img.shields.io/badge/licen%C3%A7a-GPL%20v3-blue"></a>
 </p>
 
@@ -14,9 +14,9 @@
 
 ---
 
-O LogBeamOS é uma distribuição para radioamadores, baseada no Linux Mint. Arranca de uma pen, guardando os dados, ou instala-se ao lado do Windows, já com os programas de radioamador instalados: programas nativos de Linux e, através do Wine, o N1MM Logger+ e o Log4OM.
+O LogBeamOS é uma distribuição para radioamadores, baseada no Ubuntu 24.04 LTS. Arranca de uma pen, guardando os dados, ou instala-se ao lado do Windows, já com os programas de radioamador instalados: programas nativos de Linux e, através do Wine, o N1MM Logger+ e o Log4OM.
 
-Esses programas são dos respectivos autores e vêm dos sítios habituais: os repositórios do Linux Mint e do Ubuntu, as publicações dos próprios autores e o Flathub. **Este repositório tem só o que foi escrito para o LogBeamOS**: as ferramentas abaixo. O LogBeam Uplink, que envia os QSOs para o [LogBeam](https://logbeam.org), tem repositório próprio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Esses programas são dos respectivos autores e vêm dos sítios habituais: os repositórios do Ubuntu, as publicações dos próprios autores e o Flathub. **Este repositório tem só o que foi escrito para o LogBeamOS**: as ferramentas abaixo. O LogBeam Uplink, que envia os QSOs para o [LogBeam](https://logbeam.org), tem repositório próprio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ## As ferramentas
 
@@ -39,7 +39,7 @@ O índice do repositório é assinado. Impressão digital da chave:
 A6D0 1419 9FF3 D8B0 4D6D  000A 9621 41CF 2D04 1E07
 ```
 
-Para juntar o repositório à mão no Linux Mint 22 ou no Ubuntu 24.04:
+Para juntar o repositório à mão no Ubuntu 24.04 ou numa distribuição baseada nele:
 
 ```sh
 sudo curl -fsSL -o /usr/share/keyrings/logbeamos.gpg https://logbeam.org/apt/logbeamos.gpg

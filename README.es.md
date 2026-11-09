@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://logbeam.org"><img alt="logbeam.org" src="https://img.shields.io/badge/sitio-logbeam.org-2f81f7"></a>
-  <img alt="Linux Mint 22" src="https://img.shields.io/badge/basada%20en-Linux%20Mint%2022-87cf3e">
+  <img alt="Ubuntu 24.04 LTS" src="https://img.shields.io/badge/basada%20en-Ubuntu%2024.04%20LTS-e95420">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img alt="Licencia GPL v3" src="https://img.shields.io/badge/licencia-GPL%20v3-blue"></a>
 </p>
 
@@ -14,9 +14,9 @@
 
 ---
 
-LogBeamOS es una distribución para radioaficionados basada en Linux Mint. Arranca desde una memoria USB, guardando los datos, o se instala junto a Windows, con los programas de radioaficionado ya instalados: programas nativos de Linux y, a través de Wine, N1MM Logger+ y Log4OM.
+LogBeamOS es una distribución para radioaficionados basada en Ubuntu 24.04 LTS. Arranca desde una memoria USB, guardando los datos, o se instala junto a Windows, con los programas de radioaficionado ya instalados: programas nativos de Linux y, a través de Wine, N1MM Logger+ y Log4OM.
 
-Esos programas son de sus autores y vienen de los sitios habituales: los repositorios de Linux Mint y de Ubuntu, las publicaciones de los propios autores y Flathub. **Este repositorio contiene solo lo que se escribió para LogBeamOS**: las herramientas de abajo. LogBeam Uplink, que envía los QSO a [LogBeam](https://logbeam.org), tiene su propio repositorio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Esos programas son de sus autores y vienen de los sitios habituales: los repositorios de Ubuntu, las publicaciones de los propios autores y Flathub. **Este repositorio contiene solo lo que se escribió para LogBeamOS**: las herramientas de abajo. LogBeam Uplink, que envía los QSO a [LogBeam](https://logbeam.org), tiene su propio repositorio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ## Las herramientas
 
@@ -39,7 +39,7 @@ El índice del repositorio está firmado. Huella de la clave:
 A6D0 1419 9FF3 D8B0 4D6D  000A 9621 41CF 2D04 1E07
 ```
 
-Para añadir el repositorio a mano en Linux Mint 22 o Ubuntu 24.04:
+Para añadir el repositorio a mano en Ubuntu 24.04 o en una distribución basada en él:
 
 ```sh
 sudo curl -fsSL -o /usr/share/keyrings/logbeamos.gpg https://logbeam.org/apt/logbeamos.gpg

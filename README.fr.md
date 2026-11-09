@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://logbeam.org"><img alt="logbeam.org" src="https://img.shields.io/badge/site-logbeam.org-2f81f7"></a>
-  <img alt="Linux Mint 22" src="https://img.shields.io/badge/bas%C3%A9e%20sur-Linux%20Mint%2022-87cf3e">
+  <img alt="Ubuntu 24.04 LTS" src="https://img.shields.io/badge/bas%C3%A9e%20sur-Ubuntu%2024.04%20LTS-e95420">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img alt="Licence GPL v3" src="https://img.shields.io/badge/licence-GPL%20v3-blue"></a>
 </p>
 
@@ -14,9 +14,9 @@
 
 ---
 
-LogBeamOS est une distribution pour radioamateurs basée sur Linux Mint. Elle démarre depuis une clé USB, en gardant les données, ou s'installe à côté de Windows, avec les logiciels de radioamateur déjà installés : des logiciels natifs Linux et, via Wine, N1MM Logger+ et Log4OM.
+LogBeamOS est une distribution pour radioamateurs basée sur Ubuntu 24.04 LTS. Elle démarre depuis une clé USB, en gardant les données, ou s'installe à côté de Windows, avec les logiciels de radioamateur déjà installés : des logiciels natifs Linux et, via Wine, N1MM Logger+ et Log4OM.
 
-Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles : les dépôts de Linux Mint et d'Ubuntu, les publications des auteurs eux-mêmes et Flathub. **Ce dépôt ne contient que ce qui a été écrit pour LogBeamOS** : les outils ci-dessous. LogBeam Uplink, qui envoie les QSO à [LogBeam](https://logbeam.org), a son propre dépôt : [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles : les dépôts d'Ubuntu, les publications des auteurs eux-mêmes et Flathub. **Ce dépôt ne contient que ce qui a été écrit pour LogBeamOS** : les outils ci-dessous. LogBeam Uplink, qui envoie les QSO à [LogBeam](https://logbeam.org), a son propre dépôt : [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ## Les outils
 
@@ -39,7 +39,7 @@ L'index du dépôt est signé. Empreinte de la clé :
 A6D0 1419 9FF3 D8B0 4D6D  000A 9621 41CF 2D04 1E07
 ```
 
-Pour ajouter le dépôt à la main sur Linux Mint 22 ou Ubuntu 24.04 :
+Pour ajouter le dépôt à la main sur Ubuntu 24.04 ou une distribution basée sur elle :
 
 ```sh
 sudo curl -fsSL -o /usr/share/keyrings/logbeamos.gpg https://logbeam.org/apt/logbeamos.gpg

@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://logbeam.org"><img alt="logbeam.org" src="https://img.shields.io/badge/site-logbeam.org-2f81f7"></a>
-  <img alt="Linux Mint 22" src="https://img.shields.io/badge/based%20on-Linux%20Mint%2022-87cf3e">
+  <img alt="Ubuntu 24.04 LTS" src="https://img.shields.io/badge/based%20on-Ubuntu%2024.04%20LTS-e95420">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img alt="GPL v3 licence" src="https://img.shields.io/badge/licence-GPL%20v3-blue"></a>
 </p>
 
@@ -14,9 +14,9 @@
 
 ---
 
-LogBeamOS is a Linux Mint based distribution for radio amateurs. It starts from a USB drive, keeping your data, or installs alongside Windows, with the amateur radio programs already installed: native Linux programs and, through Wine, N1MM Logger+ and Log4OM.
+LogBeamOS is a distribution for radio amateurs, based on Ubuntu 24.04 LTS. It starts from a USB drive, keeping your data, or installs alongside Windows, with the amateur radio programs already installed: native Linux programs and, through Wine, N1MM Logger+ and Log4OM.
 
-Those programs belong to their authors and come from the usual places: the Linux Mint and Ubuntu repositories, the authors' own releases and Flathub. **This repository contains only what was written for LogBeamOS**: the tools below. LogBeam Uplink, which sends QSOs to [LogBeam](https://logbeam.org), has its own repository: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Those programs belong to their authors and come from the usual places: the Ubuntu repositories, the authors' own releases and Flathub. **This repository contains only what was written for LogBeamOS**: the tools below. LogBeam Uplink, which sends QSOs to [LogBeam](https://logbeam.org), has its own repository: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ## The tools
 
@@ -39,7 +39,7 @@ The repository index is signed. Key fingerprint:
 A6D0 1419 9FF3 D8B0 4D6D  000A 9621 41CF 2D04 1E07
 ```
 
-To add the repository by hand on Linux Mint 22 or Ubuntu 24.04:
+To add the repository by hand on Ubuntu 24.04 or a distribution based on it:
 
 ```sh
 sudo curl -fsSL -o /usr/share/keyrings/logbeamos.gpg https://logbeam.org/apt/logbeamos.gpg
