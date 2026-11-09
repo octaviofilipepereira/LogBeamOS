@@ -20,6 +20,10 @@ LogBeamOS is a distribution for radio amateurs, based on Ubuntu 24.04 LTS. It st
 
 Those programs belong to their authors and come from the usual places: the Ubuntu repositories, the authors' own releases and Flathub. **This repository contains only what was written for LogBeamOS**: the tools below. LogBeam Uplink, which sends QSOs to [LogBeam](https://logbeam.org), has its own repository: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
+### Download
+
+The ISO image, its SHA-256 fingerprint and the instructions for writing the USB drive and installing alongside Windows are on the LogBeamOS page: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=en)**.
+
 ### The tools
 
 | Tool | What it does |
@@ -128,6 +132,10 @@ Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 O LogBeamOS é uma distribuição para radioamadores, baseada no Ubuntu 24.04 LTS. Arranca de uma pen, guardando os dados, ou instala-se ao lado do Windows, já com os programas de radioamador instalados: programas nativos de Linux e, através do Wine, o N1MM Logger+ e o Log4OM.
 
 Esses programas são dos respectivos autores e vêm dos sítios habituais: os repositórios do Ubuntu, as publicações dos próprios autores e o Flathub. **Este repositório tem só o que foi escrito para o LogBeamOS**: as ferramentas abaixo. O LogBeam Uplink, que envia os QSOs para o [LogBeam](https://logbeam.org), tem repositório próprio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+
+### Descarregar
+
+A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e instalar ao lado do Windows estão na página do LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/)**.
 
 ### As ferramentas
 
@@ -238,6 +246,10 @@ LogBeamOS es una distribución para radioaficionados basada en Ubuntu 24.04 LTS.
 
 Esos programas son de sus autores y vienen de los sitios habituales: los repositorios de Ubuntu, las publicaciones de los propios autores y Flathub. **Este repositorio contiene solo lo que se escribió para LogBeamOS**: las herramientas de abajo. LogBeam Uplink, que envía los QSO a [LogBeam](https://logbeam.org), tiene su propio repositorio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
+### Descargar
+
+La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memoria USB e instalar junto a Windows están en la página de LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=es)**.
+
 ### Las herramientas
 
 | Herramienta | Qué hace |
@@ -346,6 +358,10 @@ Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 LogBeamOS est une distribution pour radioamateurs basée sur Ubuntu 24.04 LTS. Elle démarre depuis une clé USB, en gardant les données, ou s'installe à côté de Windows, avec les logiciels de radioamateur déjà installés : des logiciels natifs Linux et, via Wine, N1MM Logger+ et Log4OM.
 
 Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles : les dépôts d'Ubuntu, les publications des auteurs eux-mêmes et Flathub. **Ce dépôt ne contient que ce qui a été écrit pour LogBeamOS** : les outils ci-dessous. LogBeam Uplink, qui envoie les QSO à [LogBeam](https://logbeam.org), a son propre dépôt : [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+
+### Télécharger
+
+L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé USB et installer à côté de Windows sont sur la page de LogBeamOS : **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=fr)**.
 
 ### Les outils
 
