@@ -54,6 +54,53 @@ sudo apt install logbeamos-ferramentas
 The tools were made for LogBeamOS. On another system, the parts that depend on the programs LogBeamOS installs (WSJT-X in `/opt/ham`, N1MM+ in Wine, and so on) will not work.
 
 
+### Amateur radio programs in LogBeamOS
+
+Each program belongs to its authors and keeps its own licence. LogBeamOS installs them unchanged.
+
+| Program | What for | Licence | Official page |
+|---|---|---|---|
+| WSJT-X | FT8, FT4, WSPR and other weak-signal modes | GPL-3.0 | [wsjt.sourceforge.io](https://wsjt.sourceforge.io) |
+| JTDX | FT8 and FT4 | GPL-3.0 | [www.jtdx.tech](https://www.jtdx.tech) |
+| JS8Call | Keyboard messaging with weak signals | GPL-3.0 | [github.com/JS8Call-improved/JS8Call-improved](https://github.com/JS8Call-improved/JS8Call-improved) |
+| Decodium | FT8, FT4 and FT2 | GPL-3.0 | [www.ft2.it](https://www.ft2.it) |
+| Fldigi, Flmsg, Flamp, Flarq | Digital modes and messages | GPL-3.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| FreeDV | Digital voice | LGPL-2.1 | [freedv.org](https://freedv.org) |
+| QSSTV | SSTV | GPL-3.0 | [www.qsl.net/on4qz](https://www.qsl.net/on4qz/) |
+| N1MM Logger+ | Contest logging (through Wine) | Free of charge, not open source | [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com) |
+| Log4OM 2 | Logbook (through Wine) | Free of charge, not open source | [www.log4om.com](https://www.log4om.com) |
+| Not1MM | Contest logging | GPL-3.0 | [github.com/mbridak/not1mm](https://github.com/mbridak/not1mm) |
+| Tlf | Contest logging in the terminal | GPL-2.0 | [tlf.github.io](https://tlf.github.io) |
+| CQRLOG | Logbook | GPL-2.0 | [www.cqrlog.com](https://www.cqrlog.com) |
+| KLog | Logbook | GPL-3.0 | [github.com/ea4k/klog](https://github.com/ea4k/klog) |
+| GridTracker2 | Map of the stations heard | BSD-3-Clause | [gridtracker.org](https://gridtracker.org) |
+| WaveLogGate | Sends the QSOs and the radio frequency to Wavelog | MIT | [github.com/wavelog/WaveLogGate](https://github.com/wavelog/WaveLogGate) |
+| LogBeam Uplink | Sends the QSOs to LogBeam | GPL-3.0 | [logbeam.org/uplink](https://logbeam.org/uplink/) |
+| Hamlib | Radio control (CAT) | LGPL-2.1 / GPL-2.0 | [hamlib.github.io](https://hamlib.github.io) |
+| flrig | Radio control | GPL-2.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| wfview | Control of Icom and Kenwood radios | GPL-3.0 | [wfview.org](https://wfview.org) |
+| Gqrx | SDR receiver | GPL-3.0 | [www.gqrx.dk](https://www.gqrx.dk) |
+| SDR++ | SDR receiver | GPL-3.0 | [www.sdrpp.org](https://www.sdrpp.org) |
+| SatDump | Satellite reception | GPL-3.0 | [github.com/SatDump/SatDump](https://github.com/SatDump/SatDump) |
+| GNU Radio | Signal processing | GPL-3.0 | [www.gnuradio.org](https://www.gnuradio.org) |
+| 4ham Spectrum Analysis | Spectrum analysis | AGPL-3.0 | [github.com/octaviofilipepereira/4ham-spectrum-analysis](https://github.com/octaviofilipepereira/4ham-spectrum-analysis) |
+| Direwolf | APRS and packet modem | GPL-2.0 | [github.com/wb2osz/direwolf](https://github.com/wb2osz/direwolf) |
+| Xastir | APRS map | GPL-2.0 | [github.com/Xastir/Xastir](https://github.com/Xastir/Xastir) |
+| Pat | Winlink e-mail over radio | MIT | [getpat.io](https://getpat.io) |
+| Gpredict | Satellite tracking | GPL-2.0 | [oz9aec.dk/gpredict](https://oz9aec.dk/gpredict/) |
+| qdmr | Programming DMR radios | GPL-3.0 | [dm3mat.de/software/qdmr](https://dm3mat.de/software/qdmr/) |
+| Qtel | EchoLink | GPL-2.0 | [www.svxlink.org](https://www.svxlink.org) |
+| xnec2c | Antenna modelling | GPL-3.0 | [www.xnec2c.org](https://www.xnec2c.org) |
+
+### Programs that are not open source
+
+LogBeamOS includes two programs that are free of charge but are not open source. They belong to their authors and are included unchanged:
+
+- **N1MM Logger+**: [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com)
+- **Log4OM 2**: [www.log4om.com](https://www.log4om.com)
+
+**VoxDMR** (DMR on BrandMeister without a radio) is not in the image: Update LogBeamOS installs it only if you ask for it. It is free of charge and does not publish a licence: [voxdmr.com](https://www.voxdmr.com).
+
 ### Contributing and security
 
 Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Security flaws are reported privately: see [SECURITY.md](SECURITY.md).
@@ -115,6 +162,53 @@ sudo apt install logbeamos-ferramentas
 
 As ferramentas foram feitas para o LogBeamOS. Noutro sistema, as partes que dependem dos programas que o LogBeamOS instala (o WSJT-X em `/opt/ham`, o N1MM+ no Wine, etc.) não funcionam.
 
+
+### Programas de radioamador do LogBeamOS
+
+Cada programa é dos respectivos autores e mantém a sua própria licença. O LogBeamOS instala-os sem alterações.
+
+| Programa | Para quê | Licença | Página oficial |
+|---|---|---|---|
+| WSJT-X | FT8, FT4, WSPR e outros modos de sinal fraco | GPL-3.0 | [wsjt.sourceforge.io](https://wsjt.sourceforge.io) |
+| JTDX | FT8 e FT4 | GPL-3.0 | [www.jtdx.tech](https://www.jtdx.tech) |
+| JS8Call | Mensagens por teclado em sinal fraco | GPL-3.0 | [github.com/JS8Call-improved/JS8Call-improved](https://github.com/JS8Call-improved/JS8Call-improved) |
+| Decodium | FT8, FT4 e FT2 | GPL-3.0 | [www.ft2.it](https://www.ft2.it) |
+| Fldigi, Flmsg, Flamp, Flarq | Modos digitais e mensagens | GPL-3.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| FreeDV | Voz digital | LGPL-2.1 | [freedv.org](https://freedv.org) |
+| QSSTV | SSTV | GPL-3.0 | [www.qsl.net/on4qz](https://www.qsl.net/on4qz/) |
+| N1MM Logger+ | Registo de concursos (através do Wine) | Gratuito, de código fechado | [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com) |
+| Log4OM 2 | Registo de contactos (através do Wine) | Gratuito, de código fechado | [www.log4om.com](https://www.log4om.com) |
+| Not1MM | Registo de concursos | GPL-3.0 | [github.com/mbridak/not1mm](https://github.com/mbridak/not1mm) |
+| Tlf | Registo de concursos no terminal | GPL-2.0 | [tlf.github.io](https://tlf.github.io) |
+| CQRLOG | Registo de contactos | GPL-2.0 | [www.cqrlog.com](https://www.cqrlog.com) |
+| KLog | Registo de contactos | GPL-3.0 | [github.com/ea4k/klog](https://github.com/ea4k/klog) |
+| GridTracker2 | Mapa das estações ouvidas | BSD-3-Clause | [gridtracker.org](https://gridtracker.org) |
+| WaveLogGate | Envia os QSOs e a frequência do rádio para o Wavelog | MIT | [github.com/wavelog/WaveLogGate](https://github.com/wavelog/WaveLogGate) |
+| LogBeam Uplink | Envia os QSOs para o LogBeam | GPL-3.0 | [logbeam.org/uplink](https://logbeam.org/uplink/) |
+| Hamlib | Controlo do rádio (CAT) | LGPL-2.1 / GPL-2.0 | [hamlib.github.io](https://hamlib.github.io) |
+| flrig | Controlo do rádio | GPL-2.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| wfview | Controlo de rádios Icom e Kenwood | GPL-3.0 | [wfview.org](https://wfview.org) |
+| Gqrx | Receptor SDR | GPL-3.0 | [www.gqrx.dk](https://www.gqrx.dk) |
+| SDR++ | Receptor SDR | GPL-3.0 | [www.sdrpp.org](https://www.sdrpp.org) |
+| SatDump | Recepção de satélites | GPL-3.0 | [github.com/SatDump/SatDump](https://github.com/SatDump/SatDump) |
+| GNU Radio | Processamento de sinal | GPL-3.0 | [www.gnuradio.org](https://www.gnuradio.org) |
+| 4ham Spectrum Analysis | Análise de espectro | AGPL-3.0 | [github.com/octaviofilipepereira/4ham-spectrum-analysis](https://github.com/octaviofilipepereira/4ham-spectrum-analysis) |
+| Direwolf | Modem de APRS e packet | GPL-2.0 | [github.com/wb2osz/direwolf](https://github.com/wb2osz/direwolf) |
+| Xastir | Mapa de APRS | GPL-2.0 | [github.com/Xastir/Xastir](https://github.com/Xastir/Xastir) |
+| Pat | Correio Winlink por rádio | MIT | [getpat.io](https://getpat.io) |
+| Gpredict | Seguimento de satélites | GPL-2.0 | [oz9aec.dk/gpredict](https://oz9aec.dk/gpredict/) |
+| qdmr | Programação de rádios DMR | GPL-3.0 | [dm3mat.de/software/qdmr](https://dm3mat.de/software/qdmr/) |
+| Qtel | EchoLink | GPL-2.0 | [www.svxlink.org](https://www.svxlink.org) |
+| xnec2c | Modelação de antenas | GPL-3.0 | [www.xnec2c.org](https://www.xnec2c.org) |
+
+### Programas que não são de código aberto
+
+O LogBeamOS inclui dois programas que são gratuitos, mas não são de código aberto. São dos respectivos autores e vêm sem alterações:
+
+- **N1MM Logger+**: [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com)
+- **Log4OM 2**: [www.log4om.com](https://www.log4om.com)
+
+O **VoxDMR** (DMR do BrandMeister sem rádio) não vem na imagem: o Actualizar LogBeamOS só o instala se o utilizador o pedir. É gratuito e não publica licença: [voxdmr.com](https://www.voxdmr.com).
 
 ### Contribuir e segurança
 
@@ -178,6 +272,53 @@ sudo apt install logbeamos-ferramentas
 Las herramientas se hicieron para LogBeamOS. En otro sistema, las partes que dependen de los programas que instala LogBeamOS (WSJT-X en `/opt/ham`, N1MM+ en Wine, etc.) no funcionan.
 
 
+### Programas de radioaficionado de LogBeamOS
+
+Cada programa es de sus autores y mantiene su propia licencia. LogBeamOS los instala sin cambios.
+
+| Programa | Para qué | Licencia | Página oficial |
+|---|---|---|---|
+| WSJT-X | FT8, FT4, WSPR y otros modos de señal débil | GPL-3.0 | [wsjt.sourceforge.io](https://wsjt.sourceforge.io) |
+| JTDX | FT8 y FT4 | GPL-3.0 | [www.jtdx.tech](https://www.jtdx.tech) |
+| JS8Call | Mensajes por teclado con señal débil | GPL-3.0 | [github.com/JS8Call-improved/JS8Call-improved](https://github.com/JS8Call-improved/JS8Call-improved) |
+| Decodium | FT8, FT4 y FT2 | GPL-3.0 | [www.ft2.it](https://www.ft2.it) |
+| Fldigi, Flmsg, Flamp, Flarq | Modos digitales y mensajes | GPL-3.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| FreeDV | Voz digital | LGPL-2.1 | [freedv.org](https://freedv.org) |
+| QSSTV | SSTV | GPL-3.0 | [www.qsl.net/on4qz](https://www.qsl.net/on4qz/) |
+| N1MM Logger+ | Registro de concursos (a través de Wine) | Gratuito, de código cerrado | [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com) |
+| Log4OM 2 | Registro de contactos (a través de Wine) | Gratuito, de código cerrado | [www.log4om.com](https://www.log4om.com) |
+| Not1MM | Registro de concursos | GPL-3.0 | [github.com/mbridak/not1mm](https://github.com/mbridak/not1mm) |
+| Tlf | Registro de concursos en el terminal | GPL-2.0 | [tlf.github.io](https://tlf.github.io) |
+| CQRLOG | Registro de contactos | GPL-2.0 | [www.cqrlog.com](https://www.cqrlog.com) |
+| KLog | Registro de contactos | GPL-3.0 | [github.com/ea4k/klog](https://github.com/ea4k/klog) |
+| GridTracker2 | Mapa de las estaciones oídas | BSD-3-Clause | [gridtracker.org](https://gridtracker.org) |
+| WaveLogGate | Envía los QSO y la frecuencia de la radio a Wavelog | MIT | [github.com/wavelog/WaveLogGate](https://github.com/wavelog/WaveLogGate) |
+| LogBeam Uplink | Envía los QSO a LogBeam | GPL-3.0 | [logbeam.org/uplink](https://logbeam.org/uplink/) |
+| Hamlib | Control de la radio (CAT) | LGPL-2.1 / GPL-2.0 | [hamlib.github.io](https://hamlib.github.io) |
+| flrig | Control de la radio | GPL-2.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| wfview | Control de radios Icom y Kenwood | GPL-3.0 | [wfview.org](https://wfview.org) |
+| Gqrx | Receptor SDR | GPL-3.0 | [www.gqrx.dk](https://www.gqrx.dk) |
+| SDR++ | Receptor SDR | GPL-3.0 | [www.sdrpp.org](https://www.sdrpp.org) |
+| SatDump | Recepción de satélites | GPL-3.0 | [github.com/SatDump/SatDump](https://github.com/SatDump/SatDump) |
+| GNU Radio | Procesamiento de señal | GPL-3.0 | [www.gnuradio.org](https://www.gnuradio.org) |
+| 4ham Spectrum Analysis | Análisis de espectro | AGPL-3.0 | [github.com/octaviofilipepereira/4ham-spectrum-analysis](https://github.com/octaviofilipepereira/4ham-spectrum-analysis) |
+| Direwolf | Módem de APRS y packet | GPL-2.0 | [github.com/wb2osz/direwolf](https://github.com/wb2osz/direwolf) |
+| Xastir | Mapa de APRS | GPL-2.0 | [github.com/Xastir/Xastir](https://github.com/Xastir/Xastir) |
+| Pat | Correo Winlink por radio | MIT | [getpat.io](https://getpat.io) |
+| Gpredict | Seguimiento de satélites | GPL-2.0 | [oz9aec.dk/gpredict](https://oz9aec.dk/gpredict/) |
+| qdmr | Programación de radios DMR | GPL-3.0 | [dm3mat.de/software/qdmr](https://dm3mat.de/software/qdmr/) |
+| Qtel | EchoLink | GPL-2.0 | [www.svxlink.org](https://www.svxlink.org) |
+| xnec2c | Modelado de antenas | GPL-3.0 | [www.xnec2c.org](https://www.xnec2c.org) |
+
+### Programas que no son de código abierto
+
+LogBeamOS incluye dos programas que son gratuitos, pero no son de código abierto. Son de sus autores y se incluyen sin cambios:
+
+- **N1MM Logger+**: [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com)
+- **Log4OM 2**: [www.log4om.com](https://www.log4om.com)
+
+**VoxDMR** (DMR de BrandMeister sin radio) no está en la imagen: Actualizar LogBeamOS solo lo instala si el usuario lo pide. Es gratuito y no publica licencia: [voxdmr.com](https://www.voxdmr.com).
+
 ### Contribuir y seguridad
 
 Las contribuciones son bienvenidas: ver [CONTRIBUTING.md](CONTRIBUTING.md). Los fallos de seguridad se comunican en privado: ver [SECURITY.md](SECURITY.md).
@@ -239,6 +380,53 @@ sudo apt install logbeamos-ferramentas
 
 Les outils ont été faits pour LogBeamOS. Sur un autre système, les parties qui dépendent des logiciels que LogBeamOS installe (WSJT-X dans `/opt/ham`, N1MM+ dans Wine, etc.) ne fonctionnent pas.
 
+
+### Logiciels de radioamateur de LogBeamOS
+
+Chaque logiciel appartient à ses auteurs et garde sa propre licence. LogBeamOS les installe sans modification.
+
+| Logiciel | Pour quoi | Licence | Page officielle |
+|---|---|---|---|
+| WSJT-X | FT8, FT4, WSPR et autres modes à signal faible | GPL-3.0 | [wsjt.sourceforge.io](https://wsjt.sourceforge.io) |
+| JTDX | FT8 et FT4 | GPL-3.0 | [www.jtdx.tech](https://www.jtdx.tech) |
+| JS8Call | Messages au clavier à signal faible | GPL-3.0 | [github.com/JS8Call-improved/JS8Call-improved](https://github.com/JS8Call-improved/JS8Call-improved) |
+| Decodium | FT8, FT4 et FT2 | GPL-3.0 | [www.ft2.it](https://www.ft2.it) |
+| Fldigi, Flmsg, Flamp, Flarq | Modes numériques et messages | GPL-3.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| FreeDV | Voix numérique | LGPL-2.1 | [freedv.org](https://freedv.org) |
+| QSSTV | SSTV | GPL-3.0 | [www.qsl.net/on4qz](https://www.qsl.net/on4qz/) |
+| N1MM Logger+ | Carnet de concours (via Wine) | Gratuit, code source fermé | [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com) |
+| Log4OM 2 | Carnet de trafic (via Wine) | Gratuit, code source fermé | [www.log4om.com](https://www.log4om.com) |
+| Not1MM | Carnet de concours | GPL-3.0 | [github.com/mbridak/not1mm](https://github.com/mbridak/not1mm) |
+| Tlf | Carnet de concours dans le terminal | GPL-2.0 | [tlf.github.io](https://tlf.github.io) |
+| CQRLOG | Carnet de trafic | GPL-2.0 | [www.cqrlog.com](https://www.cqrlog.com) |
+| KLog | Carnet de trafic | GPL-3.0 | [github.com/ea4k/klog](https://github.com/ea4k/klog) |
+| GridTracker2 | Carte des stations entendues | BSD-3-Clause | [gridtracker.org](https://gridtracker.org) |
+| WaveLogGate | Envoie les QSO et la fréquence de la radio à Wavelog | MIT | [github.com/wavelog/WaveLogGate](https://github.com/wavelog/WaveLogGate) |
+| LogBeam Uplink | Envoie les QSO à LogBeam | GPL-3.0 | [logbeam.org/uplink](https://logbeam.org/uplink/) |
+| Hamlib | Contrôle de la radio (CAT) | LGPL-2.1 / GPL-2.0 | [hamlib.github.io](https://hamlib.github.io) |
+| flrig | Contrôle de la radio | GPL-2.0 | [www.w1hkj.org](https://www.w1hkj.org) |
+| wfview | Contrôle des radios Icom et Kenwood | GPL-3.0 | [wfview.org](https://wfview.org) |
+| Gqrx | Récepteur SDR | GPL-3.0 | [www.gqrx.dk](https://www.gqrx.dk) |
+| SDR++ | Récepteur SDR | GPL-3.0 | [www.sdrpp.org](https://www.sdrpp.org) |
+| SatDump | Réception de satellites | GPL-3.0 | [github.com/SatDump/SatDump](https://github.com/SatDump/SatDump) |
+| GNU Radio | Traitement du signal | GPL-3.0 | [www.gnuradio.org](https://www.gnuradio.org) |
+| 4ham Spectrum Analysis | Analyse de spectre | AGPL-3.0 | [github.com/octaviofilipepereira/4ham-spectrum-analysis](https://github.com/octaviofilipepereira/4ham-spectrum-analysis) |
+| Direwolf | Modem APRS et packet | GPL-2.0 | [github.com/wb2osz/direwolf](https://github.com/wb2osz/direwolf) |
+| Xastir | Carte APRS | GPL-2.0 | [github.com/Xastir/Xastir](https://github.com/Xastir/Xastir) |
+| Pat | Courrier Winlink par radio | MIT | [getpat.io](https://getpat.io) |
+| Gpredict | Suivi de satellites | GPL-2.0 | [oz9aec.dk/gpredict](https://oz9aec.dk/gpredict/) |
+| qdmr | Programmation des radios DMR | GPL-3.0 | [dm3mat.de/software/qdmr](https://dm3mat.de/software/qdmr/) |
+| Qtel | EchoLink | GPL-2.0 | [www.svxlink.org](https://www.svxlink.org) |
+| xnec2c | Modélisation d'antennes | GPL-3.0 | [www.xnec2c.org](https://www.xnec2c.org) |
+
+### Logiciels qui ne sont pas à code source ouvert
+
+LogBeamOS contient deux logiciels gratuits, mais qui ne sont pas à code source ouvert. Ils appartiennent à leurs auteurs et sont inclus sans modification :
+
+- **N1MM Logger+**: [n1mmwp.hamdocs.com](https://n1mmwp.hamdocs.com)
+- **Log4OM 2**: [www.log4om.com](https://www.log4om.com)
+
+**VoxDMR** (DMR de BrandMeister sans radio) n'est pas dans l'image : Mettre à jour LogBeamOS ne l'installe que si l'utilisateur le demande. Il est gratuit et ne publie pas de licence : [voxdmr.com](https://www.voxdmr.com).
 
 ### Contribuer et sécurité
 
