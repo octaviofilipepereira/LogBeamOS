@@ -2,7 +2,7 @@
 
 <h1 align="center">LogBeamOS</h1>
 
-<p align="center"><b>The tools of LogBeamOS, the Linux distribution for radio amateurs.</b></p>
+<p align="center"><b>LogBeamOS, the Linux distribution for radio amateurs.</b></p>
 
 <p align="center">
   <a href="https://logbeam.org"><img alt="logbeam.org" src="https://img.shields.io/badge/site-logbeam.org-2f81f7"></a>
