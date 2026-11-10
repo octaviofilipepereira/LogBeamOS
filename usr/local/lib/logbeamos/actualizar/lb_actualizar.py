@@ -390,7 +390,7 @@ def instala_flatpak(ficheiro, alvo, pasta, registo):
             flatpak("pin", "--system", "--remove", base)
     flatpak("uninstall", "--system", "-y", "--noninteractive", "--unused")  # a base antiga, se a nova mudou
     regras = glob.glob(f"/var/lib/flatpak/app/{alvo}/current/active/files/OFF/*.rules")
-    if regras:  # de.darc.dm3mat.qdmr → /etc/udev/rules.d/60-qdmr.rules (o mesmo nome que o pacote do Mint usava)
+    if regras:  # de.darc.dm3mat.qdmr → /etc/udev/rules.d/60-qdmr.rules (o mesmo nome que o pacote antigo do sistema usava)
         shutil.copyfile(regras[0], f"/etc/udev/rules.d/60-{alvo.rsplit('.', 1)[-1]}.rules")
         subprocess.run(["udevadm", "control", "--reload-rules"], capture_output=True)
 
