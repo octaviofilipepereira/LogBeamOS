@@ -24,13 +24,16 @@ Those programs belong to their authors and come from the usual places: the Ubunt
 
 The ISO image, its SHA-256 fingerprint and the instructions for writing the USB drive and installing alongside Windows are on the LogBeamOS page: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=en)**.
 
+- Current version: **LogBeamOS 0.3.13**, of 11/11/2026
+- SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+
 ### The tools
 
 | Tool | What it does |
 |---|---|
 | **Update LogBeamOS** | One window to update the amateur radio programs and the operating system. It shows the installed version, the available one and the download size, and updates only what is ticked, with the progress in MB, speed and time left. It covers the system packages, the programs published on GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr and others), Not1MM, and the LogBeamOS tools themselves. Ten minutes after login, a notice appears if there are updates. |
 | **Radio and Equipment** | Detects radios, CAT cables, sound cards and SDR receivers. It shares the radio among the programs through Hamlib's `rigctld`, with automatic speed detection, and configures WSJT-X, JTDX, Decodium, Fldigi, Not1MM and Direwolf to use it. |
-| **LogBeamOS manual** | First steps, connecting the radio, which program for what, updating, installing alongside Windows and removing LogBeamOS. Its own window, in the language of the session. |
+| **LogBeamOS manual** | First steps, connecting the radio, which program for what, updating, installing alongside Windows and removing LogBeamOS. Its own window, in the language of the session. It can also be read here: [manual in English](docs/manual/manual-en.md). |
 | **Launchers** | N1MM Logger+ through Wine, receiving the shared radio while it is open; Direwolf with a configuration created if missing; Xastir connected to Direwolf. |
 
 Every window is in Portuguese, English, Spanish and French.
@@ -137,13 +140,16 @@ Esses programas são dos respectivos autores e vêm dos sítios habituais: os re
 
 A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e instalar ao lado do Windows estão na página do LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/)**.
 
+- Versão actual: **LogBeamOS 0.3.13**, de 11/11/2026
+- SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+
 ### As ferramentas
 
 | Ferramenta | O que faz |
 |---|---|
 | **Actualizar LogBeamOS** | Uma janela para actualizar os programas de radioamador e o sistema operativo. Mostra a versão instalada, a disponível e o tamanho a descarregar, e actualiza só o que estiver marcado, com o progresso em MB, a velocidade e o tempo que falta. Abrange os pacotes do sistema, os programas publicados no GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr e outros), o Not1MM e as próprias ferramentas do LogBeamOS. Dez minutos depois de entrar na sessão, aparece um aviso se houver actualizações. |
 | **Rádio e Equipamento** | Detecta rádios, cabos de CAT, placas de som e receptores SDR. Partilha o rádio entre os programas através do `rigctld` do Hamlib, com detecção automática da velocidade, e configura o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM e o Direwolf para o usarem. |
-| **Manual do LogBeamOS** | Primeiros passos, ligar o rádio, que programa para quê, actualizar, instalar ao lado do Windows e retirar o LogBeamOS. Em janela própria, na língua da sessão. |
+| **Manual do LogBeamOS** | Primeiros passos, ligar o rádio, que programa para quê, actualizar, instalar ao lado do Windows e retirar o LogBeamOS. Em janela própria, na língua da sessão. Também se pode ler aqui: [manual em português](docs/manual/manual-pt.md). |
 | **Lançadores** | O N1MM Logger+ através do Wine, a receber o rádio partilhado enquanto está aberto; o Direwolf, com uma configuração criada se faltar; o Xastir, ligado ao Direwolf. |
 
 Todas as janelas estão em português, inglês, espanhol e francês.
@@ -250,13 +256,16 @@ Esos programas son de sus autores y vienen de los sitios habituales: los reposit
 
 La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memoria USB e instalar junto a Windows están en la página de LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=es)**.
 
+- Versión actual: **LogBeamOS 0.3.13**, del 11/11/2026
+- SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+
 ### Las herramientas
 
 | Herramienta | Qué hace |
 |---|---|
 | **Actualizar LogBeamOS** | Una ventana para actualizar los programas de radioaficionado y el sistema operativo. Muestra la versión instalada, la disponible y el tamaño a descargar, y actualiza solo lo que esté marcado, con el progreso en MB, la velocidad y el tiempo restante. Abarca los paquetes del sistema, los programas publicados en GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr y otros), Not1MM y las propias herramientas de LogBeamOS. Diez minutos después de iniciar la sesión, aparece un aviso si hay actualizaciones. |
 | **Radio y Equipo** | Detecta radios, cables CAT, tarjetas de sonido y receptores SDR. Comparte la radio entre los programas a través de `rigctld` de Hamlib, con detección automática de la velocidad, y configura WSJT-X, JTDX, Decodium, Fldigi, Not1MM y Direwolf para que la usen. |
-| **Manual de LogBeamOS** | Primeros pasos, conectar la radio, qué programa para qué, actualizar, instalar junto a Windows y quitar LogBeamOS. En su propia ventana, en el idioma de la sesión. |
+| **Manual de LogBeamOS** | Primeros pasos, conectar la radio, qué programa para qué, actualizar, instalar junto a Windows y quitar LogBeamOS. En su propia ventana, en el idioma de la sesión. También se puede leer aquí: [manual en español](docs/manual/manual-es.md). |
 | **Lanzadores** | N1MM Logger+ a través de Wine, recibiendo la radio compartida mientras está abierto; Direwolf, con una configuración creada si falta; Xastir, conectado a Direwolf. |
 
 Todas las ventanas están en portugués, inglés, español y francés.
@@ -363,13 +372,16 @@ Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles
 
 L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé USB et installer à côté de Windows sont sur la page de LogBeamOS : **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=fr)**.
 
+- Version actuelle : **LogBeamOS 0.3.13**, du 11/11/2026
+- SHA-256 : `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+
 ### Les outils
 
 | Outil | Ce qu'il fait |
 |---|---|
 | **Mettre à jour LogBeamOS** | Une fenêtre pour mettre à jour les logiciels de radioamateur et le système d'exploitation. Elle affiche la version installée, la version disponible et la taille à télécharger, et ne met à jour que ce qui est coché, avec la progression en Mo, la vitesse et le temps restant. Elle couvre les paquets du système, les logiciels publiés sur GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr et d'autres), Not1MM et les outils de LogBeamOS eux-mêmes. Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour. |
 | **Radio et Matériel** | Détecte les radios, les câbles CAT, les cartes son et les récepteurs SDR. Partage la radio entre les logiciels via `rigctld` de Hamlib, avec détection automatique de la vitesse, et configure WSJT-X, JTDX, Decodium, Fldigi, Not1MM et Direwolf pour l'utiliser. |
-| **Manuel de LogBeamOS** | Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, installer à côté de Windows et retirer LogBeamOS. Dans sa propre fenêtre, dans la langue de la session. |
+| **Manuel de LogBeamOS** | Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, installer à côté de Windows et retirer LogBeamOS. Dans sa propre fenêtre, dans la langue de la session. Il peut aussi être lu ici : [manuel en français](docs/manual/manual-fr.md). |
 | **Lanceurs** | N1MM Logger+ via Wine, recevant la radio partagée tant qu'il est ouvert ; Direwolf, avec une configuration créée si elle manque ; Xastir, relié à Direwolf. |
 
 Toutes les fenêtres sont en portugais, anglais, espagnol et français.
