@@ -143,6 +143,17 @@ A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e
 - Versão actual: **LogBeamOS 0.3.13**, de 11/11/2026
 - SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
 
+### Capturas de ecrã
+
+Carregue numa imagem para a ver em tamanho real.
+
+<table>
+<tr><td width="50%"><a href="docs/capturas/pt/01-ambiente.jpg"><img src="docs/capturas/pt/01-ambiente-p.jpg" alt="Ambiente de trabalho"></a><br>Ambiente de trabalho</td><td width="50%"><a href="docs/capturas/pt/02-n1mm.jpg"><img src="docs/capturas/pt/02-n1mm-p.jpg" alt="N1MM Logger+ (através do Wine)"></a><br>N1MM Logger+ (através do Wine)</td></tr>
+<tr><td width="50%"><a href="docs/capturas/pt/03-nativos.jpg"><img src="docs/capturas/pt/03-nativos-p.jpg" alt="WSJT-X, Fldigi e JS8Call"></a><br>WSJT-X, Fldigi e JS8Call</td><td width="50%"><a href="docs/capturas/pt/04-echolink-dmr.jpg"><img src="docs/capturas/pt/04-echolink-dmr-p.jpg" alt="EchoLink (Qtel) e DMR (qdmr)"></a><br>EchoLink (Qtel) e DMR (qdmr)</td></tr>
+<tr><td width="50%"><a href="docs/capturas/pt/05-sdr-satelites.jpg"><img src="docs/capturas/pt/05-sdr-satelites-p.jpg" alt="SDR++, SatDump e Gpredict"></a><br>SDR++, SatDump e Gpredict</td><td width="50%"><a href="docs/capturas/pt/07-actualizar.jpg"><img src="docs/capturas/pt/07-actualizar-p.jpg" alt="Actualizar LogBeamOS"></a><br>Actualizar LogBeamOS</td></tr>
+<tr><td width="50%"><a href="docs/capturas/pt/08-instalador.jpg"><img src="docs/capturas/pt/08-instalador-p.jpg" alt="Instalar ao lado do Windows"></a><br>Instalar ao lado do Windows</td></tr>
+</table>
+
 ### As ferramentas
 
 | Ferramenta | O que faz |
