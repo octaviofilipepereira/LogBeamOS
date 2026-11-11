@@ -8,7 +8,7 @@
 
 *Distribution Linux pour radioamateurs*
 
-C'est le manuel fourni avec LogBeamOS (outils 0.3.14).
+C'est le manuel fourni avec LogBeamOS (outils 0.3.15).
 
 [Português](manual-pt.md) · [English](manual-en.md) · [Español](manual-es.md) · **Français**
 
@@ -74,7 +74,7 @@ C'est le manuel fourni avec LogBeamOS (outils 0.3.14).
 ### D'abord, dans Windows
 
 1. **Sauvegardez vos données.**
-2. **Lancez « Preparar o Windows.cmd »** par clic droit → *Exécuter en tant qu'administrateur*. Il se trouve sur le lecteur LOGBEAMOS que la clé USB affiche dans Windows, et aussi à la racine de l'ISO (double clic sur l'ISO). La clé USB affiche aussi un petit lecteur de 5 Mo, avec les dossiers « boot » et « EFI » : ne le modifiez pas, la clé USB en a besoin pour démarrer. Il désactive le démarrage rapide et, si le lecteur C: est chiffré, commence à le déchiffrer ; avant d'installer, attendez que le pourcentage chiffré atteigne 0 %. Cela peut aussi se faire à la main : *Avant d'installer*.
+2. **Lancez « Preparar o Windows.cmd »** par clic droit → *Exécuter en tant qu'administrateur*. Il se trouve à la racine de l'ISO : dans Windows, double-cliquez sur le fichier ISO pour l'ouvrir. Il désactive le démarrage rapide et, si le lecteur C: est chiffré, commence à le déchiffrer ; avant d'installer, attendez que le pourcentage chiffré atteigne 0 %. Cela peut aussi se faire à la main : *Avant d'installer*.
 
 ### Installer
 

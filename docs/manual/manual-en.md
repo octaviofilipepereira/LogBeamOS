@@ -8,7 +8,7 @@
 
 *Linux distribution for radio amateurs*
 
-This is the manual that comes with LogBeamOS (tools 0.3.14).
+This is the manual that comes with LogBeamOS (tools 0.3.15).
 
 [Português](manual-pt.md) · **English** · [Español](manual-es.md) · [Français](manual-fr.md)
 
@@ -74,7 +74,7 @@ This is the manual that comes with LogBeamOS (tools 0.3.14).
 ### First, in Windows
 
 1. **Back up your data.**
-2. **Run "Preparar o Windows.cmd"** with right-click → *Run as administrator*. It is on the LOGBEAMOS drive that the USB drive shows in Windows, and also at the root of the ISO (double-click the ISO). The USB drive also shows a small 5 MB drive with the "boot" and "EFI" folders: do not change it, the USB drive needs it to start. It turns off fast startup and, if drive C: is encrypted, starts decrypting it; before installing, wait until the percentage encrypted reaches 0 %. It can also be done by hand: *Before installing*.
+2. **Run "Preparar o Windows.cmd"** with right-click → *Run as administrator*. It is at the root of the ISO: in Windows, double-click the ISO file to open it. It turns off fast startup and, if drive C: is encrypted, starts decrypting it; before installing, wait until the percentage encrypted reaches 0 %. It can also be done by hand: *Before installing*.
 
 ### Installing
 

@@ -8,7 +8,7 @@
 
 *Distribuição Linux para radioamadores*
 
-Este é o manual que acompanha o LogBeamOS (ferramentas 0.3.14).
+Este é o manual que acompanha o LogBeamOS (ferramentas 0.3.15).
 
 **Português** · [English](manual-en.md) · [Español](manual-es.md) · [Français](manual-fr.md)
 
@@ -74,7 +74,7 @@ Este é o manual que acompanha o LogBeamOS (ferramentas 0.3.14).
 ### Antes, no Windows
 
 1. **Copie os seus dados.**
-2. **Corra o "Preparar o Windows.cmd"** com o botão direito → *Executar como administrador*. Está na unidade LOGBEAMOS que a pen mostra no Windows, e também na raiz da ISO (duplo clique na ISO). A pen mostra também uma unidade pequena, de 5 MB, com as pastas "boot" e "EFI": não mexa nela, porque a pen precisa dela para arrancar. Desliga o arranque rápido e, se o disco C: estiver encriptado, começa a desencriptação; antes de instalar, espere que a percentagem encriptada chegue a 0 %. Também se pode fazer à mão: *Antes de instalar*.
+2. **Corra o "Preparar o Windows.cmd"** com o botão direito → *Executar como administrador*. Está na raiz da ISO: no Windows, faça duplo clique no ficheiro ISO para a abrir. Desliga o arranque rápido e, se o disco C: estiver encriptado, começa a desencriptação; antes de instalar, espere que a percentagem encriptada chegue a 0 %. Também se pode fazer à mão: *Antes de instalar*.
 
 ### Instalar
 

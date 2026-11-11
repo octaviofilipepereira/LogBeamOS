@@ -8,7 +8,7 @@
 
 *Distribución Linux para radioaficionados*
 
-Este es el manual que acompaña a LogBeamOS (herramientas 0.3.14).
+Este es el manual que acompaña a LogBeamOS (herramientas 0.3.15).
 
 [Português](manual-pt.md) · [English](manual-en.md) · **Español** · [Français](manual-fr.md)
 
@@ -74,7 +74,7 @@ Este es el manual que acompaña a LogBeamOS (herramientas 0.3.14).
 ### Antes, en Windows
 
 1. **Copie sus datos.**
-2. **Ejecute "Preparar o Windows.cmd"** con el botón derecho → *Ejecutar como administrador*. Está en la unidad LOGBEAMOS que la memoria USB muestra en Windows, y también en la raíz de la ISO (doble clic en la ISO). La memoria USB muestra también una unidad pequeña, de 5 MB, con las carpetas "boot" y "EFI": no la modifique, porque la memoria USB la necesita para arrancar. Desactiva el inicio rápido y, si la unidad C: está cifrada, empieza a descifrarla; antes de instalar, espere a que el porcentaje cifrado llegue al 0 %. También se puede hacer a mano: *Antes de instalar*.
+2. **Ejecute "Preparar o Windows.cmd"** con el botón derecho → *Ejecutar como administrador*. Está en la raíz de la ISO: en Windows, haga doble clic en el archivo ISO para abrirla. Desactiva el inicio rápido y, si la unidad C: está cifrada, empieza a descifrarla; antes de instalar, espere a que el porcentaje cifrado llegue al 0 %. También se puede hacer a mano: *Antes de instalar*.
 
 ### Instalar
 

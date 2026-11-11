@@ -24,8 +24,8 @@ Those programs belong to their authors and come from the usual places: the Ubunt
 
 The ISO image, its SHA-256 fingerprint and the instructions for writing the USB drive and installing alongside Windows are on the LogBeamOS page: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=en)**.
 
-- Current version: **LogBeamOS 0.3.13**, of 11/11/2026
-- SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+- Current version: **LogBeamOS 0.3.14**, of 11/11/2026
+- SHA-256: `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
 
 ### The tools
 
@@ -140,8 +140,8 @@ Esses programas são dos respectivos autores e vêm dos sítios habituais: os re
 
 A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e instalar ao lado do Windows estão na página do LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/)**.
 
-- Versão actual: **LogBeamOS 0.3.13**, de 11/11/2026
-- SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+- Versão actual: **LogBeamOS 0.3.14**, de 11/11/2026
+- SHA-256: `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
 
 ### Capturas de ecrã
 
@@ -268,8 +268,8 @@ Esos programas son de sus autores y vienen de los sitios habituales: los reposit
 
 La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memoria USB e instalar junto a Windows están en la página de LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=es)**.
 
-- Versión actual: **LogBeamOS 0.3.13**, del 11/11/2026
-- SHA-256: `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+- Versión actual: **LogBeamOS 0.3.14**, del 11/11/2026
+- SHA-256: `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
 
 ### Las herramientas
 
@@ -384,8 +384,8 @@ Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles
 
 L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé USB et installer à côté de Windows sont sur la page de LogBeamOS : **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=fr)**.
 
-- Version actuelle : **LogBeamOS 0.3.13**, du 11/11/2026
-- SHA-256 : `2fe652436b1ff42bca11c6a2b327f707b7c5df971ce8bd13003b844903361955`
+- Version actuelle : **LogBeamOS 0.3.14**, du 11/11/2026
+- SHA-256 : `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
 
 ### Les outils
 
