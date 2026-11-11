@@ -1,0 +1,17 @@
+# LogBeamOS: verificação antes da sessão gráfica (lido pelo /etc/X11/Xsession, como o utilizador que entra).
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+#
+# O Cinnamon não arranca (fica só o ambiente de trabalho, sem painel) se o ficheiro dos marcadores do gestor de
+# ficheiros tiver texto inválido, por exemplo depois de um corte de corrente a meio da escrita (bytes nulos).
+# Se não for UTF-8 válido, é guardado à parte e retirado; a sessão volta a criá-lo com as pastas pessoais.
+lb_marcadores="$HOME/.config/gtk-3.0/bookmarks"
+if [ -f "$lb_marcadores" ]; then
+  if [ "$(tr -d '\000' < "$lb_marcadores" | wc -c)" != "$(wc -c < "$lb_marcadores")" ] \
+     || ! iconv -f UTF-8 -t UTF-8 "$lb_marcadores" >/dev/null 2>&1; then
+    mv -f "$lb_marcadores" "$lb_marcadores.estragado-$(date +%Y%m%d-%H%M%S)" 2>/dev/null \
+      || rm -f "$lb_marcadores"
+  fi
+fi
+unset lb_marcadores

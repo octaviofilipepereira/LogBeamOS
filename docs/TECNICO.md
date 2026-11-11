@@ -17,7 +17,7 @@ Cada ficheiro está na pasta onde é instalado:
 | `usr/share/logbeamos/` | Os ícones e o manual nas quatro línguas |
 | `usr/local/share/applications/` | As entradas do menu |
 | `usr/share/polkit-1/actions/` | A autorização do ajudante do Actualizar, que corre como administrador |
-| `etc/` | O aviso de actualizações ao entrar na sessão e a regra que afasta os receptores RTL-SDR do controlador de TV do Linux |
+| `etc/` | O aviso de actualizações ao entrar na sessão e a regra que afasta os receptores RTL-SDR do controlador de TV do Linux; antes da sessão gráfica, a verificação que impede um ficheiro de marcadores estragado (por exemplo, depois de um corte de corrente) de deixar o Cinnamon sem painel |
 | `docs/manual/` | O manual em Markdown, para ler no GitHub; não é instalado. É feito a partir do de `usr/share/logbeamos/manual/` a cada versão das ferramentas |
 
 ### Tecnologia
@@ -39,7 +39,7 @@ Each file is in the folder where it is installed:
 | `usr/share/logbeamos/` | Icons and the manual in the four languages |
 | `usr/local/share/applications/` | Menu entries |
 | `usr/share/polkit-1/actions/` | Authorisation for the updater's helper, which runs as administrator |
-| `etc/` | The update notice at login and the rule that keeps RTL-SDR receivers away from the Linux TV driver |
+| `etc/` | The update notice at login and the rule that keeps RTL-SDR receivers away from the Linux TV driver; before the graphical session, the check that stops a damaged bookmarks file (for example, after a power cut) from leaving Cinnamon without its panel |
 | `docs/manual/` | The manual in Markdown, to read on GitHub; it is not installed. It is made from the one in `usr/share/logbeamos/manual/` with each version of the tools |
 
 ### Technology
@@ -61,7 +61,7 @@ Cada archivo está en la carpeta donde se instala:
 | `usr/share/logbeamos/` | Los iconos y el manual en los cuatro idiomas |
 | `usr/local/share/applications/` | Las entradas del menú |
 | `usr/share/polkit-1/actions/` | La autorización del asistente de Actualizar, que se ejecuta como administrador |
-| `etc/` | El aviso de actualizaciones al iniciar la sesión y la regla que aparta los receptores RTL-SDR del controlador de TV de Linux |
+| `etc/` | El aviso de actualizaciones al iniciar la sesión y la regla que aparta los receptores RTL-SDR del controlador de TV de Linux; antes de la sesión gráfica, la comprobación que impide que un archivo de marcadores dañado (por ejemplo, tras un corte de corriente) deje Cinnamon sin panel |
 | `docs/manual/` | El manual en Markdown, para leer en GitHub; no se instala. Se hace a partir del de `usr/share/logbeamos/manual/` en cada versión de las herramientas |
 
 ### Tecnología
@@ -83,7 +83,7 @@ Chaque fichier est dans le dossier où il est installé :
 | `usr/share/logbeamos/` | Les icônes et le manuel dans les quatre langues |
 | `usr/local/share/applications/` | Les entrées du menu |
 | `usr/share/polkit-1/actions/` | L'autorisation de l'assistant de mise à jour, qui s'exécute en administrateur |
-| `etc/` | L'avis de mises à jour à l'ouverture de la session et la règle qui écarte les récepteurs RTL-SDR du pilote TV de Linux |
+| `etc/` | L'avis de mises à jour à l'ouverture de la session et la règle qui écarte les récepteurs RTL-SDR du pilote TV de Linux ; avant la session graphique, la vérification qui empêche un fichier de signets endommagé (par exemple, après une coupure de courant) de laisser Cinnamon sans panneau |
 | `docs/manual/` | Le manuel en Markdown, à lire sur GitHub ; il n'est pas installé. Il est fait à partir de celui de `usr/share/logbeamos/manual/` à chaque version des outils |
 
 ### Technologie
