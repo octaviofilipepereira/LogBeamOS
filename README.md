@@ -26,6 +26,7 @@ The ISO image, its SHA-256 fingerprint and the instructions for writing the USB 
 
 - Current version: **LogBeamOS 0.3.14**, of 11/11/2026
 - SHA-256: `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
+- To install on the disk: at least 50 GB free. The system takes about 20 GB once installed, because it already includes N1MM+ and Log4OM with everything they need to run on Linux; the rest is room for updates and for your logs. In the installer, drag the divider to give LogBeamOS at least 50 GB: it suggests less.
 
 ### The tools
 
@@ -142,6 +143,7 @@ A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e
 
 - Versão actual: **LogBeamOS 0.3.14**, de 11/11/2026
 - SHA-256: `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
+- Para instalar no disco: pelo menos 50 GB livres. O sistema ocupa cerca de 20 GB depois de instalado, porque já traz o N1MM+ e o Log4OM com tudo o que precisam para correr no Linux; o resto é o espaço para as actualizações e para os seus registos. No instalador, arraste a divisória para dar ao LogBeamOS pelo menos 50 GB: ele propõe menos.
 
 ### Capturas de ecrã
 
@@ -270,6 +272,7 @@ La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memo
 
 - Versión actual: **LogBeamOS 0.3.14**, del 11/11/2026
 - SHA-256: `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
+- Para instalar en el disco: al menos 50 GB libres. El sistema ocupa unos 20 GB una vez instalado, porque ya incluye N1MM+ y Log4OM con todo lo que necesitan para funcionar en Linux; el resto es el espacio para las actualizaciones y para sus registros. En el instalador, arrastre el divisor para dar a LogBeamOS al menos 50 GB: propone menos.
 
 ### Las herramientas
 
@@ -386,6 +389,7 @@ L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé US
 
 - Version actuelle : **LogBeamOS 0.3.14**, du 11/11/2026
 - SHA-256 : `e1495519b7539ffb0ebc498cf1e049753720df4d9a638d7bdb9a6a498cf82b27`
+- Pour installer sur le disque : au moins 50 Go libres. Le système occupe environ 20 Go une fois installé, car il inclut déjà N1MM+ et Log4OM avec tout ce qu'il leur faut pour fonctionner sous Linux ; le reste sert aux mises à jour et à vos journaux. Dans l'installateur, faites glisser le séparateur pour donner au moins 50 Go à LogBeamOS : il en propose moins.
 
 ### Les outils
 
