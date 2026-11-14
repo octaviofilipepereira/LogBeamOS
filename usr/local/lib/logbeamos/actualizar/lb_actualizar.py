@@ -253,6 +253,146 @@ def apt_tamanhos(pasta=None):
     return d
 
 
+# --- Flatpak, Cinnamon extensions and old kernels: what the Mint Update Manager also did. LogBeamOS no longer ships
+# it and "Update LogBeamOS" does everything (author's decision, 14/11/2026).
+FLATPAK_GITHUB = {g[6] for g in GITHUB if g[5] == "flatpak"}  # these have their own line (qdmr)
+TIPOS_CINNAMON = ("applet", "desklet", "extension", "theme")
+
+
+def corre_registo(cmd, registo, env=None, tempo=None):
+    """Runs a command and sends each line of its output to registo; raises with the last line if it fails."""
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
+    ultima = ""
+    for linha in p.stdout:
+        for parte in linha.replace("\r", "\n").split("\n"):
+            parte = parte.rstrip()
+            if parte:
+                ultima = parte
+                registo(parte)
+    if p.wait(tempo):
+        raise RuntimeError(ultima or " ".join(cmd))
+
+
+def flatpak_pendentes(instalacao):
+    """What "flatpak update" would do in one installation ("--system" or "--user"): list of (ref, bytes to download
+    or None). None if flatpak is not installed, or if there is no user installation.
+    libflatpak prepares the same transaction as "flatpak update" and it is stopped before anything is downloaded.
+    The shortcuts disagreed with "flatpak update" in the workshop (14/11/2026): "flatpak remote-ls --updates" leaves
+    out the bases that Flathub marked end-of-life, and list_installed_refs_for_update() listed a KDE base (395 MB)
+    that "flatpak update" did not touch, so the notice would never go away."""
+    if not shutil.which("flatpak"):
+        return None
+    if instalacao == "--user" and not os.path.isdir(os.path.expanduser("~/.local/share/flatpak/repo")):
+        return None
+    import gi
+    gi.require_version("Flatpak", "1.0")
+    from gi.repository import Flatpak, GLib
+    inst = Flatpak.Installation.new_system(None) if instalacao == "--system" else Flatpak.Installation.new_user(None)
+    t = Flatpak.Transaction.new_for_installation(inst, None)
+    t.set_no_interaction(True)
+    for r in inst.list_installed_refs(None):
+        if r.get_name() not in FLATPAK_GITHUB:  # qdmr has its own line
+            try:
+                t.add_update(r.format_ref(), None, None)
+            except GLib.Error:
+                pass
+    ops = []
+
+    def pronto(tr):
+        ops.extend((op.get_ref(), op.get_download_size() or None) for op in tr.get_operations()
+                   if not op.get_is_skipped())
+        return False  # stop: nothing is downloaded or deployed
+
+    t.connect("ready", pronto)
+    try:
+        t.run(None)
+    except GLib.Error as e:
+        if not e.matches(Flatpak.error_quark(), Flatpak.Error.ABORTED):
+            raise RuntimeError(e.message)
+    return ops
+
+
+def actualiza_flatpak(instalacao, registo):
+    """"flatpak update" of the whole installation, as the Mint Update Manager did, when flatpak_pendentes finds
+    something (worked out here, never received from the window)."""
+    pend = flatpak_pendentes(instalacao) or []
+    if not pend:
+        return "0"
+    corre_registo(["flatpak", "update", instalacao, "-y", "--noninteractive"], registo, env=dict(os.environ, LC_ALL="C"))
+    return str(len(pend))
+
+
+def cinnamon_pendentes():
+    """Cinnamon extensions of this user (applets, desklets, extensions, themes) with a new version: list of
+    (type, uuid). None outside Cinnamon. Only as the user: cinnamon-spice-updater refuses to run as root."""
+    if not shutil.which("cinnamon-spice-updater"):
+        return None
+    lista = []
+    for tipo in TIPOS_CINNAMON:
+        r = subprocess.run(["cinnamon-spice-updater", "--list-json", tipo], capture_output=True, text=True, timeout=180)
+        try:
+            d = json.loads(r.stdout)
+        except ValueError:  # it prints "Cinnamon updates failed: …" (no network, for example) and still exits with 0
+            raise RuntimeError((r.stdout.strip() or r.stderr.strip() or "cinnamon-spice-updater").splitlines()[-1])
+        lista += [(tipo, uuid) for uuid in sorted(d)]
+    return lista
+
+
+def actualiza_cinnamon(registo):
+    pend = cinnamon_pendentes() or []
+    if not pend:
+        return "0"
+    texto = []
+
+    def guarda(linha):
+        texto.append(linha)
+        registo(linha)
+    corre_registo(["cinnamon-spice-updater", "--update-all"], guarda, tempo=1800)
+    falhou = [l for l in texto if l.startswith("Cinnamon updates failed")]
+    if falhou:
+        raise RuntimeError(falhou[-1])
+    return str(len(pend))
+
+
+def actualiza_utilizador(tarefa, registo):
+    """What the window updates itself, as the user (no password): Cinnamon extensions and the user's flatpaks."""
+    if tarefa == "cinnamon":
+        return actualiza_cinnamon(registo)
+    if tarefa == "flatpak-utilizador":
+        return actualiza_flatpak("--user", registo)
+    raise RuntimeError(tarefa)
+
+
+def nucleos_a_retirar(instalados, em_uso):
+    """Kernel versions (e.g. '6.14.0-37-generic') to remove: all but the one in use and the newest. If the one in
+    use is not among them, the two newest stay."""
+    ordem = sorted(instalados, key=numeros)
+    fica = set(ordem[-1:])
+    if em_uso in ordem:
+        fica.add(em_uso)
+    else:
+        fica.update(ordem[-2:])
+    return [v for v in ordem if v not in fica]
+
+
+def pacotes_do_nucleo(versao, pacotes):
+    """Installed packages of one kernel version: linux-image-6.14.0-37-generic, linux-modules(-extra)-…,
+    linux-headers-…, linux-hwe-6.14-headers-6.14.0-37, … (never the meta packages, such as linux-generic-hwe-24.04)."""
+    abi = re.sub(r"-[a-z][a-z0-9\-]*$", "", versao)  # 6.14.0-37-generic → 6.14.0-37
+    padrao = re.compile(r"^linux-[a-z0-9.\-]*-" + re.escape(abi) + r"(-[a-z][a-z0-9\-]*)?$")
+    return [p for p in pacotes if padrao.match(p)]
+
+
+def nucleos_velhos():
+    """Packages of the old kernels of an installed system (on the pen the kernel always comes from the image)."""
+    if na_pen():
+        return []
+    r = subprocess.run(["dpkg-query", "-W", "-f=${Package} ${Status}\n"], capture_output=True, text=True)
+    pacotes = [l.split()[0] for l in r.stdout.splitlines() if l.endswith(" installed")]
+    versoes = [p[len("linux-image-"):] for p in pacotes if re.match(r"^linux-image-\d", p)]
+    return sorted({p for v in nucleos_a_retirar(versoes, os.uname().release) for p in pacotes_do_nucleo(v, pacotes)})
+
+
 # --- Instalação (só no ajudante, como root)
 def descarrega(asset, pasta, registo):
     """Descarrega e confere o SHA-256. Vai dizendo à janela o progresso, como o apt ("@baixar …", ver actualizar-raiz)."""

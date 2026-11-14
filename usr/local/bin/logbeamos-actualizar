@@ -7,6 +7,9 @@
 # pacotes, que também se escolhem um a um (autor, 08/11/2026). Actualiza só o que estiver marcado (pede a password
 # uma vez; na pen não pede) e mostra o progresso: o que está a descarregar, MB, velocidade e tempo que falta.
 # Com --verificar não abre a janela: procura actualizações e, se houver, avisa com uma notificação.
+# Since 14/11/2026 it also updates the flatpaks and the Cinnamon extensions and removes the old kernels: LogBeamOS no
+# longer ships the Mint Update Manager (author's decision). Cinnamon extensions and the user's flatpaks are updated
+# by this window, as the user; everything else by the helper, as root.
 import os
 import subprocess
 import sys
@@ -43,6 +46,8 @@ TXT = {
         "recusado": "A actualização não foi autorizada.", "n_titulo": "Há actualizações para o LogBeamOS",
         "n_texto": "{n} actualizações disponíveis.", "n_texto1": "1 actualização disponível.", "n_abrir": "Abrir",
         "a_correr": "A actualizar. Aguarde até ao fim.",
+        "flatpak": "Flatpak", "cinnamon": "Extensões do Cinnamon",
+        "n_act": "{n} actualizações", "n_act1": "1 actualização",
     },
     "en": {
         "titulo": "Update LogBeamOS", "sub": "Ham Radio Programs and operating system",
@@ -67,6 +72,8 @@ TXT = {
         "recusado": "The update was not authorised.", "n_titulo": "Updates for LogBeamOS",
         "n_texto": "{n} updates available.", "n_texto1": "1 update available.", "n_abrir": "Open",
         "a_correr": "Updating. Please wait until it finishes.",
+        "flatpak": "Flatpak", "cinnamon": "Cinnamon extensions",
+        "n_act": "{n} updates", "n_act1": "1 update",
     },
     "es": {
         "titulo": "Actualizar LogBeamOS", "sub": "Programas de Radioaficionado y sistema operativo",
@@ -91,6 +98,8 @@ TXT = {
         "recusado": "La actualización no fue autorizada.", "n_titulo": "Hay actualizaciones para LogBeamOS",
         "n_texto": "{n} actualizaciones disponibles.", "n_texto1": "1 actualización disponible.", "n_abrir": "Abrir",
         "a_correr": "Actualizando. Espere hasta el final.",
+        "flatpak": "Flatpak", "cinnamon": "Extensiones de Cinnamon",
+        "n_act": "{n} actualizaciones", "n_act1": "1 actualización",
     },
     "fr": {
         "titulo": "Mettre à jour LogBeamOS", "sub": "Logiciels Radioamateur et système d'exploitation",
@@ -115,6 +124,8 @@ TXT = {
         "recusado": "La mise à jour n'a pas été autorisée.", "n_titulo": "Mises à jour pour LogBeamOS",
         "n_texto": "{n} mises à jour disponibles.", "n_texto1": "1 mise à jour disponible.", "n_abrir": "Ouvrir",
         "a_correr": "Mise à jour en cours. Patientez jusqu'à la fin.",
+        "flatpak": "Flatpak", "cinnamon": "Extensions de Cinnamon",
+        "n_act": "{n} mises à jour", "n_act1": "1 mise à jour",
     },
 }
 LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
@@ -158,12 +169,19 @@ def tempo_texto(s):
     return f"{s // 3600} h {s % 3600 // 60:02d} min"
 
 
+def conta(n):
+    return T["n_act1"] if n == 1 else T["n_act"].format(n=n) if n else ""
+
+
 def procura():
-    """Devolve (linhas, total, apt_ok, sistema): linhas são (chave, nome, instalada, disponível, estado, actualizar?,
-    tamanho em bytes); sistema é a lista (pacote, instalada, nova, tamanho) dos pacotes do sistema operativo.
-    "actualizar?" é True (versão nova), False, ou "opcional" (programa opcional por instalar: tem caixa, desmarcada)."""
+    """Devolve (linhas, total, apt_ok, sistema, extra): linhas são (chave, nome, instalada, disponível, estado,
+    actualizar?, tamanho em bytes); sistema é a lista (pacote, instalada, nova, tamanho) dos pacotes do sistema
+    operativo; extra says how many flatpaks have a new version in each installation ("flatpak_sistema",
+    "flatpak_utilizador"). "actualizar?" é True (versão nova), False, ou "opcional" (programa opcional por instalar:
+    tem caixa, desmarcada)."""
     linhas = []
     sistema = []
+    extra = {"flatpak_sistema": 0, "flatpak_utilizador": 0}
     # Programas do GitHub
     for item in lb.GITHUB:
         chave, nome = item[0], item[1]
@@ -221,23 +239,57 @@ def procura():
     except Exception:
         linhas.append(("sistema", T["sistema"], "", "", T["sem_rede"], False, None))
         apt_ok = False
+    # Flatpak (system and user installations) and Cinnamon extensions; no line where they do not exist
+    try:
+        fs, fu = lb.flatpak_pendentes("--system"), lb.flatpak_pendentes("--user")
+        if fs is not None or fu is not None:
+            fp = (fs or []) + (fu or [])
+            extra.update(flatpak_sistema=len(fs or []), flatpak_utilizador=len(fu or []))
+            linhas.append(("flatpak", T["flatpak"], "", conta(len(fp)), T["nova"] if fp else T["actualizado"],
+                           bool(fp), sum(t or 0 for _, t in fp) or None))
+    except Exception:
+        linhas.append(("flatpak", T["flatpak"], "", "", T["sem_rede"], False, None))
+    try:
+        cp = lb.cinnamon_pendentes()
+        if cp is not None:
+            linhas.append(("cinnamon", T["cinnamon"], "", conta(len(cp)), T["nova"] if cp else T["actualizado"],
+                           bool(cp), None))
+    except Exception:
+        linhas.append(("cinnamon", T["cinnamon"], "", "", T["sem_rede"], False, None))
     # o que tem versão nova fica no topo; os opcionais por instalar, no fim
     linhas.sort(key=lambda x: (x[5] is not True, x[5] == "opcional", x[0] == "sistema", x[1].lower()))
     for chave, nome in lb.SOZINHOS:
         if not any(x[1] == nome for x in linhas):
             linhas.append((chave, nome, "", "", T["sozinho"], False, None))
     total = sum(1 for x in linhas if x[5] is True)
-    return linhas, total, apt_ok, sistema
+    return linhas, total, apt_ok, sistema, extra
+
+
+# Lines that are not single programs: the operating system and what the Mint Update Manager used to update
+DO_SISTEMA = ("sistema", "flatpak", "cinnamon")
 
 
 def grupo(chave):
-    """"sistema" (sistema operativo e os seus pacotes) ou "radio" (programas do GitHub, Not1MM e pacotes de rádio)."""
-    return "sistema" if chave == "sistema" or chave.startswith("pac:") else "radio"
+    """"sistema" (sistema operativo e os seus pacotes, Flatpak, Cinnamon extensions) ou "radio" (programas do GitHub,
+    Not1MM e pacotes de rádio)."""
+    return "sistema" if chave in DO_SISTEMA or chave.startswith("pac:") else "radio"
 
 
-def argumentos_ajudante(escolha, linhas, sistema):
+def tarefas_utilizador(escolha, linhas, extra):
+    """What the window updates itself, as the user, after the helper: Cinnamon extensions and the user's flatpaks."""
+    novas = {x[0] for x in linhas if x[5] is True}
+    t = []
+    if "cinnamon" in escolha and "cinnamon" in novas:
+        t.append("cinnamon")
+    if "flatpak" in escolha and "flatpak" in novas and extra.get("flatpak_utilizador"):
+        t.append("flatpak-utilizador")
+    return t
+
+
+def argumentos_ajudante(escolha, linhas, sistema, extra):
     """O que vai para o ajudante, por ordem: sistema (inteiro ou só os pacotes marcados), pacotes de rádio (apt),
-    depois os outros programas (os do GitHub podem precisar das bibliotecas novas).
+    the system flatpaks (qdmr, below, may need a new KDE base), depois os outros programas (os do GitHub podem
+    precisar das bibliotecas novas).
     escolha: conjunto das chaves marcadas (programas, "apt:…" e "pac:nome")."""
     args = []
     marcados_sis = [p for p, *_ in sistema if "pac:" + p in escolha]
@@ -251,8 +303,10 @@ def argumentos_ajudante(escolha, linhas, sistema):
         args.append("radio")
     elif apt_marc:
         args.append("radio=" + ",".join(c[4:] for c in apt_marc))
+    if "flatpak" in escolha and extra.get("flatpak_sistema"):
+        args.append("flatpak")
     for x in linhas:
-        if x[5] and x[0] in escolha and x[0] != "sistema" and not x[0].startswith("apt:"):
+        if x[5] and x[0] in escolha and x[0] not in DO_SISTEMA and not x[0].startswith("apt:"):
             args.append(x[0])
     return args
 
@@ -266,7 +320,7 @@ def comando_ajudante(args):
 def verificar():
     """Arranque da sessão: avisa se houver actualizações (sem janela)."""
     try:
-        _, total, _, _ = procura()
+        _, total, _, _, _ = procura()
     except Exception:
         return
     if not total:
@@ -293,7 +347,7 @@ def janela():
             if os.path.exists(ICONE):
                 self.set_icon_from_file(ICONE)
             self.a_correr = False
-            self.linhas, self.sistema, self.opcionais = [], [], set()
+            self.linhas, self.sistema, self.opcionais, self.extra = [], [], set(), {}
             self.connect("delete-event", self.ao_fechar)
 
             caixa = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -486,30 +540,33 @@ def janela():
 
             def trabalho():
                 try:
-                    linhas, total, _, sistema = procura()
+                    linhas, total, _, sistema, extra = procura()
                 except Exception as e:
-                    linhas, total, sistema = [], 0, []
+                    linhas, total, sistema, extra = [], 0, [], {}
                     self.GLib.idle_add(self.escreve, str(e))
-                self.GLib.idle_add(self.fim_procura, linhas, total, sistema)
+                self.GLib.idle_add(self.fim_procura, linhas, total, sistema, extra)
 
             threading.Thread(target=trabalho, daemon=True).start()
 
-        def fim_procura(self, linhas, total, sistema):
+        def fim_procura(self, linhas, total, sistema, extra):
             self.GLib.source_remove(self.pulso)
+            self.extra = extra
             self.mostra(linhas, total, sistema)
 
         # --- Actualização
         def actualizar(self):
-            args = argumentos_ajudante(self.escolha(), self.linhas, self.sistema)
-            if not args:
+            args = argumentos_ajudante(self.escolha(), self.linhas, self.sistema, self.extra)
+            locais = tarefas_utilizador(self.escolha(), self.linhas, self.extra)
+            if not args and not locais:
                 return
             nomes = {x[0]: x[1] for x in self.linhas}
-            nomes.update({"sistema": T["sistema"], "pacotes": T["sistema"], "radio": T["radio_pac"]})
+            nomes.update({"sistema": T["sistema"], "pacotes": T["sistema"], "radio": T["radio_pac"],
+                          "flatpak": T["flatpak"], "flatpak-utilizador": T["flatpak"], "cinnamon": T["cinnamon"]})
             self.a_correr = True
             self.botoes(False)
             self.erros = 0
             self.reiniciar = False
-            passos = len(args)
+            passos = len(args) + len(locais)
             self.feitos = 0
             self.parte = 0.0          # quanto do passo actual já foi feito (0 a 1)
             self.com_progresso = False
@@ -581,11 +638,24 @@ def janela():
                     self.escreve(t)
 
             def trabalho():
-                p = subprocess.Popen(comando_ajudante(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                     text=True)
-                for t in p.stdout:
-                    self.GLib.idle_add(linha, t.rstrip())
-                self.GLib.idle_add(self.fim_actualizar, p.wait())
+                codigo = 0
+                if args:
+                    p = subprocess.Popen(comando_ajudante(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                         text=True)
+                    for t in p.stdout:
+                        self.GLib.idle_add(linha, t.rstrip())
+                    codigo = p.wait()
+                # Then, as the user (no password): Cinnamon extensions and the user's flatpaks. Not if the
+                # password was refused: the user cancelled the update.
+                if codigo not in (126, 127):
+                    for c in locais:
+                        self.GLib.idle_add(linha, f"@passo {c}")
+                        try:
+                            v = lb.actualiza_utilizador(c, lambda s: self.GLib.idle_add(linha, s.lstrip("@")))
+                            self.GLib.idle_add(linha, f"@ok {c} {v}")
+                        except Exception as e:
+                            self.GLib.idle_add(linha, f"@erro {c} {str(e).splitlines()[-1] if str(e) else type(e).__name__}")
+                self.GLib.idle_add(self.fim_actualizar, codigo)
 
             threading.Thread(target=trabalho, daemon=True).start()
 

@@ -8,7 +8,10 @@
 #   radio          todos os pacotes de rádio com versão nova
 #   radio=a,b      só estes pacotes de rádio
 #   pacotes=a,b    só estes pacotes do sistema (escolhidos na lista)
+#   flatpak        "flatpak update" of the system installation (qdmr keeps its own line, from GitHub)
 #   not1mm, wsjtx, … programas que não vêm por pacote
+# After "sistema" or "pacotes", on an installed system, the old kernels are removed: the one in use and the newest
+# stay (14/11/2026, when the Mint Update Manager left LogBeamOS).
 # Os nomes de pacotes só são aceites se estiverem entre os que o próprio ajudante vê com versão nova.
 # Escreve para a janela: "@passo chave", "@ok chave versão", "@erro chave texto", "@reiniciar", "@fim",
 #   "@listas pct i n origem" (apt-get update: ficheiro i de n),
@@ -195,7 +198,20 @@ def sistema(com_radio):
         corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "dist-upgrade"], ENV)
     finally:
         solta(retidos)
+    retira_nucleos_velhos()
     return ""
+
+
+def retira_nucleos_velhos():
+    """Installed system only: the old kernels go away, so that the partition does not fill up with one more kernel
+    on each update. A failure here is reported but does not undo the update."""
+    try:
+        velhos = lb.nucleos_velhos()
+        if velhos:
+            diz("old kernels to remove: " + " ".join(velhos))
+            corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "purge", *velhos], ENV)
+    except Exception as e:
+        diz(f"old kernels not removed: {e}")
 
 
 def so_estes(pedidos, de_radio):
@@ -217,6 +233,8 @@ def so_estes(pedidos, de_radio):
         corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "install", "--only-upgrade", *pend], ENV)
     finally:
         solta(retidos)
+    if not de_radio:
+        retira_nucleos_velhos()
     return str(len(pend))
 
 
@@ -226,6 +244,17 @@ def not1mm():
     corre(["python3", "-I", lb.AJUSTES_NOT1MM])
     corre(["/opt/pipx/venvs/not1mm/bin/python", "-m", "compileall", "-q", "/opt/pipx/venvs/not1mm/lib"])
     return lb.versao_not1mm()
+
+
+def purga_mintupdate():
+    """The tools package (0.3.17 onwards) conflicts with the Mint Update Manager, so apt removes it, but only removes:
+    its configuration files (autostart, sudoers, logrotate) stay until it is purged. Done at the start of every run
+    of this helper; not inside the package scripts, where dpkg is busy."""
+    r = subprocess.run(["dpkg-query", "-W", "-f=${db:Status-Abbrev}", "mintupdate"], capture_output=True, text=True)
+    if r.stdout.startswith("rc"):
+        p = subprocess.run(["dpkg", "--purge", "mintupdate"], capture_output=True, text=True,
+                           env=dict(os.environ, LC_ALL="C"))
+        diz("Mint Update Manager: configuration files " + ("removed" if p.returncode == 0 else "not removed"))
 
 
 NOME_PACOTE = re.compile(r"^[a-z0-9][a-z0-9+.\-]+(:[a-z0-9]+)?$")
@@ -238,11 +267,12 @@ def lista(valor):
 def main():
     if os.geteuid() != 0:
         sys.exit("é preciso correr como root")
+    purga_mintupdate()
     github = {g[0]: g for g in lb.GITHUB}
     pedidos = []
     for a in sys.argv[1:]:
         chave, _, valor = a.partition("=")
-        if chave in ("sistema", "radio", "not1mm", *github) and (not valor or chave == "radio"):
+        if chave in ("sistema", "radio", "not1mm", "flatpak", *github) and (not valor or chave == "radio"):
             pedidos.append((chave, lista(valor) if valor else None))
         elif chave == "pacotes" and valor:
             pedidos.append((chave, lista(valor)))
@@ -261,6 +291,8 @@ def main():
                 v = so_estes(pacotes, de_radio=False)
             elif c == "not1mm":
                 v = not1mm()
+            elif c == "flatpak":
+                v = lb.actualiza_flatpak("--system", diz)
             else:
                 v = lb.instala_github(github[c], diz)
             diz(f"@ok {c} {v}")
