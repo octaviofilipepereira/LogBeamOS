@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=WIRES-X
+Exec=wires-x
+Icon=/usr/share/logbeamos/wires-x.png
+Comment=Yaesu WIRES-X node with an HRI-200 or a radio in PDN mode (installed from the Yaesu package)
+Comment[pt]=Nó WIRES-X da Yaesu com HRI-200 ou rádio em modo PDN (instala-se a partir do pacote da Yaesu)
+Comment[es]=Nodo WIRES-X de Yaesu con HRI-200 o radio en modo PDN (se instala desde el paquete de Yaesu)
+Comment[fr]=Nœud WIRES-X de Yaesu avec HRI-200 ou radio en mode PDN (s'installe depuis le paquet de Yaesu)
+Terminal=false
+Categories=HamRadio;

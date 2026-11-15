@@ -1,0 +1,6 @@
+# LogBeamOS: the NumLock state comes from /usr/local/lib/logbeamos/numlock, not from the previous session
+[org.cinnamon.desktop.peripherals.keyboard]
+remember-numlock-state=false
+
+[org.cinnamon.settings-daemon.peripherals.keyboard]
+remember-numlock-state=false

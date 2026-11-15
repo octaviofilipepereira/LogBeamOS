@@ -1,0 +1,136 @@
+#!/bin/bash
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: WIRES-X (Yaesu) through Wine.
+# WIRES-X is not shipped with LogBeamOS: the user downloads it from the WIRES-X website of Yaesu (it needs their own
+# login) and this launcher installs it into the LogBeamOS Wine prefix and shows which COM port is the HRI-200 or the
+# radio (author's decision, 13/11/2026). Checked in the workshop on 14/11/2026 with WIRES-X 2.010 (wx2010en.zip):
+# it installs and opens at its "COM port setting" screen. A test with an HRI-200 or a radio in PDN mode is still due.
+# Usage: wires-x            install if needed, then open
+#        wires-x --instalar FILE.zip   install only (no questions)
+. /usr/local/lib/logbeamos/wine-env.sh
+DIR="$WINEPREFIX/drive_c/Program Files (x86)/YAESUMUSEN/WIRES-X"
+EXE="$DIR/Wires-X.exe"
+VISTO="$HOME/.config/logbeamos/wires-x-portas-vistas"
+
+t() {
+  case "${LANG%%_*}:$1" in
+    pt:intro) echo "O WIRES-X é um programa da Yaesu e não vem com o LogBeamOS.
+
+1. Descarregue o software WIRES-X no site WIRES-X da Yaesu (é preciso entrar com o seu ID).
+2. Carregue em \"Escolher o ficheiro\" e indique o ficheiro .zip que descarregou (por exemplo wx2010en.zip).
+
+O LogBeamOS instala-o no Wine e indica a porta da HRI-200 ou do rádio (modo PDN), ligados por USB." ;;
+    pt:escolher) echo "Escolher o ficheiro…" ;;
+    pt:cancelar) echo "Cancelar" ;;
+    pt:ficheiro) echo "Indique o ficheiro do WIRES-X descarregado da Yaesu (.zip)" ;;
+    pt:instala) echo "A instalar o WIRES-X no Wine…" ;;
+    pt:naoe) echo "Este ficheiro não traz o instalador do WIRES-X (WiresSetup.msi). Indique o ficheiro .zip do software WIRES-X descarregado do site da Yaesu." ;;
+    pt:falhou) echo "A instalação do WIRES-X falhou. Tente de novo; se voltar a falhar, descarregue outra vez o ficheiro do site da Yaesu." ;;
+    pt:portas) echo "No WIRES-X, no ecrã \"COM port setting\", escolha \"Serial port number specify\" e indique o número da porta da HRI-200 ou do rádio:" ;;
+    pt:semportas) echo "Não foi encontrada nenhuma porta USB. Ligue a HRI-200 ou o rádio por USB e abra de novo o WIRES-X." ;;
+    es:intro) echo "WIRES-X es un programa de Yaesu y no viene con LogBeamOS.
+
+1. Descargue el software WIRES-X en el sitio WIRES-X de Yaesu (hay que entrar con su ID).
+2. Pulse \"Elegir el archivo\" e indique el archivo .zip descargado (por ejemplo wx2010en.zip).
+
+LogBeamOS lo instala en Wine e indica el puerto de la HRI-200 o de la radio (modo PDN), conectadas por USB." ;;
+    es:escolher) echo "Elegir el archivo…" ;;
+    es:cancelar) echo "Cancelar" ;;
+    es:ficheiro) echo "Indique el archivo de WIRES-X descargado de Yaesu (.zip)" ;;
+    es:instala) echo "Instalando WIRES-X en Wine…" ;;
+    es:naoe) echo "Este archivo no contiene el instalador de WIRES-X (WiresSetup.msi). Indique el archivo .zip del software WIRES-X descargado del sitio de Yaesu." ;;
+    es:falhou) echo "La instalación de WIRES-X ha fallado. Inténtelo de nuevo; si vuelve a fallar, descargue otra vez el archivo del sitio de Yaesu." ;;
+    es:portas) echo "En WIRES-X, en la pantalla \"COM port setting\", elija \"Serial port number specify\" e indique el número del puerto de la HRI-200 o de la radio:" ;;
+    es:semportas) echo "No se ha encontrado ningún puerto USB. Conecte la HRI-200 o la radio por USB y abra de nuevo WIRES-X." ;;
+    fr:intro) echo "WIRES-X est un logiciel de Yaesu et n'est pas fourni avec LogBeamOS.
+
+1. Téléchargez le logiciel WIRES-X sur le site WIRES-X de Yaesu (une connexion avec votre ID est nécessaire).
+2. Cliquez sur « Choisir le fichier » et indiquez le fichier .zip téléchargé (par exemple wx2010en.zip).
+
+LogBeamOS l'installe dans Wine et indique le port de la HRI-200 ou de la radio (mode PDN), branchées en USB." ;;
+    fr:escolher) echo "Choisir le fichier…" ;;
+    fr:cancelar) echo "Annuler" ;;
+    fr:ficheiro) echo "Indiquez le fichier WIRES-X téléchargé chez Yaesu (.zip)" ;;
+    fr:instala) echo "Installation de WIRES-X dans Wine…" ;;
+    fr:naoe) echo "Ce fichier ne contient pas l'installateur de WIRES-X (WiresSetup.msi). Indiquez le fichier .zip du logiciel WIRES-X téléchargé sur le site de Yaesu." ;;
+    fr:falhou) echo "L'installation de WIRES-X a échoué. Réessayez ; en cas de nouvel échec, téléchargez de nouveau le fichier sur le site de Yaesu." ;;
+    fr:portas) echo "Dans WIRES-X, à l'écran « COM port setting », choisissez « Serial port number specify » et indiquez le numéro du port de la HRI-200 ou de la radio :" ;;
+    fr:semportas) echo "Aucun port USB trouvé. Branchez la HRI-200 ou la radio en USB et rouvrez WIRES-X." ;;
+    *:intro) echo "WIRES-X is Yaesu software and does not come with LogBeamOS.
+
+1. Download the WIRES-X software from the WIRES-X website of Yaesu (you need to log in with your ID).
+2. Click \"Choose the file\" and select the downloaded .zip file (for example wx2010en.zip).
+
+LogBeamOS installs it in Wine and shows the port of the HRI-200 or of the radio (PDN mode), connected by USB." ;;
+    *:escolher) echo "Choose the file…" ;;
+    *:cancelar) echo "Cancel" ;;
+    *:ficheiro) echo "Select the WIRES-X file downloaded from Yaesu (.zip)" ;;
+    *:instala) echo "Installing WIRES-X in Wine…" ;;
+    *:naoe) echo "This file does not contain the WIRES-X installer (WiresSetup.msi). Select the .zip file of the WIRES-X software downloaded from the Yaesu website." ;;
+    *:falhou) echo "The WIRES-X installation failed. Try again; if it fails again, download the file from the Yaesu website once more." ;;
+    *:portas) echo "In WIRES-X, on the \"COM port setting\" screen, choose \"Serial port number specify\" and enter the port number of the HRI-200 or of the radio:" ;;
+    *:semportas) echo "No USB port was found. Connect the HRI-200 or the radio by USB and open WIRES-X again." ;;
+  esac
+}
+
+# Serial ports that wine-env.sh mapped (COM3 onwards), with the name the device gives itself
+portas() {
+  local c d n id
+  for c in "$WINEPREFIX"/dosdevices/com*; do
+    [ -L "$c" ] || continue
+    d=$(readlink "$c"); [ -e "$d" ] || continue
+    case "$d" in /dev/ttyUSB*|/dev/ttyACM*) ;; *) continue ;; esac
+    n=${c##*/}; id=""
+    for s in /dev/serial/by-id/*; do [ "$(readlink -f "$s")" = "$d" ] && id=" — ${s##*/}"; done
+    echo "${n^^} ($d)$id"
+  done | sort -V
+}
+
+instalar() { # $1 = .zip from Yaesu
+  local tmp msi
+  tmp=$(mktemp -d) || return 1
+  if ! unzip -q -o "$1" -d "$tmp" 2>/dev/null || ! msi=$(find "$tmp" -iname 'WiresSetup.msi' | grep -m1 .); then
+    rm -rf "$tmp"; zenity --error --title=WIRES-X --width=440 --text="$(t naoe)" 2>/dev/null; return 2
+  fi
+  # mshtml off: no question about Wine Gecko. In a new, empty prefix the installer stopped at the Wine Mono question;
+  # the LogBeamOS prefix already has .NET 4 and installs without questions (workshop, 14/11/2026)
+  WINEDLLOVERRIDES="$WINEDLLOVERRIDES;mshtml=" wine msiexec /i "$msi" /qn > /dev/null 2>&1 &
+  local p=$!
+  while kill -0 "$p" 2>/dev/null; do sleep 1; echo "#"; done | \
+    zenity --progress --pulsate --auto-close --no-cancel --title=WIRES-X --text="$(t instala)" 2>/dev/null
+  wait "$p"
+  rm -rf "$tmp"
+  [ -f "$EXE" ] || { zenity --error --title=WIRES-X --width=440 --text="$(t falhou)" 2>/dev/null; return 1; }
+  rm -f "$VISTO"
+}
+
+if [ "${1:-}" = --instalar ]; then
+  [ -f "${2:-}" ] || exit 2
+  instalar "$2"; exit $?
+fi
+
+if [ ! -f "$EXE" ]; then
+  zenity --question --title=WIRES-X --icon-name=dialog-information --width=480 --text="$(t intro)" \
+    --ok-label="$(t escolher)" --cancel-label="$(t cancelar)" 2>/dev/null || exit 0
+  f=$(zenity --file-selection --title="$(t ficheiro)" --file-filter="WIRES-X (*.zip) | *.zip *.ZIP" \
+        --filename="$(xdg-user-dir DOWNLOAD 2>/dev/null)/" 2>/dev/null) || exit 0
+  instalar "$f" || exit 1
+fi
+
+# Until the user has seen it once with a device connected: which COM port to choose in WIRES-X
+if [ ! -f "$VISTO" ]; then
+  p=$(portas)
+  if [ -n "$p" ]; then
+    zenity --info --title=WIRES-X --width=480 --text="$(t portas)
+
+$p" 2>/dev/null
+    mkdir -p "$(dirname "$VISTO")"; : > "$VISTO"
+  else
+    zenity --warning --title=WIRES-X --width=440 --text="$(t semportas)" 2>/dev/null
+  fi
+fi
+
+cd "$DIR" || exit 1
+exec wine Wires-X.exe "$@"

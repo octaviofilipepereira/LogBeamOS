@@ -8,7 +8,7 @@
 
 *Linux distribution for radio amateurs*
 
-This is the manual that comes with LogBeamOS (tools 0.3.17).
+This is the manual that comes with LogBeamOS (tools 0.3.18).
 
 [Português](manual-pt.md) · **English** · [Español](manual-es.md) · [Français](manual-fr.md)
 
@@ -45,6 +45,7 @@ This is the manual that comes with LogBeamOS (tools 0.3.17).
 | RTTY, PSK, Olivia and other digital modes | Fldigi (with Flrig, Flmsg and Flamp) |
 | Contests | N1MM+ (the Windows one, through Wine) or Not1MM |
 | Logbook | Log4OM (through Wine), CQRLOG or KLog · upload to logbeam.org: LogBeam Uplink · upload to Wavelog: WaveLogGate |
+| Logbook of The World (LoTW) confirmations | TQSL, from the ARRL: signs your QSOs and uploads them to LoTW |
 | APRS | Direwolf (the sound card modem) and Xastir (the map); Xastir starts Direwolf by itself and connects to it |
 | Winlink (e-mail over radio) | Pat |
 | Satellites | Gpredict (predictions and tracking) · weather satellite images: SatDump |
@@ -54,6 +55,7 @@ This is the manual that comes with LogBeamOS (tools 0.3.17).
 | Programming DMR radios | qdmr |
 | DMR without a radio (BrandMeister) | VoxDMR (optional: installed by *Update LogBeamOS*; asks for your DMR ID and BrandMeister hotspot password) |
 | EchoLink | Qtel (the router must let UDP ports 5198–5199 and TCP port 5200 through, or use an EchoLink proxy) |
+| WIRES-X (Yaesu) | WIRES-X, through Wine. It does not come with LogBeamOS: download it from the Yaesu WIRES-X website (you need to log in with your ID), open *WIRES-X* and select the downloaded .zip file. The COM port of the HRI-200 or of the radio (PDN mode) is then shown, to choose on the WIRES-X *COM port setting* screen. |
 | Antenna modelling | xnec2c |
 | Band analysis | 4ham Spectrum Analysis |
 
@@ -63,6 +65,8 @@ This is the manual that comes with LogBeamOS (tools 0.3.17).
 
 - **Update LogBeamOS** lists the radio programs and the operating system, with the installed version, the available one and the download size.
 - The LogBeamOS tools (this updater, **Radio and Equipment** and this manual) and **LogBeam Uplink** are also updated here. They come from the LogBeamOS repository at logbeam.org, which is signed.
+- It also updates Flatpak applications and Cinnamon extensions. On a LogBeamOS installed on disk, it removes the old kernels: the one in use and the most recent one stay.
+- Each new version of LogBeamOS also arrives here, with no need to reinstall. Only what belongs to the start-up of the USB drive requires writing the drive again. What each version brings is listed at [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=en).
 - Tick what you want to update. Each program has its own box; *Operating system* opens with the arrow and each package can be chosen too. Shortcuts: *Radio*, *System*, *All*, *None*.
 - Press *Update selected*. While updating, it shows what is being downloaded, the MB, the speed and the time left.
 - N1MM+, Log4OM and GridTracker2 update themselves.
@@ -78,7 +82,7 @@ This is the manual that comes with LogBeamOS (tools 0.3.17).
 
 ### Installing
 
-3. Start from the USB drive and open *Install LogBeamOS*. For the installation type, choose to install alongside Windows and drag the divider: 40 GB is enough for LogBeamOS.
+3. Start from the USB drive and open *Install LogBeamOS*. For the installation type, choose to install alongside Windows and drag the divider to give LogBeamOS at least 50 GB; the installer does not accept less.
 4. Afterwards, when the computer starts, a menu with LogBeamOS and Windows is shown for 10 seconds. The last choice is remembered.
 
 ### Removing LogBeamOS

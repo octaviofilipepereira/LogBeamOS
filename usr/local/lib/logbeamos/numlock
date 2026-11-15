@@ -1,0 +1,14 @@
+#!/bin/sh
+# LogBeamOS: NumLock on, but only on computers without a battery of their own (author's choice, 14/11/2026).
+# On many older laptops the numeric keys share the letters U I O J K L M: with NumLock on they would type digits,
+# also in the password of the login screen. Batteries of wireless mice and keyboards (scope "Device") do not count.
+# Run by LightDM before the login screen (greeter-setup-script: it must always exit 0, or LightDM stops) and when
+# the desktop session starts (autostart).
+for s in /sys/class/power_supply/*; do
+    [ -r "$s/type" ] || continue
+    [ "$(cat "$s/type" 2>/dev/null)" = Battery ] || continue
+    [ "$(cat "$s/scope" 2>/dev/null)" = Device ] && continue
+    exit 0
+done
+command -v numlockx > /dev/null 2>&1 && numlockx on > /dev/null 2>&1
+exit 0

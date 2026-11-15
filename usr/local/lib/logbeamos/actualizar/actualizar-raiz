@@ -12,6 +12,7 @@
 #   not1mm, wsjtx, … programas que não vêm por pacote
 # After "sistema" or "pacotes", on an installed system, the old kernels are removed: the one in use and the newest
 # stay (14/11/2026, when the Mint Update Manager left LogBeamOS).
+# At the end of every run the LogBeamOS identity (description, GRUB title, installer minimum) is applied again.
 # Os nomes de pacotes só são aceites se estiverem entre os que o próprio ajudante vê com versão nova.
 # Escreve para a janela: "@passo chave", "@ok chave versão", "@erro chave texto", "@reiniciar", "@fim",
 #   "@listas pct i n origem" (apt-get update: ficheiro i de n),
@@ -257,6 +258,20 @@ def purga_mintupdate():
         diz("Mint Update Manager: configuration files " + ("removed" if p.returncode == 0 else "not removed"))
 
 
+def identidade():
+    """System identity (tools 0.3.18): applied again at the end of every run, because updates of base-files,
+    mint-info-cinnamon or ubiquity can put the original text back. On an installed system a new GRUB title also
+    needs update-grub; on the pen the boot menu comes from the image and is left alone."""
+    try:
+        mudou = lb.identidade()
+        if mudou:
+            diz("system identity: " + ", ".join(mudou))
+        if "grub" in mudou and not lb.na_pen() and os.path.exists("/boot/grub/grub.cfg"):
+            corre(["update-grub"], dict(os.environ, LC_ALL="C"))
+    except Exception as e:
+        diz(f"system identity not applied: {e}")
+
+
 NOME_PACOTE = re.compile(r"^[a-z0-9][a-z0-9+.\-]+(:[a-z0-9]+)?$")
 
 
@@ -298,6 +313,7 @@ def main():
             diz(f"@ok {c} {v}")
         except Exception as e:  # um programa com problemas não impede os outros
             diz(f"@erro {c} {str(e).splitlines()[-1] if str(e) else type(e).__name__}")
+    identidade()
     if os.path.exists("/var/run/reboot-required"):
         diz("@reiniciar")
     diz("@fim")

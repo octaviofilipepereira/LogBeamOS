@@ -53,6 +53,7 @@ PACOTES_RADIO = {
     "wine-stable": "Wine", "qtel": "Qtel (EchoLink)",
     # Repositório apt do LogBeamOS (https://logbeam.org/apt, desde a 0.3.11): as ferramentas e o Uplink
     "logbeamos-ferramentas": "LogBeamOS", "logbeam-uplink": "LogBeam Uplink",
+    "logbeamos-tqsl": "TQSL",   # since tools 0.3.18 (14/11/2026), from the same repository
 }
 
 # Programas que se actualizam sozinhos: só aparecem na lista
@@ -391,6 +392,84 @@ def nucleos_velhos():
     pacotes = [l.split()[0] for l in r.stdout.splitlines() if l.endswith(" installed")]
     versoes = [p[len("linux-image-"):] for p in pacotes if re.match(r"^linux-image-\d", p)]
     return sorted({p for v in nucleos_a_retirar(versoes, os.uname().release) for p in pacotes_do_nucleo(v, pacotes)})
+
+
+# --- System identity (tools 0.3.18, author's decision of 14/11/2026). A LogBeamOS that is updated through "Update
+# LogBeamOS" gets everything a new image brings to the system itself, including its name and version: the description
+# ("LogBeamOS 0.3.17"), the GRUB title and the installer minimum of 50 GB. Some of these files belong to other packages
+# (base-files, mint-info-cinnamon, ubiquity), whose updates can put the original text back, so this is applied by the
+# package scripts and again at the end of every run of the helper.
+VERSAO_SISTEMA = "usr/share/logbeamos/versao-sistema"   # the LogBeamOS version these tools bring the system to
+INSTALADOR = "usr/lib/ubiquity/ubiquity/misc.py"
+MINIMO_50GB = "    min_disk_size = max(size * 3 // 2, 50 * 1000 ** 3)  # LogBeamOS: pelo menos 50 GB"
+MINIMOS_ANTIGOS = ("    min_disk_size = size * 2  # fudge factor", "    min_disk_size = size * 3 // 2  # LogBeamOS: 1,5x (era 2x)")
+
+
+def versao_sistema(raiz="/"):
+    try:
+        with open(os.path.join(raiz, VERSAO_SISTEMA), encoding="utf-8") as f:
+            v = f.read().strip()
+    except OSError:
+        return None
+    return v if re.fullmatch(r"\d+(\.\d+)+", v) else None
+
+
+def _caminho_real(raiz, relativo):
+    """Follows a symbolic link inside raiz (/etc/os-release points to ../usr/lib/os-release)."""
+    p = os.path.join(raiz, relativo)
+    for _ in range(8):
+        if not os.path.islink(p):
+            return p
+        alvo = os.readlink(p)
+        p = os.path.join(raiz, alvo.lstrip("/")) if alvo.startswith("/") else os.path.normpath(
+            os.path.join(os.path.dirname(p), alvo))
+    return p
+
+
+def _troca_linhas(caminho, trocas):
+    """trocas: {line that starts with this: new line}. Only lines that exist are replaced; the file is written only
+    if it changes, keeping its permissions. Returns True when it changed."""
+    try:
+        with open(caminho, encoding="utf-8") as f:
+            texto = f.read()
+    except OSError:
+        return False
+    linhas = texto.split("\n")
+    novas = []
+    for l in linhas:
+        for inicio, nova in trocas.items():
+            if l.startswith(inicio):
+                l = nova
+                break
+        novas.append(l)
+    novo = "\n".join(novas)
+    if novo == texto:
+        return False
+    tmp = caminho + ".logbeamos-novo"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(novo)
+    shutil.copymode(caminho, tmp)
+    os.replace(tmp, caminho)
+    return True
+
+
+def identidade(raiz="/"):
+    """Applies the LogBeamOS identity. Returns what changed: 'descricao', 'versao', 'grub' (the GRUB title: an installed
+    system then needs update-grub) and 'instalador'."""
+    v = versao_sistema(raiz)
+    if not v:
+        return []
+    mudou = []
+    if _troca_linhas(os.path.join(raiz, "etc/lsb-release"), {"DISTRIB_DESCRIPTION=": f'DISTRIB_DESCRIPTION="LogBeamOS {v}"'}) | \
+            _troca_linhas(_caminho_real(raiz, "etc/os-release"), {"PRETTY_NAME=": f'PRETTY_NAME="LogBeamOS {v}"'}):
+        mudou.append("descricao")
+    if _troca_linhas(os.path.join(raiz, "etc/logbeamos-release"), {"VERSION=": f'VERSION="{v}"'}):
+        mudou.append("versao")
+    if _troca_linhas(os.path.join(raiz, "etc/linuxmint/info"), {"GRUB_TITLE=": f"GRUB_TITLE=LogBeamOS v{v}"}):
+        mudou.append("grub")
+    if _troca_linhas(os.path.join(raiz, INSTALADOR), {a: MINIMO_50GB for a in MINIMOS_ANTIGOS}):
+        mudou.append("instalador")
+    return mudou
 
 
 # --- Instalação (só no ajudante, como root)

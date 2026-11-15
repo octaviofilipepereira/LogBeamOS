@@ -1,0 +1,2 @@
+# LogBeamOS: screen brightness at start (see /usr/local/lib/logbeamos/brilho)
+ACTION=="add", SUBSYSTEM=="backlight", RUN+="/usr/local/lib/logbeamos/brilho /sys%p"

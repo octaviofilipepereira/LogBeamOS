@@ -1,0 +1,18 @@
+#!/bin/sh
+# LogBeamOS: screen brightness when the computer starts.
+# Some laptops hand the screen over almost dark (an HP Pavilion with amdgpu_bl1 started at 12 of 255, 14/11/2026);
+# when there is no saved value yet (first start of a USB drive or of a new install), systemd-backlight only raises
+# it to its 5 % minimum. Run by udev when a backlight device appears, before systemd-backlight restores the saved
+# value (a value the user chose always wins): at 5 % of the maximum or lower, the brightness goes to 80 %.
+# Usage: brilho /sys/class/backlight/<device>
+d=${1:?}
+max=$(cat "$d/max_brightness" 2>/dev/null) || exit 0
+b=$(cat "$d/brightness" 2>/dev/null) || exit 0
+[ "$max" -gt 0 ] 2>/dev/null || exit 0
+[ "$b" -ge 0 ] 2>/dev/null || exit 0
+if [ $((b * 100)) -le $((max * 5)) ]; then
+    n=$((max * 80 / 100))
+    echo "$n" > "$d/brightness" 2>/dev/null &&
+        logger -t logbeamos-brilho "$d: brightness $b of $max, set to $n (80 %)" 2>/dev/null
+fi
+exit 0
