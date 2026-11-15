@@ -396,13 +396,30 @@ def nucleos_velhos():
 
 # --- System identity (tools 0.3.18, author's decision of 14/11/2026). A LogBeamOS that is updated through "Update
 # LogBeamOS" gets everything a new image brings to the system itself, including its name and version: the description
-# ("LogBeamOS 0.3.17"), the GRUB title and the installer minimum of 50 GB. Some of these files belong to other packages
-# (base-files, mint-info-cinnamon, ubiquity), whose updates can put the original text back, so this is applied by the
-# package scripts and again at the end of every run of the helper.
+# ("LogBeamOS 0.3.17"), the GRUB title, the installer minimum of 50 GB and, since tools 0.3.19 (author, 15/11/2026),
+# the "System information" screen (mintreport), which writes "Linux Mint" in its code. Some of these files belong to
+# other packages (base-files, mint-info-cinnamon, ubiquity, mintreport), whose updates can put the original text back,
+# so this is applied by the package scripts and again at the end of every run of the helper.
 VERSAO_SISTEMA = "usr/share/logbeamos/versao-sistema"   # the LogBeamOS version these tools bring the system to
 INSTALADOR = "usr/lib/ubiquity/ubiquity/misc.py"
 MINIMO_50GB = "    min_disk_size = max(size * 3 // 2, 50 * 1000 ** 3)  # LogBeamOS: pelo menos 50 GB"
 MINIMOS_ANTIGOS = ("    min_disk_size = size * 2  # fudge factor", "    min_disk_size = size * 3 // 2  # LogBeamOS: 1,5x (era 2x)")
+# mintreport 1.6.0 shows f"{distribution} {release} - {edition} {architecture}" under a banner with the Linux Mint logo
+# on green; the version is read when the screen opens, so it follows the system version without patching again. The
+# banner gets the LogBeam logo (installed by these tools as the icon logbeamos-logo) on the dark blue of logbeam.org.
+INFORMACOES = "usr/lib/linuxmint/mintreport/app.py"
+INFORMACOES_UI = "usr/share/linuxmint/mintreport/mintreport.ui"
+_VS = "/" + VERSAO_SISTEMA
+INFORMACOES_TROCAS = {
+    '        distribution = "Linux Mint"': '        distribution = "LogBeamOS"  # LogBeamOS',
+    "        release = config['RELEASE']":
+        f"        release = open({_VS!r}).read().strip() if os.path.exists({_VS!r}) else config['RELEASE']  # LogBeamOS",
+    "                background-color: #86be43;": "                background-color: #0d1117; /* LogBeamOS */",
+}
+INFORMACOES_UI_TROCAS = {
+    '                                <property name="icon-name">linuxmint-logo-filled-ring</property>':
+        '                                <property name="icon-name">logbeamos-logo</property>',
+}
 
 
 def versao_sistema(raiz="/"):
@@ -455,7 +472,7 @@ def _troca_linhas(caminho, trocas):
 
 def identidade(raiz="/"):
     """Applies the LogBeamOS identity. Returns what changed: 'descricao', 'versao', 'grub' (the GRUB title: an installed
-    system then needs update-grub) and 'instalador'."""
+    system then needs update-grub), 'instalador' and 'informacoes' (the "System information" screen)."""
     v = versao_sistema(raiz)
     if not v:
         return []
@@ -469,6 +486,9 @@ def identidade(raiz="/"):
         mudou.append("grub")
     if _troca_linhas(os.path.join(raiz, INSTALADOR), {a: MINIMO_50GB for a in MINIMOS_ANTIGOS}):
         mudou.append("instalador")
+    if _troca_linhas(os.path.join(raiz, INFORMACOES), INFORMACOES_TROCAS) | \
+            _troca_linhas(os.path.join(raiz, INFORMACOES_UI), INFORMACOES_UI_TROCAS):
+        mudou.append("informacoes")
     return mudou
 
 
