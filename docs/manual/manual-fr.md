@@ -8,7 +8,7 @@
 
 *Distribution Linux pour radioamateurs*
 
-C'est le manuel fourni avec LogBeamOS (outils 0.3.22).
+C'est le manuel fourni avec LogBeamOS (outils 0.3.23).
 
 [Português](manual-pt.md) · [English](manual-en.md) · [Español](manual-es.md) · **Français**
 
@@ -65,7 +65,7 @@ C'est le manuel fourni avec LogBeamOS (outils 0.3.22).
 ## 4. Mettre à jour
 
 - **Mettre à jour LogBeamOS** affiche les logiciels radio et le système d'exploitation, avec la version installée, la version disponible et la taille à télécharger.
-- Les outils de LogBeamOS (cet outil de mise à jour, **Radio et Matériel** et ce manuel) et **LogBeam Uplink** se mettent aussi à jour ici. Ils viennent du dépôt de LogBeamOS sur logbeam.org, qui est signé.
+- **LogBeamOS Update** (cet outil de mise à jour, **Radio et Matériel** et ce manuel) et **LogBeam Uplink** se mettent aussi à jour ici. Ils viennent du dépôt de LogBeamOS sur logbeam.org, qui est signé. La version de LogBeamOS et celle de LogBeamOS Update sont affichées en haut de la fenêtre.
 - Il met aussi à jour les applications Flatpak et les extensions de Cinnamon. Sur un LogBeamOS installé sur le disque, il retire les anciens noyaux : restent celui en cours d'utilisation et le plus récent.
 - Chaque nouvelle version de LogBeamOS arrive aussi par ici, sans réinstallation. Seul ce qui fait partie du démarrage de la clé USB demande de la graver à nouveau. Les nouveautés de chaque version sont sur [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=fr).
 - Cochez ce que vous voulez mettre à jour. Chaque logiciel a sa case ; le *Système d'exploitation* s'ouvre avec la flèche et chaque paquet peut aussi être choisi. Raccourcis : *Radio*, *Système*, *Tout*, *Rien*.

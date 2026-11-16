@@ -29,11 +29,11 @@ The ISO image, its SHA-256 fingerprint and the instructions for writing the USB 
 - What's new in each version: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=en)
 - To install on the disk: at least 50 GB free. The system takes about 20 GB once installed, because it already includes N1MM+ and Log4OM with everything they need to run on Linux; the rest is room for updates and for your logs. In the installer, drag the divider to give LogBeamOS at least 50 GB: it suggests less.
 
-### The tools
+### LogBeamOS Update
 
 | Tool | What it does |
 |---|---|
-| **Update LogBeamOS** | One window to update the amateur radio programs and the operating system. It shows the installed version, the available one and the download size, and updates only what is ticked, with the progress in MB, speed and time left. It covers the system packages, the programs published on GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr and others), Not1MM, and the LogBeamOS tools themselves. Ten minutes after login, a notice appears if there are updates. |
+| **Update LogBeamOS** | One window to update the amateur radio programs and the operating system. It shows the installed version, the available one and the download size, and updates only what is ticked, with the progress in MB, speed and time left. It covers the system packages, the programs published on GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr and others), Not1MM, and LogBeamOS Update itself. Ten minutes after login, a notice appears if there are updates. |
 | **Radio and Equipment** | Detects radios, CAT cables, sound cards and SDR receivers. It shares the radio among the programs through Hamlib's `rigctld`, with automatic speed detection, and configures WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ and Log4OM to use it; N1MM+ and Log4OM either share the radio or have it to themselves, as the user chooses. It keeps WaveLogGate on a port of its own, with its certificate trusted by Firefox. |
 | **LogBeamOS manual** | First steps, connecting the radio, which program for what, updating, installing alongside Windows and removing LogBeamOS. Its own window, in the language of the session. It can also be read here: [manual in English](docs/manual/manual-en.md), and on the website: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Diagnostic report** | Gathers in one text file what is needed to report a problem: versions, computer, USB and serial devices, the radio settings of each program, and the warnings and errors of the system. No passwords or keys; the user name, the computer name and the network addresses are taken out. In the menu, or `logbeamos-diagnostic` in a terminal. |
@@ -45,7 +45,7 @@ LogBeamOS also takes **muffin**, the Cinnamon window manager, from its apt repos
 
 ### Installing and updating
 
-The tools come with LogBeamOS. They are distributed by the LogBeamOS apt repository, at `https://logbeam.org/apt`, which also carries LogBeam Uplink. On LogBeamOS, they are updated by **Update LogBeamOS**, like any other program.
+Together they are **LogBeamOS Update**, the part of LogBeamOS that arrives through **Update LogBeamOS**; its version is shown at the top of that window and in the "System Information" screen. They come with LogBeamOS. They are distributed by the LogBeamOS apt repository, at `https://logbeam.org/apt`, which also carries LogBeam Uplink. On LogBeamOS, they are updated by **Update LogBeamOS**, like any other program.
 
 The repository index is signed. Key fingerprint:
 
@@ -162,11 +162,11 @@ Carregue numa imagem para a ver em tamanho real.
 <tr><td width="50%"><a href="docs/capturas/pt/07-actualizar.jpg"><img src="docs/capturas/pt/07-actualizar-p.jpg" alt="Actualizar LogBeamOS"></a><br>Actualizar LogBeamOS</td><td width="50%"><a href="docs/capturas/pt/08-instalador.jpg"><img src="docs/capturas/pt/08-instalador-p.jpg" alt="Instalar ao lado do Windows"></a><br>Instalar ao lado do Windows</td></tr>
 </table>
 
-### As ferramentas
+### LogBeamOS Update
 
 | Ferramenta | O que faz |
 |---|---|
-| **Actualizar LogBeamOS** | Uma janela para actualizar os programas de radioamador e o sistema operativo. Mostra a versão instalada, a disponível e o tamanho a descarregar, e actualiza só o que estiver marcado, com o progresso em MB, a velocidade e o tempo que falta. Abrange os pacotes do sistema, os programas publicados no GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr e outros), o Not1MM e as próprias ferramentas do LogBeamOS. Dez minutos depois de entrar na sessão, aparece um aviso se houver actualizações. |
+| **Actualizar LogBeamOS** | Uma janela para actualizar os programas de radioamador e o sistema operativo. Mostra a versão instalada, a disponível e o tamanho a descarregar, e actualiza só o que estiver marcado, com o progresso em MB, a velocidade e o tempo que falta. Abrange os pacotes do sistema, os programas publicados no GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr e outros), o Not1MM e o próprio LogBeamOS Update. Dez minutos depois de entrar na sessão, aparece um aviso se houver actualizações. |
 | **Rádio e Equipamento** | Detecta rádios, cabos de CAT, placas de som e receptores SDR. Partilha o rádio entre os programas através do `rigctld` do Hamlib, com detecção automática da velocidade, e configura o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM, o Direwolf, o N1MM+ e o Log4OM para o usarem; o N1MM+ e o Log4OM partilham o rádio ou ficam com ele só para si, como o utilizador escolher. Mantém o WaveLogGate numa porta própria, com o certificado aceite pelo Firefox. |
 | **Manual do LogBeamOS** | Primeiros passos, ligar o rádio, que programa para quê, actualizar, instalar ao lado do Windows e retirar o LogBeamOS. Em janela própria, na língua da sessão. Também se pode ler aqui: [manual em português](docs/manual/manual-pt.md), e no site: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Relatório de diagnóstico** | Junta num ficheiro de texto o que é preciso para relatar um problema: versões, computador, aparelhos USB e série, a configuração do rádio em cada programa, e os avisos e erros do sistema. Sem passwords nem chaves; o nome do utilizador, o do computador e os endereços de rede são retirados. No menu, ou `logbeamos-diagnostico` num terminal. |
@@ -178,7 +178,7 @@ O LogBeamOS vai também buscar o **muffin**, o gestor de janelas do Cinnamon, ao
 
 ### Instalar e actualizar
 
-As ferramentas vêm com o LogBeamOS. São distribuídas pelo repositório apt do LogBeamOS, em `https://logbeam.org/apt`, que traz também o LogBeam Uplink. No LogBeamOS, actualizam-se pelo **Actualizar LogBeamOS**, como qualquer outro programa.
+Em conjunto são o **LogBeamOS Update**, a parte do LogBeamOS que chega pelo **Actualizar LogBeamOS**; a sua versão aparece no topo dessa janela e no ecrã «Informações do sistema». Vêm com o LogBeamOS. São distribuídas pelo repositório apt do LogBeamOS, em `https://logbeam.org/apt`, que traz também o LogBeam Uplink. No LogBeamOS, actualizam-se pelo **Actualizar LogBeamOS**, como qualquer outro programa.
 
 O índice do repositório é assinado. Impressão digital da chave:
 
@@ -283,11 +283,11 @@ La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memo
 - Novedades de cada versión: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=es)
 - Para instalar en el disco: al menos 50 GB libres. El sistema ocupa unos 20 GB una vez instalado, porque ya incluye N1MM+ y Log4OM con todo lo que necesitan para funcionar en Linux; el resto es el espacio para las actualizaciones y para sus registros. En el instalador, arrastre el divisor para dar a LogBeamOS al menos 50 GB: propone menos.
 
-### Las herramientas
+### LogBeamOS Update
 
 | Herramienta | Qué hace |
 |---|---|
-| **Actualizar LogBeamOS** | Una ventana para actualizar los programas de radioaficionado y el sistema operativo. Muestra la versión instalada, la disponible y el tamaño a descargar, y actualiza solo lo que esté marcado, con el progreso en MB, la velocidad y el tiempo restante. Abarca los paquetes del sistema, los programas publicados en GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr y otros), Not1MM y las propias herramientas de LogBeamOS. Diez minutos después de iniciar la sesión, aparece un aviso si hay actualizaciones. |
+| **Actualizar LogBeamOS** | Una ventana para actualizar los programas de radioaficionado y el sistema operativo. Muestra la versión instalada, la disponible y el tamaño a descargar, y actualiza solo lo que esté marcado, con el progreso en MB, la velocidad y el tiempo restante. Abarca los paquetes del sistema, los programas publicados en GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr y otros), Not1MM y el propio LogBeamOS Update. Diez minutos después de iniciar la sesión, aparece un aviso si hay actualizaciones. |
 | **Radio y Equipo** | Detecta radios, cables CAT, tarjetas de sonido y receptores SDR. Comparte la radio entre los programas a través de `rigctld` de Hamlib, con detección automática de la velocidad, y configura WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ y Log4OM para que la usen; N1MM+ y Log4OM comparten la radio o la usan solos, como elija el usuario. Mantiene WaveLogGate en un puerto propio, con su certificado aceptado por Firefox. |
 | **Manual de LogBeamOS** | Primeros pasos, conectar la radio, qué programa para qué, actualizar, instalar junto a Windows y quitar LogBeamOS. En su propia ventana, en el idioma de la sesión. También se puede leer aquí: [manual en español](docs/manual/manual-es.md), y en el sitio web: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Informe de diagnóstico** | Reúne en un archivo de texto lo necesario para informar de un problema: versiones, ordenador, dispositivos USB y serie, la configuración de la radio en cada programa, y los avisos y errores del sistema. Sin contraseñas ni claves; se eliminan el nombre del usuario, el del ordenador y las direcciones de red. En el menú, o `logbeamos-diagnostico` en un terminal. |
@@ -299,7 +299,7 @@ LogBeamOS toma además **muffin**, el gestor de ventanas de Cinnamon, de su repo
 
 ### Instalar y actualizar
 
-Las herramientas vienen con LogBeamOS. Se distribuyen desde el repositorio apt de LogBeamOS, en `https://logbeam.org/apt`, que también trae LogBeam Uplink. En LogBeamOS se actualizan con **Actualizar LogBeamOS**, como cualquier otro programa.
+En conjunto son **LogBeamOS Update**, la parte de LogBeamOS que llega con **Actualizar LogBeamOS**; su versión aparece en la parte superior de esa ventana y en la pantalla «Información del sistema». Vienen con LogBeamOS. Se distribuyen desde el repositorio apt de LogBeamOS, en `https://logbeam.org/apt`, que también trae LogBeam Uplink. En LogBeamOS se actualizan con **Actualizar LogBeamOS**, como cualquier otro programa.
 
 El índice del repositorio está firmado. Huella de la clave:
 
@@ -404,11 +404,11 @@ L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé US
 - Nouveautés de chaque version : [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=fr)
 - Pour installer sur le disque : au moins 50 Go libres. Le système occupe environ 20 Go une fois installé, car il inclut déjà N1MM+ et Log4OM avec tout ce qu'il leur faut pour fonctionner sous Linux ; le reste sert aux mises à jour et à vos journaux. Dans l'installateur, faites glisser le séparateur pour donner au moins 50 Go à LogBeamOS : il en propose moins.
 
-### Les outils
+### LogBeamOS Update
 
 | Outil | Ce qu'il fait |
 |---|---|
-| **Mettre à jour LogBeamOS** | Une fenêtre pour mettre à jour les logiciels de radioamateur et le système d'exploitation. Elle affiche la version installée, la version disponible et la taille à télécharger, et ne met à jour que ce qui est coché, avec la progression en Mo, la vitesse et le temps restant. Elle couvre les paquets du système, les logiciels publiés sur GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr et d'autres), Not1MM et les outils de LogBeamOS eux-mêmes. Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour. |
+| **Mettre à jour LogBeamOS** | Une fenêtre pour mettre à jour les logiciels de radioamateur et le système d'exploitation. Elle affiche la version installée, la version disponible et la taille à télécharger, et ne met à jour que ce qui est coché, avec la progression en Mo, la vitesse et le temps restant. Elle couvre les paquets du système, les logiciels publiés sur GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr et d'autres), Not1MM et LogBeamOS Update lui-même. Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour. |
 | **Radio et Matériel** | Détecte les radios, les câbles CAT, les cartes son et les récepteurs SDR. Partage la radio entre les logiciels via `rigctld` de Hamlib, avec détection automatique de la vitesse, et configure WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ et Log4OM pour l'utiliser ; N1MM+ et Log4OM partagent la radio ou l'utilisent seuls, au choix de l'utilisateur. Il garde WaveLogGate sur un port à lui, avec son certificat accepté par Firefox. |
 | **Manuel de LogBeamOS** | Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, installer à côté de Windows et retirer LogBeamOS. Dans sa propre fenêtre, dans la langue de la session. Il peut aussi être lu ici : [manuel en français](docs/manual/manual-fr.md), et sur le site : [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Rapport de diagnostic** | Rassemble dans un fichier texte ce qu'il faut pour signaler un problème : versions, ordinateur, périphériques USB et série, le réglage de la radio dans chaque logiciel, et les avertissements et erreurs du système. Ni mots de passe ni clés ; le nom de l'utilisateur, celui de l'ordinateur et les adresses réseau en sont retirés. Dans le menu, ou `logbeamos-diagnostic` dans un terminal. |
@@ -420,7 +420,7 @@ LogBeamOS prend aussi **muffin**, le gestionnaire de fenêtres de Cinnamon, dans
 
 ### Installer et mettre à jour
 
-Les outils sont fournis avec LogBeamOS. Ils sont distribués par le dépôt apt de LogBeamOS, à `https://logbeam.org/apt`, qui contient aussi LogBeam Uplink. Sur LogBeamOS, ils se mettent à jour avec **Mettre à jour LogBeamOS**, comme n'importe quel autre logiciel.
+Ensemble, ils forment **LogBeamOS Update**, la partie de LogBeamOS qui arrive par **Mettre à jour LogBeamOS** ; sa version est affichée en haut de cette fenêtre et dans l'écran « Renseignements sur le système ». Ils sont fournis avec LogBeamOS. Ils sont distribués par le dépôt apt de LogBeamOS, à `https://logbeam.org/apt`, qui contient aussi LogBeam Uplink. Sur LogBeamOS, ils se mettent à jour avec **Mettre à jour LogBeamOS**, comme n'importe quel autre logiciel.
 
 L'index du dépôt est signé. Empreinte de la clé :
 

@@ -142,6 +142,9 @@ fi
 if ! pgrep -u "$(id -u)" -f 'N1MMLogger[.]net[.]exe|L4ONG[.]exe|Wires-X[.]exe' > /dev/null; then
   timeout 15 "$(dirname "$(readlink -f "$(command -v wine)")")/wineserver" -w 2>/dev/null
 fi
+# The Yaesu installer leaves a Windows shortcut (Wires-X.lnk) on the desktop, because the Wine desktop is the user's
+# desktop; the LogBeamOS shortcut is already in the radio programs folder, so this one goes (author's decision, 16/11/2026)
+rm -f "$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")/Wires-X.lnk"
 portas_wine
 p=$(portas)
 if [ -n "$p" ]; then

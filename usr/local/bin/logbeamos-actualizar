@@ -363,6 +363,12 @@ def janela():
             tit.pack_start(l, False, False, 0)
             tit.pack_start(Gtk.Label(label=T["sub"], xalign=0), False, False, 0)
             cab.pack_start(tit, True, True, 0)
+            # The installed versions, on the right of the title: "LogBeamOS 0.3.17 · LogBeamOS Update 0.3.23" (0.3.23)
+            versoes = lb.versoes_logbeamos()
+            if versoes:
+                lv = Gtk.Label(xalign=1, yalign=0.5)
+                lv.set_markup(f"<b>{GLib.markup_escape_text(versoes)}</b>")
+                cab.pack_end(lv, False, False, 0)
             caixa.pack_start(cab, False, False, 0)
 
             # chave, marcado, tem caixa, meio marcado, nome, instalada, disponível, tamanho, estado, cor, bytes

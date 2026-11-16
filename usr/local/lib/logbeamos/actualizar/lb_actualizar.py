@@ -4,6 +4,7 @@
 # LogBeamOS: o que o "Actualizar LogBeamOS" sabe de cada programa: de onde vem, como se lê a versão instalada,
 # como se procura a mais recente e como se instala. Usado pela janela (como utilizador) e pelo ajudante (como root).
 # O ajudante nunca recebe endereços da janela: procura-os ele próprio, a partir desta tabela.
+import errno
 import glob
 import hashlib
 import json
@@ -51,8 +52,9 @@ PACOTES_RADIO = {
     "gqrx-sdr": "Gqrx", "xastir": "Xastir", "qsstv": "QSSTV", "xnec2c": "xnec2c",
     "gridtracker2": "GridTracker2", "shutter": "Shutter", "libhamlib4t64": "Hamlib", "libhamlib-utils": "Hamlib",
     "wine-stable": "Wine", "qtel": "Qtel (EchoLink)",
-    # Repositório apt do LogBeamOS (https://logbeam.org/apt, desde a 0.3.11): as ferramentas e o Uplink
-    "logbeamos-ferramentas": "LogBeamOS", "logbeam-uplink": "LogBeam Uplink",
+    # Repositório apt do LogBeamOS (https://logbeam.org/apt, desde a 0.3.11): as ferramentas e o Uplink. The tools
+    # package is shown to the user as "LogBeamOS Update" (author's decision of 16/11/2026, tools 0.3.23)
+    "logbeamos-ferramentas": "LogBeamOS Update", "logbeam-uplink": "LogBeam Uplink",
     "logbeamos-tqsl": "TQSL",   # since tools 0.3.18 (14/11/2026), from the same repository
 }
 
@@ -401,6 +403,8 @@ def nucleos_velhos():
 # other packages (base-files, mint-info-cinnamon, ubiquity, mintreport), whose updates can put the original text back,
 # so this is applied by the package scripts and again at the end of every run of the helper.
 VERSAO_SISTEMA = "usr/share/logbeamos/versao-sistema"   # the LogBeamOS version these tools bring the system to
+# The version of these tools, shown to the user as "LogBeamOS Update" (tools 0.3.23, author's decision of 16/11/2026)
+VERSAO_UPDATE = "usr/share/logbeamos/versao-update"
 INSTALADOR = "usr/lib/ubiquity/ubiquity/misc.py"
 MINIMO_50GB = "    min_disk_size = max(size * 3 // 2, 50 * 1000 ** 3)  # LogBeamOS: pelo menos 50 GB"
 MINIMOS_ANTIGOS = ("    min_disk_size = size * 2  # fudge factor", "    min_disk_size = size * 3 // 2  # LogBeamOS: 1,5x (era 2x)")
@@ -410,10 +414,15 @@ MINIMOS_ANTIGOS = ("    min_disk_size = size * 2  # fudge factor", "    min_disk
 INFORMACOES = "usr/lib/linuxmint/mintreport/app.py"
 INFORMACOES_UI = "usr/share/linuxmint/mintreport/mintreport.ui"
 _VS = "/" + VERSAO_SISTEMA
+_VU = "/" + VERSAO_UPDATE
+# Since tools 0.3.23 the screen also shows the LogBeamOS Update version: "LogBeamOS 0.3.17 · LogBeamOS Update 0.3.23".
+# The second key is the line written by tools 0.3.19 to 0.3.22, so that systems already patched get the new one
+_RELEASE = (f"        release = (open({_VS!r}).read().strip() + (' · LogBeamOS Update ' + open({_VU!r}).read().strip() "
+            f"if os.path.exists({_VU!r}) else '')) if os.path.exists({_VS!r}) else config['RELEASE']  # LogBeamOS")
 INFORMACOES_TROCAS = {
     '        distribution = "Linux Mint"': '        distribution = "LogBeamOS"  # LogBeamOS',
-    "        release = config['RELEASE']":
-        f"        release = open({_VS!r}).read().strip() if os.path.exists({_VS!r}) else config['RELEASE']  # LogBeamOS",
+    "        release = config['RELEASE']": _RELEASE,
+    "        release = open(": _RELEASE,
     "                background-color: #86be43;": "                background-color: #0d1117; /* LogBeamOS */",
 }
 INFORMACOES_UI_TROCAS = {
@@ -429,6 +438,21 @@ def versao_sistema(raiz="/"):
     except OSError:
         return None
     return v if re.fullmatch(r"\d+(\.\d+)+", v) else None
+
+
+def versao_update(raiz="/"):
+    try:
+        with open(os.path.join(raiz, VERSAO_UPDATE), encoding="utf-8") as f:
+            v = f.read().strip()
+    except OSError:
+        return None
+    return v if re.fullmatch(r"\d+(\.\d+)+([~+][\w.]+)?", v) else None
+
+
+def versoes_logbeamos():
+    """'LogBeamOS 0.3.17 · LogBeamOS Update 0.3.23' (what the Update window shows under its title), or '' if unknown."""
+    s, u = versao_sistema(), versao_update()
+    return " · ".join(x for x in (f"LogBeamOS {s}" if s else "", f"LogBeamOS Update {u}" if u else "") if x)
 
 
 def _caminho_real(raiz, relativo):
@@ -539,7 +563,15 @@ def extrai_appimage(ficheiro, alvo):
     velho = alvo + ".velho"
     shutil.rmtree(velho, ignore_errors=True)
     if os.path.exists(alvo):
-        os.rename(alvo, velho)
+        try:
+            os.rename(alvo, velho)
+        except OSError as e:
+            # On the pen the old folder may come from the system image (overlayfs), and a directory from there
+            # cannot be renamed (EXDEV). The new version is already complete in .novo, so the old one is removed
+            # instead (tools 0.3.23, 16/11/2026: Decodium did not update on the pen).
+            if e.errno != errno.EXDEV:
+                raise
+            shutil.rmtree(alvo)
     os.rename(novo, alvo)
     shutil.rmtree(velho, ignore_errors=True)
 

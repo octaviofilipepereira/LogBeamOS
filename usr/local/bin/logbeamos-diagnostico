@@ -189,7 +189,8 @@ def junta(anterior):
 
     viva = "boot=casper" in le("/proc/cmdline")
     sec("1. LogBeamOS",
-        f"LogBeamOS version: {le('/usr/share/logbeamos/versao-sistema')}",
+        f"LogBeamOS version: {le('/usr/share/logbeamos/versao-sistema')} · LogBeamOS Update: "
+        f"{le('/usr/share/logbeamos/versao-update')}",
         f"Started from: {'the pen (live)' if viva else 'the disk (installed)'} · firmware: "
         f"{'UEFI' if os.path.isdir('/sys/firmware/efi') else 'BIOS (legacy)'} · Secure Boot: {corre(['mokutil', '--sb-state'], 5).splitlines()[0]}",
         f"Kernel: {corre(['uname', '-r'])} · language: {os.environ.get('LANG', '')} {os.environ.get('LANGUAGE', '')} · "

@@ -13,6 +13,8 @@
 # After "sistema" or "pacotes", on an installed system, the old kernels are removed: the one in use and the newest
 # stay (14/11/2026, when the Mint Update Manager left LogBeamOS).
 # At the end of every run the LogBeamOS identity (description, GRUB title, installer minimum) is applied again.
+# If the apt steps installed a new LogBeamOS tools package, the helper starts again with the new code before the
+# other programs (tools 0.3.23).
 # Os nomes de pacotes só são aceites se estiverem entre os que o próprio ajudante vê com versão nova.
 # Escreve para a janela: "@passo chave", "@ok chave versão", "@erro chave texto", "@reiniciar", "@fim",
 #   "@listas pct i n origem" (apt-get update: ficheiro i de n),
@@ -279,6 +281,28 @@ def lista(valor):
     return [p for p in valor.split(",") if NOME_PACOTE.match(p)]
 
 
+PASSOS_APT = ("sistema", "radio", "pacotes")
+RECOMECO = "LOGBEAMOS_ACTUALIZAR_RECOMECO"
+
+
+def versao_ferramentas():
+    r = subprocess.run(["dpkg-query", "-W", "-f=${Version}", "logbeamos-ferramentas"], capture_output=True, text=True)
+    return r.stdout.strip()
+
+
+def recomeca(antes, resto):
+    """Tools 0.3.23: when the apt steps of this run installed a new LogBeamOS tools package, this helper starts again
+    with the new code (same process, same output to the window) for the steps that are left, so that a fix in the
+    programs' installation (such as the Decodium one on the pen) already counts in this run. Only once per run."""
+    if not resto or os.environ.get(RECOMECO):
+        return
+    agora = versao_ferramentas()
+    if not agora or agora == antes:
+        return
+    diz(f"LogBeamOS tools {antes} -> {agora}: the helper starts again with the new code")
+    os.execve(sys.executable, [sys.executable, os.path.abspath(sys.argv[0]), *resto], dict(os.environ, **{RECOMECO: "1"}))
+
+
 def main():
     if os.geteuid() != 0:
         sys.exit("é preciso correr como root")
@@ -288,15 +312,18 @@ def main():
     for a in sys.argv[1:]:
         chave, _, valor = a.partition("=")
         if chave in ("sistema", "radio", "not1mm", "flatpak", *github) and (not valor or chave == "radio"):
-            pedidos.append((chave, lista(valor) if valor else None))
+            pedidos.append((chave, lista(valor) if valor else None, a))
         elif chave == "pacotes" and valor:
-            pedidos.append((chave, lista(valor)))
-    chaves = [c for c, _ in pedidos]
-    for c, pacotes in pedidos:
+            pedidos.append((chave, lista(valor), a))
+    chaves = [c for c, _, _ in pedidos]
+    antes = versao_ferramentas()
+    for i, (c, pacotes, _) in enumerate(pedidos):
+        if c not in PASSOS_APT and any(p[0] in PASSOS_APT for p in pedidos[:i]):
+            recomeca(antes, [p[2] for p in pedidos[i:]])
         diz(f"@passo {c}")
         try:
             if c == "sistema":
-                v = sistema(com_radio="radio" in chaves and dict(pedidos)["radio"] is None)
+                v = sistema(com_radio="radio" in chaves and {p[0]: p[1] for p in pedidos}["radio"] is None)
             elif c == "radio":
                 if "sistema" in chaves and pacotes is None:
                     v = ""  # já foi com o sistema inteiro (dist-upgrade sem reter os pacotes de rádio)
