@@ -25,6 +25,7 @@
   <a href="#actualizar">4. Actualizar</a>
   <a href="#windows">5. Ao lado do Windows</a>
   <a href="#problemas">6. Problemas comuns</a>
+  <a href="#relatar">7. Relatar um problema</a>
 </nav>
 
 <section id="inicio">
@@ -45,7 +46,7 @@
   <li><strong>Abra o Rádio e Equipamento.</strong> Aparecem o rádio, a porta do CAT, a placa de som do rádio e a COM correspondente para o N1MM+ e o Log4OM.</li>
   <li><strong>Testar CAT:</strong> escolha o modelo; com a velocidade <em>Automática</em>, é procurada a velocidade a que o rádio responde. O teste só lê a frequência: nunca transmite.</li>
   <li><strong>Configurar os programas…:</strong> escolha o rádio na lista e carregue em <em>Configurar</em>. O WSJT-X, o JTDX, o Fldigi, o Not1MM e o Direwolf ficam a usar o rádio ao mesmo tempo, com o som do rádio e o PTT pelo CAT. Antes de mudar, é guardada uma cópia da configuração de cada programa.</li>
-  <li><strong>N1MM+ e Log4OM:</strong> nas definições de CAT de cada um, escolha a COM indicada no Rádio e Equipamento. Enquanto o N1MM+ estiver aberto, os outros programas ficam sem CAT; quando fecha, voltam a tê-lo.</li>
+  <li><strong>N1MM+ e Log4OM:</strong> no mesmo ecrã, escolha como cada um usa o rádio. <em>Só o N1MM+ (ou o Log4OM) usa o rádio</em>: o programa fala directamente com o rádio; enquanto estiver aberto, os outros programas ficam sem CAT e, quando fecha, voltam a tê-lo. <em>Usa o rádio com os outros programas</em>: todos usam o rádio ao mesmo tempo; o N1MM+ passa a ver um «Kenwood TS-2000» e as funções próprias do seu rádio podem não funcionar. A escolha pode ser mudada quando quiser, voltando a <em>Configurar os programas…</em>. O Log4OM tem de ser aberto uma vez antes de poder ser configurado.</li>
 </ol>
 <p class="nota">A velocidade do CAT tem de ser a mesma no menu do rádio (por exemplo, <em>CAT RATE</em> nos Yaesu).</p>
 <p><a class="botao" href="logbeamos:equipamento">Abrir o Rádio e Equipamento</a></p>
@@ -133,12 +134,30 @@
   <dd>Carregue em Ctrl+Alt+Esc para o reiniciar, ou termine a sessão e volte a entrar.</dd>
   <dt>O rádio não responde ao CAT</dt>
   <dd>No Rádio e Equipamento, confirme o modelo e use a velocidade <em>Automática</em>; confirme que o CAT está ligado no menu do rádio e feche os programas que estejam a usar a porta.</dd>
+  <dt>N1MM+: "The given port name is invalid… not a serial port" ou "Radio … is not responding"</dt>
+  <dd>A porta COM escolhida no N1MM+ não é a do cabo do rádio. No Rádio e Equipamento, carregue em <em>Configurar os programas…</em> e escolha como o N1MM+ usa o rádio: a porta certa é escrita no N1MM+. A COM de cada cabo aparece no Rádio e Equipamento ("no N1MM+ e no Log4OM: COM…").</dd>
+  <dt>O LogBeam Uplink avisa "a porta 2333 está ocupada por outro programa"</dt>
+  <dd>Normalmente é o WaveLogGate, que também recebe QSOs nessa porta. O LogBeamOS passa o WaveLogGate para a porta 2335 ao entrar na sessão; se a voltou a pôr em 2333, mude-a no WaveLogGate: <em>Configuration</em> → <em>Advanced</em> → <em>UDP Port</em> 2335 → <em>Save</em>. Depois feche e abra o LogBeam Uplink. Se algum programa enviava QSOs para o WaveLogGate, mude nele a porta de destino para 2335.</dd>
+  <dt>WaveLogGate: "HTTPS/WSS require a trusted certificate"</dt>
+  <dd>O LogBeamOS põe o certificado do WaveLogGate no Firefox sozinho, sem password, logo que o WaveLogGate o cria: não é preciso carregar em <em>Install Certificate</em>. Se o aviso continuar, feche o WaveLogGate e abra-o de novo.</dd>
   <dt>Sem som do rádio no WSJT-X ou no Direwolf</dt>
   <dd>No Rádio e Equipamento → <em>Configurar os programas…</em>, escolha o som do rádio.</dd>
   <dt>O Direwolf fecha-se logo</dt>
   <dd>A janela fica aberta com a explicação. A configuração está no ficheiro <code>direwolf.conf</code> da pasta pessoal.</dd>
 </dl>
 <p><a class="botao" href="logbeamos:monitor">Abrir o Monitor do sistema</a></p>
+</section>
+
+<section id="relatar">
+<h2>7. Relatar um problema</h2>
+<p>Quando alguma coisa falhar, um relato com estes três passos chega para se perceber o que aconteceu.</p>
+<ol>
+  <li><strong>Anote o que aconteceu:</strong> o que estava a fazer, o que esperava e o que apareceu. Se houver uma mensagem de erro, copie o texto ou fotografe o ecrã (tecla <em>PrtSc</em>).</li>
+  <li><strong>Crie o relatório de diagnóstico</strong> logo a seguir à falha, antes de reiniciar: no menu, <em>Relatório de diagnóstico</em>; ou, num terminal, <code>logbeamos-diagnostico</code>. Fica um ficheiro de texto no ambiente de trabalho. Se o computador bloqueou e teve de ser reiniciado, use <code>logbeamos-diagnostico --anterior</code>, que junta também os erros do arranque anterior.</li>
+  <li><strong>Envie o relato</strong> com o ficheiro em anexo: em <a href="https://github.com/octaviofilipepereira/LogBeamOS/issues/new/choose">github.com/octaviofilipepereira/LogBeamOS</a>, separador <em>Issues</em> (é precisa uma conta do GitHub, gratuita).</li>
+</ol>
+<p class="nota">O relatório não contém passwords nem chaves, e o nome do utilizador, o nome do computador e os endereços de rede são retirados. Contém as versões, o modelo do computador, os aparelhos USB ligados, a configuração do rádio em cada programa e os avisos e erros do sistema. Pode lê-lo antes de o enviar.</p>
+<p><a class="botao" href="logbeamos:diagnostico">Criar o relatório de diagnóstico</a></p>
 </section>
 </main>
 </body>

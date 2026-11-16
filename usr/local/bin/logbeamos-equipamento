@@ -133,17 +133,17 @@ TXT_CFG = {
                     "O PTT é por CAT. Antes de mudar, é guardada uma cópia da configuração de cada programa.",
         "cfg_radio": "Rádio:", "cfg_porta": "Porta:", "cfg_som": "Som do rádio:", "cfg_som_nao": "Não alterar",
         "cfg_programas": "Programas:", "cfg_btn": "Configurar", "cancelar": "Cancelar", "fechar": "Fechar",
-        "cfg_n1mm": "N1MM+: no Configurer escolha a {c}, {b} bps e o rádio {m}. Enquanto o N1MM+ estiver aberto, "
-                    "os outros programas ficam sem CAT; quando fecha, a partilha volta sozinha.",
-        "cfg_log4om": "Log4OM: ainda não é configurado por aqui; escolha a {c} nas definições de CAT.",
         "cfg_abertos": "Feche primeiro: {p}. Ao fechar, gravariam a configuração antiga.",
         "cfg_a_fazer": "A configurar…", "cfg_freq": "Partilha ligada. O rádio responde: {f}.",
         "cfg_sem_freq": "Partilha ligada, mas o rádio ainda não respondeu. Confirme que está ligado e a velocidade do CAT.",
         "cfg_com_som": "{p}: configurado, com o som do rádio", "cfg_sem_som": "{p}: configurado",
         "cfg_erro": "{p}: erro ({e})", "cfg_modelo_mal": "Escolha o modelo do rádio na lista.",
         "partilhado": "Partilhado com os programas: {m}, {b} bps (127.0.0.1:4532)",
-        "partilha_parada": "Partilha configurada ({m}), mas parada: o rádio está desligado ou o N1MM+ está aberto.",
+        "partilha_parada": "Partilha configurada ({m}), mas parada: o rádio está desligado ou está a ser usado só por "
+                           "um programa (N1MM+ ou Log4OM).",
         "desligar_partilha": "Desligar a partilha", "ok_partilha": "O rádio responde pela partilha: {f}",
+        "partilha_calada": "Partilha ligada ({m}, {b} bps), mas o rádio não responde. Confirme o modelo escolhido, "
+                           "a velocidade do CAT no menu do rádio e o cabo.",
     },
     "en": {
         "configurar": "Set up the programs…", "cfg_titulo": "Set up the radio in the programs",
@@ -151,17 +151,17 @@ TXT_CFG = {
                     "PTT is by CAT. A copy of each program's settings is kept before changing them.",
         "cfg_radio": "Radio:", "cfg_porta": "Port:", "cfg_som": "Radio sound:", "cfg_som_nao": "Do not change",
         "cfg_programas": "Programs:", "cfg_btn": "Set up", "cancelar": "Cancel", "fechar": "Close",
-        "cfg_n1mm": "N1MM+: in the Configurer choose {c}, {b} bps and the radio {m}. While N1MM+ is open, "
-                    "the other programs have no CAT; when it closes, sharing resumes by itself.",
-        "cfg_log4om": "Log4OM: not set up from here yet; choose {c} in its CAT settings.",
         "cfg_abertos": "Close first: {p}. When closing, they would save the old settings.",
         "cfg_a_fazer": "Setting up…", "cfg_freq": "Sharing is on. The radio answers: {f}.",
         "cfg_sem_freq": "Sharing is on, but the radio has not answered yet. Check that it is on and the CAT speed.",
         "cfg_com_som": "{p}: set up, with the radio sound", "cfg_sem_som": "{p}: set up",
         "cfg_erro": "{p}: error ({e})", "cfg_modelo_mal": "Choose the radio model from the list.",
         "partilhado": "Shared with the programs: {m}, {b} bps (127.0.0.1:4532)",
-        "partilha_parada": "Sharing is set up ({m}) but stopped: the radio is off or N1MM+ is open.",
+        "partilha_parada": "Sharing is set up ({m}) but stopped: the radio is off or one program has it to itself "
+                           "(N1MM+ or Log4OM).",
         "desligar_partilha": "Stop sharing", "ok_partilha": "The radio answers through sharing: {f}",
+        "partilha_calada": "Sharing is on ({m}, {b} bps), but the radio does not answer. Check the chosen model, "
+                           "the CAT speed in the radio's menu and the cable.",
     },
     "es": {
         "configurar": "Configurar los programas…", "cfg_titulo": "Configurar la radio en los programas",
@@ -169,17 +169,17 @@ TXT_CFG = {
                     "El PTT es por CAT. Antes de cambiar, se guarda una copia de la configuración de cada programa.",
         "cfg_radio": "Radio:", "cfg_porta": "Puerto:", "cfg_som": "Sonido de la radio:", "cfg_som_nao": "No cambiar",
         "cfg_programas": "Programas:", "cfg_btn": "Configurar", "cancelar": "Cancelar", "fechar": "Cerrar",
-        "cfg_n1mm": "N1MM+: en el Configurer elija {c}, {b} bps y la radio {m}. Mientras N1MM+ esté abierto, "
-                    "los demás programas no tienen CAT; al cerrarlo, la compartición vuelve sola.",
-        "cfg_log4om": "Log4OM: aún no se configura desde aquí; elija {c} en sus ajustes de CAT.",
         "cfg_abertos": "Cierre primero: {p}. Al cerrarse, guardarían la configuración antigua.",
         "cfg_a_fazer": "Configurando…", "cfg_freq": "Compartición activa. La radio responde: {f}.",
         "cfg_sem_freq": "Compartición activa, pero la radio aún no respondió. Compruebe que está encendida y la velocidad CAT.",
         "cfg_com_som": "{p}: configurado, con el sonido de la radio", "cfg_sem_som": "{p}: configurado",
         "cfg_erro": "{p}: error ({e})", "cfg_modelo_mal": "Elija el modelo de radio en la lista.",
         "partilhado": "Compartida con los programas: {m}, {b} bps (127.0.0.1:4532)",
-        "partilha_parada": "Compartición configurada ({m}), pero detenida: la radio está apagada o N1MM+ está abierto.",
+        "partilha_parada": "Compartición configurada ({m}), pero detenida: la radio está apagada o la está usando "
+                           "un solo programa (N1MM+ o Log4OM).",
         "desligar_partilha": "Dejar de compartir", "ok_partilha": "La radio responde a través de la compartición: {f}",
+        "partilha_calada": "Compartición activa ({m}, {b} bps), pero la radio no responde. Compruebe el modelo elegido, "
+                           "la velocidad CAT en el menú de la radio y el cable.",
     },
     "fr": {
         "configurar": "Configurer les logiciels…", "cfg_titulo": "Configurer la radio dans les logiciels",
@@ -187,17 +187,17 @@ TXT_CFG = {
                     "Le PTT passe par le CAT. Une copie des réglages de chaque logiciel est gardée avant de les changer.",
         "cfg_radio": "Radio :", "cfg_porta": "Port :", "cfg_som": "Son de la radio :", "cfg_som_nao": "Ne pas changer",
         "cfg_programas": "Logiciels :", "cfg_btn": "Configurer", "cancelar": "Annuler", "fechar": "Fermer",
-        "cfg_n1mm": "N1MM+ : dans le Configurer choisissez {c}, {b} bps et la radio {m}. Tant que N1MM+ est ouvert, "
-                    "les autres logiciels n'ont pas de CAT ; à sa fermeture, le partage reprend tout seul.",
-        "cfg_log4om": "Log4OM : pas encore configuré d'ici ; choisissez {c} dans ses réglages CAT.",
         "cfg_abertos": "Fermez d'abord : {p}. En se fermant, ils enregistreraient les anciens réglages.",
         "cfg_a_fazer": "Configuration…", "cfg_freq": "Partage actif. La radio répond : {f}.",
         "cfg_sem_freq": "Partage actif, mais la radio n'a pas encore répondu. Vérifiez qu'elle est allumée et la vitesse CAT.",
         "cfg_com_som": "{p} : configuré, avec le son de la radio", "cfg_sem_som": "{p} : configuré",
         "cfg_erro": "{p} : erreur ({e})", "cfg_modelo_mal": "Choisissez le modèle de radio dans la liste.",
         "partilhado": "Partagée avec les logiciels : {m}, {b} bps (127.0.0.1:4532)",
-        "partilha_parada": "Partage configuré ({m}), mais arrêté : la radio est éteinte ou N1MM+ est ouvert.",
+        "partilha_parada": "Partage configuré ({m}), mais arrêté : la radio est éteinte ou un seul logiciel "
+                           "l'utilise (N1MM+ ou Log4OM).",
         "desligar_partilha": "Arrêter le partage", "ok_partilha": "La radio répond par le partage : {f}",
+        "partilha_calada": "Partage actif ({m}, {b} bps), mais la radio ne répond pas. Vérifiez le modèle choisi, "
+                           "la vitesse CAT dans le menu de la radio et le câble.",
     },
 }
 # 0.3.10: velocidade automática, Direwolf no "Configurar", outros aparelhos USB
@@ -206,8 +206,6 @@ TXT_V10 = {
         "automatica": "Automática",
         "cfg_expl": "O rádio fica partilhado: o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM e o Direwolf passam a usá-lo ao "
                     "mesmo tempo. O PTT é por CAT. Antes de mudar, é guardada uma cópia da configuração de cada programa.",
-        "cfg_n1mm_auto": "N1MM+: no Configurer escolha a {c}, a velocidade do CAT do rádio e o rádio {m}. Enquanto o "
-                         "N1MM+ estiver aberto, os outros programas ficam sem CAT; quando fecha, a partilha volta sozinha.",
         "cfg_a_procurar": "À procura da velocidade do CAT… (só leitura, sem transmitir)",
         "cfg_vel": "Velocidade do CAT: {b} bps.",
         "cfg_sem_vel": "O rádio não respondeu a nenhuma velocidade. Confirme que está ligado e o CAT ligado no menu "
@@ -220,8 +218,6 @@ TXT_V10 = {
         "automatica": "Automatic",
         "cfg_expl": "The radio is shared: WSJT-X, JTDX, Decodium, Fldigi, Not1MM and Direwolf use it at the same time. "
                     "PTT is by CAT. A copy of each program's settings is kept before changing them.",
-        "cfg_n1mm_auto": "N1MM+: in the Configurer choose {c}, the radio's CAT speed and the radio {m}. While N1MM+ "
-                         "is open, the other programs have no CAT; when it closes, sharing resumes by itself.",
         "cfg_a_procurar": "Looking for the CAT speed… (read only, no transmission)",
         "cfg_vel": "CAT speed: {b} bps.",
         "cfg_sem_vel": "The radio did not answer at any speed. Check that it is on and CAT is enabled in the radio's "
@@ -234,8 +230,6 @@ TXT_V10 = {
         "automatica": "Automática",
         "cfg_expl": "La radio queda compartida: WSJT-X, JTDX, Decodium, Fldigi, Not1MM y Direwolf la usan al mismo tiempo. "
                     "El PTT es por CAT. Antes de cambiar, se guarda una copia de la configuración de cada programa.",
-        "cfg_n1mm_auto": "N1MM+: en el Configurer elija {c}, la velocidad CAT de la radio y la radio {m}. Mientras "
-                         "N1MM+ esté abierto, los demás programas no tienen CAT; al cerrarlo, la compartición vuelve sola.",
         "cfg_a_procurar": "Buscando la velocidad CAT… (solo lectura, sin transmitir)",
         "cfg_vel": "Velocidad CAT: {b} bps.",
         "cfg_sem_vel": "La radio no respondió a ninguna velocidad. Compruebe que está encendida y el CAT activado en "
@@ -248,8 +242,6 @@ TXT_V10 = {
         "automatica": "Automatique",
         "cfg_expl": "La radio est partagée : WSJT-X, JTDX, Decodium, Fldigi, Not1MM et Direwolf l'utilisent en même temps. "
                     "Le PTT passe par le CAT. Une copie des réglages de chaque logiciel est gardée avant de les changer.",
-        "cfg_n1mm_auto": "N1MM+ : dans le Configurer choisissez {c}, la vitesse CAT de la radio et la radio {m}. Tant "
-                         "que N1MM+ est ouvert, les autres logiciels n'ont pas de CAT ; à sa fermeture, le partage reprend tout seul.",
         "cfg_a_procurar": "Recherche de la vitesse CAT… (lecture seule, sans émettre)",
         "cfg_vel": "Vitesse CAT : {b} bps.",
         "cfg_sem_vel": "La radio n'a répondu à aucune vitesse. Vérifiez qu'elle est allumée et le CAT activé dans son "
@@ -259,9 +251,86 @@ TXT_V10 = {
                            "radio n'apparaît qu'ici, Linux n'y a trouvé ni port série ni carte son.",
     },
 }
+# 0.3.22: N1MM+ and Log4OM use the radio the way the user chooses, alone or together with the other programs
+TXT_V22 = {
+    "pt": {
+        "n1mm_so": "Só o N1MM+ usa o rádio",
+        "n1mm_so_d": "O N1MM+ fala directamente com o rádio e reconhece o modelo verdadeiro, com todas as funções. "
+                     "Enquanto estiver aberto, os outros programas ficam sem CAT.",
+        "n1mm_com": "O N1MM+ usa o rádio com os outros programas",
+        "n1mm_com_d": "O N1MM+ e os outros programas usam o rádio ao mesmo tempo. O N1MM+ passa a ver um «Kenwood "
+                      "TS-2000»: a frequência, o modo e o PTT funcionam; as funções próprias do seu rádio podem não "
+                      "funcionar.",
+        "log4om_so": "Só o Log4OM usa o rádio",
+        "log4om_so_d": "O Log4OM fala directamente com o rádio. Enquanto estiver aberto, os outros programas ficam "
+                       "sem CAT.",
+        "log4om_com": "O Log4OM usa o rádio com os outros programas",
+        "log4om_com_d": "O Log4OM e os outros programas usam o rádio ao mesmo tempo.",
+        "cfg_wine_so": "{p}: configurado para usar o rádio sozinho ({c}, {b} bps)",
+        "cfg_wine_com": "{p}: configurado para usar o rádio com os outros programas",
+        "cfg_n1mm_sem_radio": "N1MM+: porta {c} a {b} bps. O N1MM+ não tem o rádio «{m}» na sua lista: escolha no "
+                              "Configurer o modelo mais parecido.",
+        "cfg_wine_falta": "{p}: abra-o uma vez, feche-o e volte a configurar aqui (a configuração dele ainda não existe).",
+    },
+    "en": {
+        "n1mm_so": "Only N1MM+ uses the radio",
+        "n1mm_so_d": "N1MM+ talks directly to the radio and recognises the real model, with all its functions. "
+                     "While it is open, the other programs have no CAT.",
+        "n1mm_com": "N1MM+ uses the radio together with the other programs",
+        "n1mm_com_d": "N1MM+ and the other programs use the radio at the same time. N1MM+ sees a “Kenwood TS-2000”: "
+                      "frequency, mode and PTT work; functions specific to your radio may not.",
+        "log4om_so": "Only Log4OM uses the radio",
+        "log4om_so_d": "Log4OM talks directly to the radio. While it is open, the other programs have no CAT.",
+        "log4om_com": "Log4OM uses the radio together with the other programs",
+        "log4om_com_d": "Log4OM and the other programs use the radio at the same time.",
+        "cfg_wine_so": "{p}: set up to use the radio alone ({c}, {b} bps)",
+        "cfg_wine_com": "{p}: set up to use the radio together with the other programs",
+        "cfg_n1mm_sem_radio": "N1MM+: port {c} at {b} bps. N1MM+ does not have the radio “{m}” in its list: choose "
+                              "the closest model in the Configurer.",
+        "cfg_wine_falta": "{p}: open it once, close it and set up here again (its settings do not exist yet).",
+    },
+    "es": {
+        "n1mm_so": "Solo N1MM+ usa la radio",
+        "n1mm_so_d": "N1MM+ habla directamente con la radio y reconoce el modelo real, con todas sus funciones. "
+                     "Mientras esté abierto, los demás programas no tienen CAT.",
+        "n1mm_com": "N1MM+ usa la radio junto con los demás programas",
+        "n1mm_com_d": "N1MM+ y los demás programas usan la radio al mismo tiempo. N1MM+ ve una «Kenwood TS-2000»: "
+                      "la frecuencia, el modo y el PTT funcionan; las funciones propias de su radio pueden no funcionar.",
+        "log4om_so": "Solo Log4OM usa la radio",
+        "log4om_so_d": "Log4OM habla directamente con la radio. Mientras esté abierto, los demás programas no tienen CAT.",
+        "log4om_com": "Log4OM usa la radio junto con los demás programas",
+        "log4om_com_d": "Log4OM y los demás programas usan la radio al mismo tiempo.",
+        "cfg_wine_so": "{p}: configurado para usar la radio solo ({c}, {b} bps)",
+        "cfg_wine_com": "{p}: configurado para usar la radio junto con los demás programas",
+        "cfg_n1mm_sem_radio": "N1MM+: puerto {c} a {b} bps. N1MM+ no tiene la radio «{m}» en su lista: elija en el "
+                              "Configurer el modelo más parecido.",
+        "cfg_wine_falta": "{p}: ábralo una vez, ciérrelo y vuelva a configurar aquí (su configuración aún no existe).",
+    },
+    "fr": {
+        "n1mm_so": "Seul N1MM+ utilise la radio",
+        "n1mm_so_d": "N1MM+ communique directement avec la radio et reconnaît le vrai modèle, avec toutes ses "
+                     "fonctions. Tant qu'il est ouvert, les autres logiciels n'ont pas de CAT.",
+        "n1mm_com": "N1MM+ utilise la radio avec les autres logiciels",
+        "n1mm_com_d": "N1MM+ et les autres logiciels utilisent la radio en même temps. N1MM+ voit un « Kenwood "
+                      "TS-2000 » : la fréquence, le mode et le PTT fonctionnent ; les fonctions propres à votre "
+                      "radio peuvent ne pas fonctionner.",
+        "log4om_so": "Seul Log4OM utilise la radio",
+        "log4om_so_d": "Log4OM communique directement avec la radio. Tant qu'il est ouvert, les autres logiciels "
+                       "n'ont pas de CAT.",
+        "log4om_com": "Log4OM utilise la radio avec les autres logiciels",
+        "log4om_com_d": "Log4OM et les autres logiciels utilisent la radio en même temps.",
+        "cfg_wine_so": "{p} : configuré pour utiliser la radio seul ({c}, {b} bps)",
+        "cfg_wine_com": "{p} : configuré pour utiliser la radio avec les autres logiciels",
+        "cfg_n1mm_sem_radio": "N1MM+ : port {c} à {b} bps. N1MM+ n'a pas la radio « {m} » dans sa liste : choisissez "
+                              "dans le Configurer le modèle le plus proche.",
+        "cfg_wine_falta": "{p} : ouvrez-le une fois, fermez-le et refaites la configuration ici (ses réglages "
+                          "n'existent pas encore).",
+    },
+}
 for _l in TXT:
     TXT[_l].update(TXT_CFG[_l])
     TXT[_l].update(TXT_V10[_l])
+    TXT[_l].update(TXT_V22[_l])
 LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
 T = TXT.get(LINGUA, TXT["en"])
 
@@ -580,12 +649,15 @@ def janela():
                     b.pack_start(etiqueta(T["som_radio"].format(n=nomes.get(r["som"], cartas.get(r["som"], "")))),
                                  False, False, 0)
                 if cat:
-                    b.pack_start(self.teste(cat, r["modelo"]), False, False, 0)
+                    b.pack_start(self.teste(cat, r["modelo"], r["tipo"]), False, False, 0)
                     cfg = lb_radio.configuracao()
                     if cfg and os.path.realpath(cfg.get("porta", "")) == os.path.realpath(cat):
                         if lb_radio.partilha_activa():
-                            b.pack_start(etiqueta("✔ " + T["partilhado"].format(m=cfg["nome"], b=cfg["velocidade"]),
-                                                  cor="#2ea043"), False, False, 0)
+                            # The service running is not enough: the tick only once the radio answers through it
+                            # (a wrong model or speed keeps the service up while the radio stays silent)
+                            et = etiqueta(T["partilhado"].format(m=cfg["nome"], b=cfg["velocidade"]))
+                            b.pack_start(et, False, False, 0)
+                            self.confirma_partilha(et, cfg)
                         else:
                             b.pack_start(etiqueta(T["partilha_parada"].format(m=cfg["nome"]), cor="#d29922"),
                                          False, False, 0)
@@ -659,21 +731,31 @@ def janela():
             self.corpo.show_all()
             return True
 
-        def teste(self, porta, modelo):
+        def teste(self, porta, modelo, tipo=""):
             caixa = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
             lin = Gtk.Box(spacing=8)
             lin.pack_start(Gtk.Label(label=T["modelo"]), False, False, 0)
             cm = Gtk.ComboBoxText()
             for k in sorted(MODELOS):
                 cm.append(k, k)
-            cm.set_active_id(modelo if modelo in MODELOS else "IC-7300")
+            # What "Configure the programs" saved for this port wins over the name the cable gives; without either,
+            # a Yaesu cable starts on a Yaesu model (it used to fall back to the IC-7300 for every radio)
+            escolhido, vel = (modelo if modelo in MODELOS else None), "auto"
+            cfg = lb_radio.configuracao()
+            if cfg and os.path.realpath(cfg.get("porta", "")) == os.path.realpath(porta):
+                guardado = next((k for k in sorted(MODELOS) if MODELOS[k][0] == cfg.get("modelo")), None)
+                if guardado:
+                    escolhido = guardado
+                    if cfg.get("velocidade") in VELOCIDADES:
+                        vel = str(cfg["velocidade"])
+            cm.set_active_id(escolhido or ("FT-991A" if tipo == "yaesu" else "IC-7300"))
             lin.pack_start(cm, False, False, 0)
             lin.pack_start(Gtk.Label(label=T["velocidade"]), False, False, 0)
             cv = Gtk.ComboBoxText()
             cv.append("auto", T["automatica"])
             for v in VELOCIDADES:
                 cv.append(str(v), str(v))
-            cv.set_active_id("auto")
+            cv.set_active_id(vel)
             lin.pack_start(cv, False, False, 0)
             bt = Gtk.Button(label=T["testar"])
             lin.pack_start(bt, False, False, 0)
@@ -700,10 +782,23 @@ def janela():
             self.ass = None
             self.actualiza()
 
+        def confirma_partilha(self, et, cfg):
+            """Asks the radio for its frequency through the sharing, in a thread (the window does not wait), and
+            then marks the line: green tick if it answers, warning if it does not."""
+            def trabalho():
+                f = lb_radio.frequencia_partilha(4)
+                if f:
+                    t, cor = "✔ " + T["partilhado"].format(m=cfg["nome"], b=cfg["velocidade"]), "#2ea043"
+                else:
+                    t, cor = "⚠ " + T["partilha_calada"].format(m=cfg["nome"], b=cfg["velocidade"]), "#d29922"
+                GLib.idle_add(lambda: (et.set_markup(f"<span foreground='{cor}'>{GLib.markup_escape_text(t)}</span>"),
+                                       False)[1])
+            threading.Thread(target=trabalho, daemon=True).start()
+
         def configurar(self, porta, r, com):
             """Diálogo: rádio, velocidade, som e programas; liga a partilha e configura os programas."""
             dlg = Gtk.Dialog(title=T["cfg_titulo"], transient_for=self, modal=True)
-            dlg.set_default_size(560, -1)
+            dlg.set_default_size(640, -1)
             bt_cancelar = dlg.add_button(T["cancelar"], Gtk.ResponseType.CANCEL)
             bt_ok = dlg.add_button(T["cfg_btn"], Gtk.ResponseType.OK)
             bt_ok.get_style_context().add_class("suggested-action")
@@ -712,8 +807,27 @@ def janela():
             area.set_border_width(12)
             area.pack_start(etiqueta(T["cfg_expl"]), False, False, 0)
 
+            # The messages and the form live in an area that scrolls, so that the window keeps its size whatever they
+            # need (it used to grow with the result, past the screen on a low one). A message shows above the form; the
+            # form is hidden once everything is set up and the result takes its place.
+            conteudo = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+            resultado = etiqueta("")
+            resultado.set_no_show_all(True)
+            conteudo.pack_start(resultado, False, False, 0)
+            formulario = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+            conteudo.pack_start(formulario, False, False, 0)
+            rol = Gtk.ScrolledWindow(overlay_scrolling=False, min_content_height=200)
+            rol.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            rol.add(conteudo)
+            area.pack_start(rol, True, True, 0)
+
+            def diz(texto):
+                resultado.set_text(texto)
+                resultado.set_visible(bool(texto))
+                rol.get_vadjustment().set_value(0)
+
             grelha = Gtk.Grid(column_spacing=10, row_spacing=8)
-            area.pack_start(grelha, False, False, 0)
+            formulario.pack_start(grelha, False, False, 0)
             # Rádio: todos os modelos do Hamlib, com procura ao escrever
             modelos = lb_radio.modelos_hamlib()
             cm = Gtk.ComboBoxText.new_with_entry()
@@ -759,10 +873,31 @@ def janela():
                 caixas[chave] = Gtk.CheckButton(label=nome, active=True)
                 cp.pack_start(caixas[chave], False, False, 0)
             grelha.attach(cp, 1, 4, 1, 1)
-            notas = etiqueta("")
-            area.pack_start(notas, False, False, 0)
-            resultado = etiqueta("")
-            area.pack_start(resultado, False, False, 0)
+            # N1MM+ and Log4OM: the user chooses how each one uses the radio, alone or with the other programs (0.3.22).
+            # What was chosen before comes selected. The first time: what the program's own settings already say (a
+            # radio port set up by hand stays "only the program"); when they say nothing, shared with the others.
+            modos = lb_radio.modos()
+            for chave, _n, _e in lb_radio.WINE:
+                modos.setdefault(chave, lb_radio.modo_presumido(chave))
+            sozinho = {}
+            for chave, nome_prog, _exe in lb_radio.WINE:
+                t = etiqueta(nome_prog, True)
+                t.set_margin_top(4)
+                formulario.pack_start(t, False, False, 0)
+                grupo = None
+                for sufixo in ("_so", "_com"):
+                    bt = Gtk.RadioButton.new_with_label_from_widget(grupo, T[chave + sufixo])
+                    grupo = grupo or bt
+                    formulario.pack_start(bt, False, False, 0)
+                    d = Gtk.Label(xalign=0, wrap=True, max_width_chars=80)
+                    d.set_markup("<small>" + GLib.markup_escape_text(T[chave + sufixo + "_d"]) + "</small>")
+                    d.set_margin_start(26)
+                    formulario.pack_start(d, False, False, 0)
+                    if sufixo == "_so":
+                        sozinho[chave] = bt
+                        bt.set_sensitive(com != "—")  # a port without a COM in Wine cannot be opened by the program
+                    else:
+                        bt.set_active(com == "—" or modos.get(chave) != "exclusivo")
 
             def modelo_escolhido():
                 i = cm.get_active_id()
@@ -774,19 +909,17 @@ def janela():
                         return n
                 return None
 
-            def actualiza_notas(*_, vel=None):
-                if com == "—":  # porta sem COM no Wine: o N1MM+ e o Log4OM não a vêem
-                    notas.set_text("")
-                    return
-                n = modelo_escolhido()
-                nome = next((x for k, x in modelos if k == n), "—")
-                b = vel or (None if cv.get_active_id() == "auto" else cv.get_active_id())
-                n1mm = T["cfg_n1mm"].format(c=com, b=b, m=nome) if b else T["cfg_n1mm_auto"].format(c=com, m=nome)
-                notas.set_text(n1mm + "\n" + T["cfg_log4om"].format(c=com))
-            cm.connect("changed", actualiza_notas)
-            cv.connect("changed", actualiza_notas)
-            actualiza_notas()
             dlg.show_all()
+            # The window takes the height at which the whole form shows (measured at the width the form really got:
+            # the descriptions wrap), up to what the screen has
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+            mon = dlg.get_display().get_monitor_at_window(self.get_window())
+            alto = mon.get_geometry().height if mon else 768
+            largura = formulario.get_allocated_width()
+            preciso = formulario.get_preferred_height_for_width(largura)[1] if largura > 1 else 520
+            larg_j, alt_j = dlg.get_size()
+            dlg.resize(larg_j, min(alt_j + max(preciso - rol.get_allocated_height(), 0) + 8, alto - 110))
 
             while True:
                 resp = dlg.run()
@@ -794,16 +927,18 @@ def janela():
                     break
                 n = modelo_escolhido()
                 if not n:
-                    resultado.set_text(T["cfg_modelo_mal"])
+                    diz(T["cfg_modelo_mal"])
                     continue
                 progs = [k for k, c in caixas.items() if c.get_active()]
                 abertos = [nome for k, nome, _ in lb_radio.PROGRAMAS if k in progs and nome in lb_radio.abertos()]
+                abertos += lb_radio.abertos_wine()
+                wine = {k: "exclusivo" if b.get_active() else "partilhado" for k, b in sozinho.items()}
                 if abertos:
-                    resultado.set_text(T["cfg_abertos"].format(p=", ".join(abertos)))
+                    diz(T["cfg_abertos"].format(p=", ".join(abertos)))
                     continue
                 carta = None if cs.get_active_id() == "nao" else cs.get_active_id()
                 auto = cv.get_active_id() == "auto"
-                resultado.set_text(T["cfg_a_procurar"] if auto else T["cfg_a_fazer"])
+                diz(T["cfg_a_procurar"] if auto else T["cfg_a_fazer"])
                 bt_ok.set_sensitive(False)
                 bt_cancelar.set_sensitive(False)
                 fim = {}
@@ -824,7 +959,7 @@ def janela():
                                 fim["sem_vel"] = True
                         if vel:
                             fim["vel"] = vel
-                            fim["r"] = lb_radio.configura(n, porta, vel, progs, carta)
+                            fim["r"] = lb_radio.configura(n, porta, vel, progs, carta, wine, None if com == "—" else com)
                     except Exception as e:
                         fim["e"] = str(e)
                     GLib.idle_add(Gtk.main_quit)
@@ -832,23 +967,32 @@ def janela():
                 threading.Thread(target=trabalho, daemon=True).start()
                 Gtk.main()  # espera sem bloquear a janela
                 if fim.get("sem_vel"):
-                    resultado.set_text(T["cfg_sem_vel"])
+                    diz(T["cfg_sem_vel"])
                     bt_ok.set_sensitive(True)
                     bt_cancelar.set_sensitive(True)
                     continue
                 if "e" in fim:
-                    resultado.set_text(T["cfg_erro"].format(p="rigctld", e=fim["e"]))
+                    diz(T["cfg_erro"].format(p="rigctld", e=fim["e"]))
                 else:
                     nome, _fixa, f, res = fim["r"]
-                    nomes = {k: x for k, x, _ in lb_radio.PROGRAMAS}
+                    nomes = {k: x for k, x, _ in lb_radio.PROGRAMAS + lb_radio.WINE}
                     linhas = [T["cfg_freq"].format(f=mhz(f)) if f else T["cfg_sem_freq"], T["cfg_vel"].format(b=fim["vel"])]
-                    actualiza_notas(vel=fim["vel"])
                     for k, ok, det in res:
-                        if ok:
+                        if ok and det == "exclusivo":
+                            linhas.append("✔ " + T["cfg_wine_so"].format(p=nomes[k], c=com, b=fim["vel"]))
+                        elif ok and det == "partilhado":
+                            linhas.append("✔ " + T["cfg_wine_com"].format(p=nomes[k]))
+                        elif ok and det == "exclusivo-sem-radio":
+                            linhas.append("⚠ " + T["cfg_n1mm_sem_radio"].format(c=com, b=fim["vel"], m=nome))
+                        elif ok:
                             linhas.append("✔ " + (T["cfg_com_som"] if det == "som" else T["cfg_sem_som"]).format(p=nomes[k]))
+                        elif det == "falta":
+                            linhas.append("⚠ " + T["cfg_wine_falta"].format(p=nomes[k]))
                         else:
                             linhas.append("✖ " + T["cfg_erro"].format(p=nomes[k], e=det))
-                    resultado.set_text("\n".join(linhas))
+                    # the result takes the place of the form
+                    formulario.hide()
+                    diz("\n".join(linhas))
                 bt_ok.hide()
                 bt_cancelar.set_label(T["fechar"])
                 bt_cancelar.set_sensitive(True)
@@ -882,10 +1026,13 @@ if __name__ == "__main__":
         print("dialout:", tem_dialout())
         cfg = lb_radio.configuracao()
         print("partilha:", cfg, "activa" if lb_radio.partilha_activa() else "parada")
+        print("N1MM+ e Log4OM:", lb_radio.modos(), "abertos:", lb_radio.abertos_wine())
     elif "--configurar" in sys.argv:
-        # para ensaios: logbeamos-equipamento --configurar MODELO PORTA VELOCIDADE|auto [CARTA_SOM|-] [programa,…]
+        # para ensaios: logbeamos-equipamento --configurar MODELO PORTA VELOCIDADE|auto [CARTA_SOM|-] [programa,…|-]
+        #               [n1mm=partilhado|exclusivo,log4om=partilhado|exclusivo]
         a = sys.argv[sys.argv.index("--configurar") + 1:]
-        progs = a[4].split(",") if len(a) > 4 else [k for k, _, _ in lb_radio.PROGRAMAS]
+        progs = [p for p in a[4].split(",") if p != "-"] if len(a) > 4 else [k for k, _, _ in lb_radio.PROGRAMAS]
+        wine = dict(x.split("=", 1) for x in a[5].split(",")) if len(a) > 5 else None
         carta = a[3] if len(a) > 3 and a[3] != "-" else None
         vel = None if a[2] == "auto" else int(a[2])
         if vel is None:
@@ -893,7 +1040,7 @@ if __name__ == "__main__":
             print("velocidade encontrada:", vel)
             if not vel:
                 sys.exit(1)
-        nome, fixa, f, res = lb_radio.configura(int(a[0]), a[1], vel, progs, carta)
+        nome, fixa, f, res = lb_radio.configura(int(a[0]), a[1], vel, progs, carta, wine, portas_wine().get(a[1]))
         print("rádio:", nome, fixa, "frequência:", f)
         for r in res:
             print("programa:", *r)

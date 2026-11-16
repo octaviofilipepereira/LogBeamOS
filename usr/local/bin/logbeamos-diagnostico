@@ -1,0 +1,281 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: diagnostic report. One command that gathers, in a single text file on the desktop, what is needed to
+# understand a problem: versions, computer, USB and serial devices, the shared radio (CAT) and how each program is set
+# up to use it, sound, Wine, updates and the warnings and errors of the system log.
+# It only reads; it changes nothing and needs no password. It never opens files that hold passwords or keys, and it
+# takes the user name, the computer name and network addresses out of what it writes. The report is in English so
+# that anyone helping can read it; the user reads it before sending it.
+# It is the one tool that testers type by hand, so it answers in their language (author, 15/11/2026): two names,
+# logbeamos-diagnostico (Portuguese, Spanish) and logbeamos-diagnostic (English, French), and the option in each.
+# Usage: logbeamos-diagnostico [--anterior | --previous | --precedent] [--janela] [--saida FILE]
+#   --anterior  also the warnings and errors of the previous start (after a freeze that forced a restart);
+#               --previous and --precedent are the same option
+#   --janela    for the menu entry: shows a window while it works and at the end
+import datetime
+import glob
+import json
+import os
+import re
+import socket
+import subprocess
+import sys
+
+LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
+TXT = {
+    "pt": {"titulo": "Relatório de diagnóstico", "a_juntar": "A juntar a informação…",
+           "feito": "O relatório foi guardado em:\n{f}\n\nNão contém passwords nem chaves. Leia-o antes de o enviar e "
+                    "anexe-o ao seu relato.",
+           "abrir": "Abrir a pasta", "fechar": "Fechar"},
+    "en": {"titulo": "Diagnostic report", "a_juntar": "Gathering the information…",
+           "feito": "The report was saved to:\n{f}\n\nIt holds no passwords or keys. Read it before sending it and "
+                    "attach it to your report.",
+           "abrir": "Open the folder", "fechar": "Close"},
+    "es": {"titulo": "Informe de diagnóstico", "a_juntar": "Reuniendo la información…",
+           "feito": "El informe se ha guardado en:\n{f}\n\nNo contiene contraseñas ni claves. Léalo antes de enviarlo y "
+                    "adjúntelo a su aviso.",
+           "abrir": "Abrir la carpeta", "fechar": "Cerrar"},
+    "fr": {"titulo": "Rapport de diagnostic", "a_juntar": "Collecte des informations…",
+           "feito": "Le rapport a été enregistré dans :\n{f}\n\nIl ne contient ni mots de passe ni clés. Lisez-le avant "
+                    "de l'envoyer et joignez-le à votre signalement.",
+           "abrir": "Ouvrir le dossier", "fechar": "Fermer"},
+}
+T = TXT.get(LINGUA, TXT["en"])
+CASA = os.path.expanduser("~")
+UTILIZADOR = os.environ.get("USER") or os.path.basename(CASA)
+MAQUINA = socket.gethostname()
+
+
+def corre(cmd, tempo=15, entrada=None):
+    """Output of a command (both streams), or a short note when it is missing, fails or takes too long."""
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=tempo, input=entrada, errors="replace",
+                           env=dict(os.environ, LC_ALL="C"))
+        saida = (r.stdout + r.stderr).strip()
+        return saida if saida or r.returncode == 0 else f"(exit code {r.returncode}, no output)"
+    except FileNotFoundError:
+        return f"(not installed: {cmd[0]})"
+    except subprocess.TimeoutExpired:
+        return f"(no answer after {tempo} s: {' '.join(cmd)})"
+    except OSError as e:
+        return f"({e})"
+
+
+def le(caminho, linhas=None):
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as f:
+            t = f.read()
+    except OSError as e:
+        return f"({e.strerror}: {caminho})"
+    if linhas:
+        t = "\n".join(t.splitlines()[-linhas:])
+    return t.strip()
+
+
+def limpa(texto):
+    """Takes out what identifies the person or the network: user name, computer name, addresses; and the value of
+    anything that looks like a password or a key, should a log carry one."""
+    texto = texto.replace(CASA, "~")
+    for nome, troca in ((UTILIZADOR, "USER"), (MAQUINA, "HOST")):
+        # names that say nothing about the person stay (the pen user is "logbeam", as in "logbeam.org")
+        if len(nome) > 2 and nome.lower() not in ("logbeam", "logbeamos", "mint", "user", "ubuntu", "ham", "radio", "root"):
+            texto = re.sub(r"(?<![A-Za-z0-9_-])" + re.escape(nome) + r"(?![A-Za-z0-9_-])", troca, texto)
+    # network addresses, not version numbers such as 6.8.0.1-generic or 9.0.0.0~noble-1
+    texto = re.sub(r"(?<![\w.])(?!127\.)(\d{1,3}\.){3}\d{1,3}(?![\w.~-])", "x.x.x.x", texto)
+    texto = re.sub(r"\b([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}\b", "xx:xx:xx:xx:xx:xx", texto)
+    texto = re.sub(r"(?i)\b(pass(word|wd)?|senha|token|secret|api[_-]?key|apikey)\b(\s*[=:]\s*)\S+", r"\1\3(removed)", texto)
+    return texto
+
+
+def chaves_ini(caminho, seccao, chaves):
+    """Only the given keys of one section of an ini file (the rest may be personal)."""
+    if not os.path.exists(caminho):
+        return "(no such file)"
+    dentro, r = False, []
+    for l in le(caminho).splitlines():
+        if l.startswith("["):
+            dentro = l.strip() == f"[{seccao}]"
+        elif dentro and l.split("=", 1)[0] in chaves:
+            r.append(l[:200])
+    return "\n".join(r) or "(none of the radio keys is set)"
+
+
+def radio_programas():
+    r = []
+    cfg = os.path.join(CASA, ".config")
+    chaves = ("Rig", "CATNetworkPort", "CATSerialPort", "CATSerialRate", "PTTMethod", "PTTport", "Polling",
+              "SoundInName", "SoundOutName")
+    for nome, f in (("WSJT-X", "WSJT-X.ini"), ("JTDX", "JTDX.ini")):
+        r.append(f"-- {nome} ({f}, [Configuration])\n" + chaves_ini(os.path.join(cfg, f), "Configuration", chaves))
+    r.append("-- Decodium ([Transceiver])\n" + chaves_ini(os.path.join(cfg, "Decodium", "Decodium3.ini"), "Transceiver",
+                                                           ("rigName", "networkPort", "pttMethod", "pttPort",
+                                                            "pollInterval", "catAutoConnect")))
+    f = os.path.join(CASA, ".fldigi", "fldigi_def.xml")
+    if os.path.exists(f):
+        t = le(f)
+        r.append("-- Fldigi\n" + "\n".join(m.group(0) for m in re.finditer(
+            r"<(CHKUSEHAMLIBIS|CHKUSERIGCATIS|CHKUSEXMLRPCIS|HAMRIGMODEL|HAMRIGNAME|HAMRIGDEVICE|HAMLIBCMDPTT)>.*?</\1>", t)))
+    f = os.path.join(cfg, "not1mm", "not1mm.json")
+    if os.path.exists(f):
+        try:
+            d = json.loads(le(f))
+            r.append("-- Not1MM\n" + str({k: d.get(k) for k in ("userigctld", "useflrig", "CAT_ip", "CAT_port")}))
+        except ValueError:
+            r.append("-- Not1MM\n(settings file cannot be read)")
+    f = os.path.join(CASA, "direwolf.conf")
+    if os.path.exists(f):
+        r.append("-- Direwolf\n" + "\n".join(l for l in le(f).splitlines() if re.match(r"\s*(ADEVICE|PTT)\b", l)))
+    try:
+        sys.path.insert(0, "/usr/local/lib/logbeamos/equipamento")
+        import lb_radio
+        r.append(f"-- N1MM+ and Log4OM: choice {lb_radio.modos()}, open now {lb_radio.abertos_wine()}, "
+                 f"Wine prefix {lb_radio.prefixo_wine()} ({'exists' if os.path.isdir(lb_radio.prefixo_wine()) else 'MISSING'})")
+        ini = lb_radio.ini_n1mm()
+        if os.path.exists(ini):
+            portas, dentro = [], False
+            for l in le(ini).splitlines():
+                if l.startswith("["):
+                    dentro = bool(re.match(r"\[Port\d\]", l.strip()))
+                if dentro and l.strip():
+                    portas.append(l.strip()[:200])
+            r.append("-- N1MM+ (port lines of its ini)\n" + ("\n".join(portas) or "(no port set)"))
+            r.append("-- N1MM+ LogError.txt (last lines)\n" + le(os.path.join(os.path.dirname(ini), "LogError.txt"), 30))
+        else:
+            r.append("-- N1MM+\n(no ini yet: never opened or never set up)")
+        f = lb_radio.json_log4om()
+        if os.path.exists(f):
+            with open(f, "rb") as fh:
+                c = lb_radio._cat_log4om(json.loads(fh.read().decode("utf-8-sig"))) or {}
+            h = next((x for x in c.get("CATDrivers", []) if isinstance(x, dict) and x.get("CATSoftware") == 10), {})
+            campos = ("AttachExisting", "Address", "TcpPort", "Radio", "COMPort", "BaudRate", "StopBits", "RTS", "DTR",
+                      "PTTMode", "Parameters")
+            r.append(f"-- Log4OM (CAT only)\nCatEngine={c.get('CatEngine')} CatAutostart={c.get('CatAutostart')} "
+                     + str({k: h.get(k) for k in campos}))
+        else:
+            r.append("-- Log4OM\n(no settings yet: never opened)")
+    except Exception as e:  # the report goes on without this part
+        r.append(f"-- N1MM+ and Log4OM\n(could not be read: {e})")
+    return "\n".join(r)
+
+
+def portas_abertas():
+    r = []
+    for fd in glob.glob("/proc/[0-9]*/fd/*"):
+        try:
+            alvo = os.readlink(fd)
+        except OSError:
+            continue
+        if alvo.startswith(("/dev/ttyUSB", "/dev/ttyACM")):
+            r.append(f"{alvo}: {le(fd.split('/fd/')[0] + '/comm')}")
+    return "\n".join(sorted(set(r))) or "(no program has a serial port open, or they belong to another user)"
+
+
+def junta(anterior):
+    S = []
+
+    def sec(titulo, *partes):
+        S.append("\n" + "=" * 100 + f"\n{titulo}\n" + "=" * 100)
+        for p in partes:
+            S.append(p if isinstance(p, str) else p())
+
+    def cmd(*c, tempo=15):
+        return "$ " + " ".join(c) + "\n" + corre(list(c), tempo)
+
+    def dmi(campo):
+        t = le("/sys/class/dmi/id/" + campo)
+        return "?" if t.startswith("(") else t
+
+    viva = "boot=casper" in le("/proc/cmdline")
+    sec("1. LogBeamOS",
+        f"LogBeamOS version: {le('/usr/share/logbeamos/versao-sistema')}",
+        f"Started from: {'the pen (live)' if viva else 'the disk (installed)'} · firmware: "
+        f"{'UEFI' if os.path.isdir('/sys/firmware/efi') else 'BIOS (legacy)'} · Secure Boot: {corre(['mokutil', '--sb-state'], 5).splitlines()[0]}",
+        f"Kernel: {corre(['uname', '-r'])} · language: {os.environ.get('LANG', '')} {os.environ.get('LANGUAGE', '')} · "
+        f"session: {os.environ.get('XDG_CURRENT_DESKTOP', '')} {os.environ.get('XDG_SESSION_TYPE', '')}",
+        cmd("dpkg-query", "-W", "-f=${Package} ${Version} ${db:Status-Abbrev}\\n", "logbeamos-ferramentas",
+            "logbeamos-tqsl", "logbeam-uplink", "libhamlib-utils", "libhamlib4", "wine-stable", "cinnamon"),
+        cmd("uptime"), cmd("timedatectl", "show", "-p", "Timezone", "-p", "NTPSynchronized", "-p", "LocalRTC"))
+    sec("2. Computer",
+        f"{dmi('sys_vendor')} {dmi('product_name')} {dmi('product_version')} · BIOS {dmi('bios_version')} {dmi('bios_date')}",
+        "CPU: " + next((l.split(":", 1)[1].strip() for l in le("/proc/cpuinfo").splitlines() if l.startswith("model name")), "?")
+        + f" · {os.cpu_count()} threads",
+        cmd("free", "-h"), cmd("df", "-h", "-x", "tmpfs", "-x", "devtmpfs", "-x", "squashfs", "-x", "efivarfs"),
+        cmd("lsblk", "-o", "NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL"),
+        "$ lspci (graphics)\n" + "\n".join(l for l in corre(["lspci", "-nn"]).splitlines() if re.search("VGA|3D|Display", l)),
+        "$ xrandr (screens)\n" + "\n".join(l for l in corre(["xrandr", "--current"]).splitlines() if " connected" in l or "*" in l))
+    sec("3. USB and serial ports", cmd("lsusb"), cmd("ls", "-l", "/dev/serial/by-id"),
+        "Groups of the user: " + corre(["id", "-nG"]),
+        "Serial ports open now:\n" + portas_abertas(),
+        cmd("logbeamos-equipamento", "--texto", tempo=20))
+    u = os.path.join(CASA, ".config", "systemd", "user")
+    servicos = ("logbeamos-rigctld.service", "logbeamos-ponte-n1mm.service")
+    sec("4. Shared radio (CAT)",
+        "radio.json: " + le(os.path.join(CASA, ".config", "logbeamos", "radio.json")),
+        *[f"-- {s}: enabled={corre(['systemctl', '--user', 'is-enabled', s], 5)} active={corre(['systemctl', '--user', 'is-active', s], 5)}\n"
+          + le(os.path.join(u, s)) + "\n" + cmd("journalctl", "--user", "-u", s, "-n", "40", "--no-pager", "-o", "short")
+          for s in servicos],
+        "Reading the radio through the sharing (frequency, mode), read only:\n"
+        + corre(["rigctl", "-m", "2", "-r", "127.0.0.1:4532", "f", "m"], 8),
+        "Wine COM ports:\n" + corre(["sh", "-c", "ls -l /opt/ham/wine/dosdevices ~/.local/share/logbeamos/wine/dosdevices 2>/dev/null | grep -i com"], 5),
+        "How each program is set up to use the radio:", radio_programas)
+    sec("5. Sound", "$ cat /proc/asound/cards\n" + le("/proc/asound/cards"),
+        "$ pactl info\n" + "\n".join(l for l in corre(["pactl", "info"]).splitlines() if re.match("Server Name|Default", l)),
+        cmd("pactl", "list", "short", "sinks"), cmd("pactl", "list", "short", "sources"))
+    sec("6. Updates",
+        "$ tail /var/log/apt/history.log\n" + le("/var/log/apt/history.log", 60),
+        cmd("dpkg", "--audit"),
+        "$ apt sources with logbeam\n" + corre(["sh", "-c", "grep -rhs logbeam /etc/apt/sources.list /etc/apt/sources.list.d/ | grep -v '^#'"], 5),
+        cmd("flatpak", "list", "--app", "--columns=application,version,installation", tempo=20))
+    sec("7. System log: warnings and errors since this start",
+        cmd("journalctl", "-b", "-p", "warning", "--no-pager", "-n", "300", "-o", "short", tempo=30),
+        "$ tail ~/.xsession-errors\n" + le(os.path.join(CASA, ".xsession-errors"), 80),
+        cmd("coredumpctl", "list", "--no-pager", "-n", "15"), cmd("ls", "-la", "/var/crash"))
+    if anterior:
+        sec("8. System log: warnings and errors of the previous start",
+            cmd("journalctl", "-b", "-1", "-p", "warning", "--no-pager", "-n", "300", "-o", "short", tempo=30))
+    agora = datetime.datetime.now(datetime.timezone.utc)
+    cabeca = (f"LogBeamOS diagnostic report · {agora:%d/%m/%Y %H:%M} UTC\n"
+              "Made by logbeamos-diagnostico. It holds no passwords or keys; the user name, the computer name and\n"
+              "network addresses were taken out. Read it before sending it.\n")
+    return cabeca + limpa("\n".join(S)) + "\n"
+
+
+def destino():
+    d = corre(["xdg-user-dir", "DESKTOP"], 5)
+    if not os.path.isdir(d):
+        d = CASA
+    return os.path.join(d, f"LogBeamOS-diagnostico-{datetime.datetime.now():%Y%m%d-%H%M}.txt")
+
+
+def main():
+    a = sys.argv[1:]
+    janela = "--janela" in a
+    ficheiro = a[a.index("--saida") + 1] if "--saida" in a and len(a) > a.index("--saida") + 1 else destino()
+    espera = None
+    if janela:
+        try:
+            espera = subprocess.Popen(["zenity", "--progress", "--pulsate", "--no-cancel", "--auto-close",
+                                       f"--title={T['titulo']}", f"--text={T['a_juntar']}"], stdin=subprocess.PIPE)
+        except OSError:
+            pass
+    texto = junta(any(o in a for o in ("--anterior", "--previous", "--precedent")))
+    with open(ficheiro, "w", encoding="utf-8") as f:
+        f.write(texto)
+    if espera:
+        try:
+            espera.stdin.close()
+        except OSError:
+            pass
+        espera.terminate()
+    print(T["feito"].format(f=ficheiro))
+    if janela:
+        r = subprocess.run(["zenity", "--question", f"--title={T['titulo']}", "--width=520", f"--text={T['feito'].format(f=ficheiro)}",
+                            f"--ok-label={T['abrir']}", f"--cancel-label={T['fechar']}"])
+        if r.returncode == 0:
+            subprocess.Popen(["xdg-open", os.path.dirname(ficheiro)], start_new_session=True)
+
+
+if __name__ == "__main__":
+    main()

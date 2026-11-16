@@ -1,0 +1,6 @@
+[Unit]
+Description=LogBeamOS: WaveLogGate certificate trusted by Firefox
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/logbeamos/wavelog-gate-ajuste --certificado

@@ -1,0 +1,140 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: two WaveLogGate settings that LogBeamOS takes care of by itself (tools 0.3.22, author's decision of
+# 16/11/2026: "why don't we change it ourselves and be done with it?"). Measured in the virtual machine on 16/11/2026
+# with WaveLogGate 2.2.3; the WaveLogGate code referred to below is its internal/config and internal/cert.
+#
+# 1. The port. WaveLogGate receives QSOs on UDP 2333 by default, the same port on which the LogBeam Uplink of
+#    LogBeamOS receives the QSOs of Log4OM. Whichever program starts first keeps the port: the Uplink then warns
+#    "port 2333 is in use by another program", or WaveLogGate silently receives nothing. WaveLogGate moves to 2335,
+#    once per user: whoever later sets a port by hand keeps it. A user without a WaveLogGate configuration gets one
+#    with only {"udp_port": 2335}; WaveLogGate fills in all the rest with its own defaults (config.Load and migrate).
+#    Only with WaveLogGate closed (it writes its whole configuration back when the user saves).
+# 2. The certificate. WaveLogGate serves HTTPS and WSS (ports 54321 and 54323) with its own CA, created when it first
+#    starts. Its "Install Certificate" button puts the CA in the system store and, only if it exists, in ~/.pki/nssdb
+#    (Chrome/Chromium). Firefox, the LogBeamOS browser, uses neither: it kept warning until the CA was added to its
+#    profile with certutil. Here the CA goes into every Firefox profile and into ~/.pki/nssdb (created if missing,
+#    which is where WaveLogGate's own check also looks, so it stops asking), with the nickname WaveLogGate uses.
+#    No password is needed. Again whenever WaveLogGate creates a new CA, and when Firefox creates a profile (a new
+#    user who opens WaveLogGate before ever opening Firefox): logbeamos-wavelog-ca.path watches both.
+#
+# Usage: wavelog-gate-ajuste                 both, at the start of the session (/etc/xdg/autostart)
+#        wavelog-gate-ajuste --certificado   the certificate only (logbeamos-wavelog-ca.service)
+import base64
+import glob
+import json
+import os
+import subprocess
+import sys
+import time
+
+CONF = os.path.join(os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"), "WavelogGate")
+CONFIG = os.path.join(CONF, "config.json")
+CA = os.path.join(CONF, "certs", "ca.crt")
+MARCA = os.path.expanduser("~/.config/logbeamos/wavelog-gate-porta")
+PORTA_UPLINK, PORTA_NOVA = 2333, 2335
+NOME = "WavelogGate CA"
+
+
+def escreve(caminho, texto):
+    novo = caminho + ".logbeamos"
+    with open(novo, "w", encoding="utf-8") as f:
+        f.write(texto)
+    os.chmod(novo, 0o644)
+    os.replace(novo, caminho)
+
+
+def a_correr():
+    return subprocess.run(["pgrep", "-u", str(os.getuid()), "-x", "wavelog-gate"],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+
+
+def porta():
+    if os.path.exists(MARCA) or a_correr():
+        return
+    if os.path.exists(CONFIG):
+        try:
+            with open(CONFIG, encoding="utf-8") as f:
+                cfg = json.load(f)
+        except (OSError, ValueError):
+            return      # a file WaveLogGate cannot read either: it falls back to its defaults; left to WaveLogGate
+        if not isinstance(cfg, dict):
+            return
+        if cfg.get("udp_port") in (None, 0, PORTA_UPLINK):
+            cfg["udp_port"] = PORTA_NOVA
+            escreve(CONFIG, json.dumps(cfg, indent=2))
+    else:
+        os.makedirs(CONF, mode=0o755, exist_ok=True)
+        escreve(CONFIG, json.dumps({"udp_port": PORTA_NOVA}, indent=2))
+    os.makedirs(os.path.dirname(MARCA), exist_ok=True)
+    open(MARCA, "w").close()
+
+
+def der(pem):
+    """The first certificate of a PEM text, in DER (bytes), or None."""
+    i = pem.find("-----BEGIN CERTIFICATE-----")
+    j = pem.find("-----END CERTIFICATE-----", i)
+    if i < 0 or j < 0:
+        return None
+    try:
+        return base64.b64decode("".join(pem[i + 27:j].split()))
+    except ValueError:
+        return None
+
+
+def certutil(*args):
+    return subprocess.run(["certutil", *args], capture_output=True, text=True)
+
+
+def bases():
+    """The NSS databases that must trust the CA: each Firefox profile and the user's shared one. A profile Firefox has
+    only just created gets its certificate database a moment later: wait for it, at most 30 s. Only for profiles made in
+    the last two minutes: Firefox also leaves an empty, unused "….default" profile next to "….default-release"."""
+    # Profiles made before Firefox 14x are in ~/.mozilla/firefox; new ones (Firefox 160 in the VM, 16/11/2026) in
+    # $XDG_CONFIG_HOME/mozilla/firefox
+    xdg = os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
+    raizes = [os.path.expanduser("~/.mozilla/firefox"), os.path.join(xdg, "mozilla", "firefox"),
+              os.path.expanduser("~/snap/firefox/common/.mozilla/firefox")]
+    novos = [p for r in raizes for p in glob.glob(os.path.join(r, "*.default*"))
+             if os.path.isdir(p) and time.time() - os.path.getmtime(p) < 120]
+    for _ in range(30 if novos else 0):     # one of them is the real one; the empty "….default" never gets it
+        if any(os.path.exists(os.path.join(p, "cert9.db")) for p in novos):
+            break
+        time.sleep(1)
+    b = [os.path.dirname(p) for r in raizes for p in glob.glob(os.path.join(r, "*", "cert9.db"))]
+    nss = os.path.expanduser("~/.pki/nssdb")
+    if not os.path.exists(os.path.join(nss, "cert9.db")):
+        os.makedirs(nss, mode=0o700, exist_ok=True)
+        certutil("-N", "-d", "sql:" + nss, "--empty-password")
+    if os.path.exists(os.path.join(nss, "cert9.db")):
+        b.append(nss)
+    return b
+
+
+def certificado():
+    try:
+        with open(CA, encoding="ascii") as f:
+            ca = der(f.read())
+    except (OSError, ValueError):
+        return
+    if not ca:
+        return
+    for b in bases():
+        r = certutil("-L", "-d", "sql:" + b, "-n", NOME, "-a")
+        if r.returncode == 0 and der(r.stdout) == ca:
+            continue
+        for _ in range(5):      # an older CA of WaveLogGate under the same name goes first
+            if certutil("-D", "-d", "sql:" + b, "-n", NOME).returncode != 0:
+                break
+        certutil("-A", "-d", "sql:" + b, "-t", "C,,", "-n", NOME, "-i", CA)
+
+
+if __name__ == "__main__":
+    try:
+        if "--certificado" not in sys.argv[1:]:
+            porta()
+        certificado()
+    except Exception as e:      # never in the way of the session
+        print(f"wavelog-gate-ajuste: {e}", file=sys.stderr)

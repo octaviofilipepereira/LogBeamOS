@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Diagnostic report
+Name[pt]=Relatório de diagnóstico
+Name[es]=Informe de diagnóstico
+Name[fr]=Rapport de diagnostic
+Comment=Gathers in one file what is needed to report a problem (no passwords)
+Comment[pt]=Junta num ficheiro o que é preciso para relatar um problema (sem passwords)
+Comment[es]=Reúne en un archivo lo necesario para informar de un problema (sin contraseñas)
+Comment[fr]=Rassemble dans un fichier ce qu'il faut pour signaler un problème (sans mots de passe)
+Exec=logbeamos-diagnostico --janela
+Icon=/usr/share/logbeamos/diagnostico.png
+Terminal=false
+Categories=HamRadio;

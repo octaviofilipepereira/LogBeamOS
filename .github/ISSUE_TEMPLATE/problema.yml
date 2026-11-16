@@ -1,0 +1,58 @@
+name: Problem report · Relato de problema
+description: Something does not work as it should · Alguma coisa não funciona como devia
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping. Before sending, create the diagnostic report: menu **Diagnostic report**, or `logbeamos-diagnostic` in a terminal. It holds no passwords or keys, and you can read it first.
+
+        Obrigado pela ajuda. Antes de enviar, crie o relatório de diagnóstico: menu **Relatório de diagnóstico**, ou `logbeamos-diagnostico` num terminal. Não contém passwords nem chaves, e pode lê-lo primeiro.
+  - type: input
+    id: versao
+    attributes:
+      label: LogBeamOS version · Versão do LogBeamOS
+      description: Shown on the boot screen and in the diagnostic report · Aparece no ecrã de arranque e no relatório de diagnóstico
+      placeholder: "0.3.17"
+    validations:
+      required: true
+  - type: dropdown
+    id: onde
+    attributes:
+      label: Where it runs · Onde corre
+      options:
+        - USB drive · Pen
+        - Installed on the disk · Instalado no disco
+    validations:
+      required: true
+  - type: textarea
+    id: fazia
+    attributes:
+      label: What you were doing · O que estava a fazer
+      description: Step by step, so that it can be repeated · Passo a passo, para se poder repetir
+    validations:
+      required: true
+  - type: textarea
+    id: esperava
+    attributes:
+      label: What you expected · O que esperava
+  - type: textarea
+    id: aconteceu
+    attributes:
+      label: What happened · O que aconteceu
+      description: Error messages exactly as shown; pictures of the screen help · Mensagens de erro tal como aparecem; fotografias do ecrã ajudam
+    validations:
+      required: true
+  - type: input
+    id: radio
+    attributes:
+      label: Radio and cable · Rádio e cabo
+      description: Only if the problem is with the radio · Só se o problema for com o rádio
+      placeholder: "Yaesu FT-991A, USB"
+  - type: textarea
+    id: relatorio
+    attributes:
+      label: Diagnostic report · Relatório de diagnóstico
+      description: Drag the file LogBeamOS-diagnostico-….txt here · Arraste para aqui o ficheiro LogBeamOS-diagnostico-….txt
+    validations:
+      required: true

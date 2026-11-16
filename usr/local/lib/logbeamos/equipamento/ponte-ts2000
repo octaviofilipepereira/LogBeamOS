@@ -1,0 +1,227 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: bridge between a program that only knows "a Kenwood TS-2000" and the shared radio (rigctld, Hamlib).
+# N1MM+ cannot speak to Hamlib, but it can speak to its radio over the network (port "TCP" in the Configurer): it
+# connects here, sends Kenwood commands as it would to a TS-2000, and this translates them to the sharing, so N1MM+
+# and the other programs use the radio at the same time. Whatever the real radio is, N1MM+ sees a TS-2000: frequency,
+# mode, split, PTT and CW by CAT pass; functions specific to the real model do not.
+# (Hamlib's own rigctlcom does this on a serial port, but version 4.5.5 crashes on the first "IF;" and .NET refuses to
+# open a pseudo-terminal, which has no modem lines. N1MM+ has a radio called "Hamlib" in its code, but only its authors
+# get it in the list.)
+# Local machine only, one program at a time. "Radio and Equipment" starts it as a service of the user
+# (logbeamos-ponte-n1mm.service) when the user chooses that N1MM+ shares the radio.
+# Usage: ponte-ts2000 [PORT [RIGCTLD-HOST:PORT [regista]]]
+import select
+import socket
+import sys
+import time
+
+PORTA = int(sys.argv[1]) if len(sys.argv) > 1 else 4533
+PARTILHA = sys.argv[2] if len(sys.argv) > 2 else "127.0.0.1:4532"
+REGISTA = len(sys.argv) > 3
+VALIDADE = 0.25           # seconds the radio state is reused (N1MM+ polls several times a second)
+
+PARA_KENWOOD = {"LSB": "1", "USB": "2", "CW": "3", "FM": "4", "AM": "5", "RTTY": "6", "CWR": "7", "RTTYR": "9",
+                "PKTLSB": "1", "PKTUSB": "2", "PKTFM": "4", "PKTAM": "5", "FMN": "4", "WFM": "4", "AMS": "5",
+                "AMN": "5", "DSB": "2", "ECSSUSB": "2", "ECSSLSB": "1"}
+DE_KENWOOD = {"1": "LSB", "2": "USB", "3": "CW", "4": "FM", "5": "AM", "6": "RTTY", "7": "CWR", "9": "RTTYR"}
+# Settings of a TS-2000 that have no equivalent in the sharing (filters, RIT, antennas, menus, receiver choice):
+# accepted and ignored, as N1MM+ does not wait for an answer to them
+SEM_EFEITO = ("AI", "RT", "XT", "RC", "RU", "RD", "FR", "AG", "PS", "DA", "SP", "NB", "BC", "PC", "AN", "FL", "FW", "EX",
+              "SB", "TR", "PB", "SH", "SL", "NR", "PA", "RA", "GT", "VX")
+
+
+def diz(*a):
+    if REGISTA:
+        print(time.strftime("%H:%M:%S"), *a, flush=True)
+
+
+class Partilha:
+    """rigctld, extended protocol ("+command"): the answer ends with a line "RPRT n"."""
+
+    def __init__(self, onde):
+        host, porta = onde.rsplit(":", 1)
+        self.onde = (host, int(porta))
+        self.s = None
+        self.estado = None
+        self.quando = 0.0
+        self.vfo_b = 0              # transmit frequency the program asked for (its "VFO B"), sent when split goes on
+
+    def pede(self, cmd):
+        """Returns (fields, code): fields is {"Frequency": "14074000", ...}; code is 0 when the radio accepted."""
+        for _tentativa in (1, 2):
+            try:
+                if self.s is None:
+                    self.s = socket.create_connection(self.onde, timeout=3)
+                self.s.sendall(("+" + cmd + "\n").encode())
+                dados = b""
+                while True:
+                    b = self.s.recv(4096)
+                    if not b:
+                        raise OSError("rigctld closed")
+                    dados += b
+                    linhas = dados.decode("ascii", "replace").splitlines()
+                    if linhas and linhas[-1].startswith("RPRT ") and dados.endswith(b"\n"):
+                        campos = {}
+                        for l in linhas[1:-1]:
+                            if ": " in l:
+                                k, v = l.split(": ", 1)
+                                campos[k] = v
+                        return campos, int(linhas[-1].split()[1])
+            except (OSError, ValueError):
+                if self.s:
+                    self.s.close()
+                self.s = None
+        return {}, -1
+
+    def le(self):
+        """Radio state, reused for a short time. None while the sharing does not answer."""
+        if self.estado is not None and time.monotonic() - self.quando < VALIDADE:
+            return self.estado
+        f, c = self.pede("f")
+        if c != 0 or not f.get("Frequency", "").split(".")[0].isdigit():
+            self.estado = None
+            return None
+        e = {"freq": int(f["Frequency"].split(".")[0]), "modo": "USB", "split": False, "tx": 0, "ptt": False}
+        m, c = self.pede("m")
+        if c == 0:
+            e["modo"] = m.get("Mode", "USB")
+        s, c = self.pede("s")
+        if c == 0 and s.get("Split") == "1":
+            e["split"] = True
+            i, c = self.pede("i")
+            if c == 0 and i.get("TX Frequency", "").split(".")[0].isdigit():
+                e["tx"] = int(i["TX Frequency"].split(".")[0])
+        t, c = self.pede("t")
+        if c == 0:
+            e["ptt"] = t.get("PTT", "0") != "0"
+        self.estado, self.quando = e, time.monotonic()
+        return e
+
+    def muda(self, cmd):
+        _, c = self.pede(cmd)
+        self.estado = None          # the next poll reads the radio again
+        diz("partilha:", cmd, "->", c)
+        return c
+
+
+def resposta_if(e):
+    """38 characters, as the TS-2000 answers "IF;" (N1MM+ reads the frequency, RIT, mode, VFO and split from it)."""
+    modo = PARA_KENWOOD.get(e["modo"], "2")
+    return (f"IF{e['freq']:011d}    +0000000000{1 if e['ptt'] else 0}{modo}00{1 if e['split'] else 0}0000;")
+
+
+def trata(cmd, rig, desconhecidos):
+    """One Kenwood command without the final ";". Returns the answer ("" when the command is a setting)."""
+    c, arg = cmd[:2].upper(), cmd[2:]
+    if c in ("TX", "RX"):
+        rig.muda("T 1" if c == "TX" else "T 0")
+        return ""
+    if c == "KY" and arg:
+        rig.muda("b " + arg.strip())            # CW text by CAT, where the radio has it
+        return ""
+    if c == "KS" and arg.strip().isdigit():
+        rig.muda("L KEYSPD " + str(int(arg)))
+        return ""
+    if c in SEM_EFEITO and arg and c + arg != "AG0":
+        return ""
+    e = rig.le()
+    if e is None:
+        return None                             # the sharing is not answering: stay silent, as a radio that is off
+    if c == "IF":
+        return resposta_if(e)
+    if c == "FA":
+        if arg.strip().isdigit():
+            rig.muda(f"F {int(arg)}")
+            return ""
+        return f"FA{e['freq']:011d};"
+    if c == "FB":
+        # N1MM+ sets "VFO B" first and turns split on afterwards. In Hamlib the transmit frequency belongs to the split:
+        # set while split is off, it can end up on the receive frequency. So it is kept and sent once split is on.
+        if arg.strip().isdigit():
+            rig.vfo_b = int(arg)
+            if e["split"]:
+                rig.muda(f"I {rig.vfo_b}")
+            return ""
+        return f"FB{(e['tx'] if e['split'] and e['tx'] else rig.vfo_b or e['freq']):011d};"
+    if c == "MD":
+        if arg[:1] in DE_KENWOOD:
+            if PARA_KENWOOD.get(e["modo"]) != arg[:1]:      # USB asked while the radio is in PKTUSB: nothing to change
+                rig.muda(f"M {DE_KENWOOD[arg[:1]]} 0")
+            return ""
+        return f"MD{PARA_KENWOOD.get(e['modo'], '2')};"
+    if c == "FT":
+        if arg[:1] in ("0", "1"):
+            if arg[0] == "1":
+                if not e["split"]:
+                    rig.muda("S 1 VFOB")
+                    if rig.vfo_b:
+                        rig.muda(f"I {rig.vfo_b}")
+            elif e["split"]:                                # N1MM+ repeats "FT0;" with every frequency it sets
+                rig.muda("S 0 VFOA")
+            return ""
+        return f"FT{1 if e['split'] else 0};"
+    fixas = {"AG0": "AG0000;", "FR": "FR0;", "ID": "ID019;", "AI": "AI0;", "PS": "PS1;", "KY": "KY0;", "KS": "KS025;",
+             "DA": "DA0;", "SM0": "SM00000;", "SM": "SM00000;", "RT": "RT0;", "XT": "XT0;", "AN": "AN1;"}
+    if c + arg in fixas:
+        return fixas[c + arg]
+    if c not in desconhecidos:
+        desconhecidos.add(c)
+        diz("comando sem tradução:", repr(cmd))
+    return "?;"
+
+
+def main():
+    rig = Partilha(PARTILHA)
+    srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    srv.bind(("127.0.0.1", PORTA))
+    srv.listen(1)
+    diz(f"ponte TS-2000 em 127.0.0.1:{PORTA}, partilha em {PARTILHA}")
+    cli, resto, desconhecidos = None, b"", set()
+    while True:
+        for fd in select.select([srv] + ([cli] if cli else []), [], [], 5)[0]:
+            if fd is srv:
+                novo, quem = srv.accept()
+                if cli:
+                    cli.close()
+                cli, resto = novo, b""
+                diz("programa ligado:", quem[0])
+                continue
+            try:
+                d = cli.recv(4096)
+            except OSError:
+                d = b""
+            if not d:
+                diz("programa desligado")
+                cli.close()
+                cli = None
+                continue
+            resto += d
+            *cmds, resto = resto.split(b";")
+            if len(resto) > 200:                # not Kenwood traffic
+                resto = b""
+            saida = ""
+            for b in cmds:
+                cmd = b.decode("ascii", "replace").strip()
+                if len(cmd) >= 2:
+                    if REGISTA and (len(cmd) > 3 or cmd[:2].upper() not in ("IF", "FA", "FB", "AG")):
+                        diz("pedido:", cmd)
+                    r = trata(cmd, rig, desconhecidos)
+                    if r:
+                        saida += r
+            if saida:
+                try:
+                    cli.sendall(saida.encode("ascii"))
+                except OSError:
+                    cli.close()
+                    cli = None
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

@@ -34,11 +34,14 @@ The ISO image, its SHA-256 fingerprint and the instructions for writing the USB 
 | Tool | What it does |
 |---|---|
 | **Update LogBeamOS** | One window to update the amateur radio programs and the operating system. It shows the installed version, the available one and the download size, and updates only what is ticked, with the progress in MB, speed and time left. It covers the system packages, the programs published on GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr and others), Not1MM, and the LogBeamOS tools themselves. Ten minutes after login, a notice appears if there are updates. |
-| **Radio and Equipment** | Detects radios, CAT cables, sound cards and SDR receivers. It shares the radio among the programs through Hamlib's `rigctld`, with automatic speed detection, and configures WSJT-X, JTDX, Decodium, Fldigi, Not1MM and Direwolf to use it. |
-| **LogBeamOS manual** | First steps, connecting the radio, which program for what, updating, installing alongside Windows and removing LogBeamOS. Its own window, in the language of the session. It can also be read here: [manual in English](docs/manual/manual-en.md). |
-| **Launchers** | N1MM Logger+ through Wine, receiving the shared radio while it is open; Direwolf with a configuration created if missing; Xastir connected to Direwolf. |
+| **Radio and Equipment** | Detects radios, CAT cables, sound cards and SDR receivers. It shares the radio among the programs through Hamlib's `rigctld`, with automatic speed detection, and configures WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ and Log4OM to use it; N1MM+ and Log4OM either share the radio or have it to themselves, as the user chooses. It keeps WaveLogGate on a port of its own, with its certificate trusted by Firefox. |
+| **LogBeamOS manual** | First steps, connecting the radio, which program for what, updating, installing alongside Windows and removing LogBeamOS. Its own window, in the language of the session. It can also be read here: [manual in English](docs/manual/manual-en.md), and on the website: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
+| **Diagnostic report** | Gathers in one text file what is needed to report a problem: versions, computer, USB and serial devices, the radio settings of each program, and the warnings and errors of the system. No passwords or keys; the user name, the computer name and the network addresses are taken out. In the menu, or `logbeamos-diagnostic` in a terminal. |
+| **Launchers** | N1MM Logger+ and Log4OM through Wine, using the radio the way the user chose; WIRES-X, installed from the Yaesu file, with the COM port of the radio; Direwolf with a configuration created if missing; Xastir connected to Direwolf. |
 
 Every window is in Portuguese, English, Spanish and French.
+
+LogBeamOS also takes **muffin**, the Cinnamon window manager, from its apt repository, with a one-line correction that keeps Cinnamon from crashing when N1MM+ or Log4OM is closed and opened again: see [fontes/muffin](fontes/muffin/).
 
 ### Installing and updating
 
@@ -112,7 +115,7 @@ LogBeamOS includes two programs that are free of charge but are not open source.
 
 ### Contributing and security
 
-Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Security flaws are reported privately: see [SECURITY.md](SECURITY.md).
+To report a problem: **Issues → New issue → Problem report**, with the diagnostic report attached ([how to report a problem](https://logbeam.org/logbeamos/relatar/?hl=en)). Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Security flaws are reported privately: see [SECURITY.md](SECURITY.md).
 
 ### Licence
 
@@ -164,11 +167,14 @@ Carregue numa imagem para a ver em tamanho real.
 | Ferramenta | O que faz |
 |---|---|
 | **Actualizar LogBeamOS** | Uma janela para actualizar os programas de radioamador e o sistema operativo. Mostra a versão instalada, a disponível e o tamanho a descarregar, e actualiza só o que estiver marcado, com o progresso em MB, a velocidade e o tempo que falta. Abrange os pacotes do sistema, os programas publicados no GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr e outros), o Not1MM e as próprias ferramentas do LogBeamOS. Dez minutos depois de entrar na sessão, aparece um aviso se houver actualizações. |
-| **Rádio e Equipamento** | Detecta rádios, cabos de CAT, placas de som e receptores SDR. Partilha o rádio entre os programas através do `rigctld` do Hamlib, com detecção automática da velocidade, e configura o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM e o Direwolf para o usarem. |
-| **Manual do LogBeamOS** | Primeiros passos, ligar o rádio, que programa para quê, actualizar, instalar ao lado do Windows e retirar o LogBeamOS. Em janela própria, na língua da sessão. Também se pode ler aqui: [manual em português](docs/manual/manual-pt.md). |
-| **Lançadores** | O N1MM Logger+ através do Wine, a receber o rádio partilhado enquanto está aberto; o Direwolf, com uma configuração criada se faltar; o Xastir, ligado ao Direwolf. |
+| **Rádio e Equipamento** | Detecta rádios, cabos de CAT, placas de som e receptores SDR. Partilha o rádio entre os programas através do `rigctld` do Hamlib, com detecção automática da velocidade, e configura o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM, o Direwolf, o N1MM+ e o Log4OM para o usarem; o N1MM+ e o Log4OM partilham o rádio ou ficam com ele só para si, como o utilizador escolher. Mantém o WaveLogGate numa porta própria, com o certificado aceite pelo Firefox. |
+| **Manual do LogBeamOS** | Primeiros passos, ligar o rádio, que programa para quê, actualizar, instalar ao lado do Windows e retirar o LogBeamOS. Em janela própria, na língua da sessão. Também se pode ler aqui: [manual em português](docs/manual/manual-pt.md), e no site: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
+| **Relatório de diagnóstico** | Junta num ficheiro de texto o que é preciso para relatar um problema: versões, computador, aparelhos USB e série, a configuração do rádio em cada programa, e os avisos e erros do sistema. Sem passwords nem chaves; o nome do utilizador, o do computador e os endereços de rede são retirados. No menu, ou `logbeamos-diagnostico` num terminal. |
+| **Lançadores** | O N1MM Logger+ e o Log4OM através do Wine, a usar o rádio como o utilizador escolheu; o WIRES-X, instalado a partir do ficheiro da Yaesu, com a porta COM do rádio; o Direwolf, com uma configuração criada se faltar; o Xastir, ligado ao Direwolf. |
 
 Todas as janelas estão em português, inglês, espanhol e francês.
+
+O LogBeamOS vai também buscar o **muffin**, o gestor de janelas do Cinnamon, ao seu repositório apt, com uma correcção de uma linha que impede o Cinnamon de ir abaixo ao fechar e voltar a abrir o N1MM+ ou o Log4OM: ver [fontes/muffin](fontes/muffin/).
 
 ### Instalar e actualizar
 
@@ -242,7 +248,7 @@ O **VoxDMR** (DMR do BrandMeister sem rádio) não vem na imagem: o Actualizar L
 
 ### Contribuir e segurança
 
-As contribuições são bem-vindas: ver o [CONTRIBUTING.md](CONTRIBUTING.md). As falhas de segurança comunicam-se em privado: ver o [SECURITY.md](SECURITY.md).
+Para relatar um problema: **Issues → New issue → Problem report**, com o relatório de diagnóstico em anexo ([como relatar um problema](https://logbeam.org/logbeamos/relatar/)). As contribuições são bem-vindas: ver o [CONTRIBUTING.md](CONTRIBUTING.md). As falhas de segurança comunicam-se em privado: ver o [SECURITY.md](SECURITY.md).
 
 ### Licença
 
@@ -282,11 +288,14 @@ La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memo
 | Herramienta | Qué hace |
 |---|---|
 | **Actualizar LogBeamOS** | Una ventana para actualizar los programas de radioaficionado y el sistema operativo. Muestra la versión instalada, la disponible y el tamaño a descargar, y actualiza solo lo que esté marcado, con el progreso en MB, la velocidad y el tiempo restante. Abarca los paquetes del sistema, los programas publicados en GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr y otros), Not1MM y las propias herramientas de LogBeamOS. Diez minutos después de iniciar la sesión, aparece un aviso si hay actualizaciones. |
-| **Radio y Equipo** | Detecta radios, cables CAT, tarjetas de sonido y receptores SDR. Comparte la radio entre los programas a través de `rigctld` de Hamlib, con detección automática de la velocidad, y configura WSJT-X, JTDX, Decodium, Fldigi, Not1MM y Direwolf para que la usen. |
-| **Manual de LogBeamOS** | Primeros pasos, conectar la radio, qué programa para qué, actualizar, instalar junto a Windows y quitar LogBeamOS. En su propia ventana, en el idioma de la sesión. También se puede leer aquí: [manual en español](docs/manual/manual-es.md). |
-| **Lanzadores** | N1MM Logger+ a través de Wine, recibiendo la radio compartida mientras está abierto; Direwolf, con una configuración creada si falta; Xastir, conectado a Direwolf. |
+| **Radio y Equipo** | Detecta radios, cables CAT, tarjetas de sonido y receptores SDR. Comparte la radio entre los programas a través de `rigctld` de Hamlib, con detección automática de la velocidad, y configura WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ y Log4OM para que la usen; N1MM+ y Log4OM comparten la radio o la usan solos, como elija el usuario. Mantiene WaveLogGate en un puerto propio, con su certificado aceptado por Firefox. |
+| **Manual de LogBeamOS** | Primeros pasos, conectar la radio, qué programa para qué, actualizar, instalar junto a Windows y quitar LogBeamOS. En su propia ventana, en el idioma de la sesión. También se puede leer aquí: [manual en español](docs/manual/manual-es.md), y en el sitio web: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
+| **Informe de diagnóstico** | Reúne en un archivo de texto lo necesario para informar de un problema: versiones, ordenador, dispositivos USB y serie, la configuración de la radio en cada programa, y los avisos y errores del sistema. Sin contraseñas ni claves; se eliminan el nombre del usuario, el del ordenador y las direcciones de red. En el menú, o `logbeamos-diagnostico` en un terminal. |
+| **Lanzadores** | N1MM Logger+ y Log4OM a través de Wine, usando la radio como eligió el usuario; WIRES-X, instalado a partir del archivo de Yaesu, con el puerto COM de la radio; Direwolf, con una configuración creada si falta; Xastir, conectado a Direwolf. |
 
 Todas las ventanas están en portugués, inglés, español y francés.
+
+LogBeamOS toma además **muffin**, el gestor de ventanas de Cinnamon, de su repositorio apt, con una corrección de una línea que impide que Cinnamon se caiga al cerrar y volver a abrir N1MM+ o Log4OM: ver [fontes/muffin](fontes/muffin/).
 
 ### Instalar y actualizar
 
@@ -360,7 +369,7 @@ LogBeamOS incluye dos programas que son gratuitos, pero no son de código abiert
 
 ### Contribuir y seguridad
 
-Las contribuciones son bienvenidas: ver [CONTRIBUTING.md](CONTRIBUTING.md). Los fallos de seguridad se comunican en privado: ver [SECURITY.md](SECURITY.md).
+Para informar de un problema: **Issues → New issue → Problem report**, con el informe de diagnóstico adjunto ([cómo informar de un problema](https://logbeam.org/logbeamos/relatar/?hl=es)). Las contribuciones son bienvenidas: ver [CONTRIBUTING.md](CONTRIBUTING.md). Los fallos de seguridad se comunican en privado: ver [SECURITY.md](SECURITY.md).
 
 ### Licencia
 
@@ -400,11 +409,14 @@ L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé US
 | Outil | Ce qu'il fait |
 |---|---|
 | **Mettre à jour LogBeamOS** | Une fenêtre pour mettre à jour les logiciels de radioamateur et le système d'exploitation. Elle affiche la version installée, la version disponible et la taille à télécharger, et ne met à jour que ce qui est coché, avec la progression en Mo, la vitesse et le temps restant. Elle couvre les paquets du système, les logiciels publiés sur GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr et d'autres), Not1MM et les outils de LogBeamOS eux-mêmes. Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour. |
-| **Radio et Matériel** | Détecte les radios, les câbles CAT, les cartes son et les récepteurs SDR. Partage la radio entre les logiciels via `rigctld` de Hamlib, avec détection automatique de la vitesse, et configure WSJT-X, JTDX, Decodium, Fldigi, Not1MM et Direwolf pour l'utiliser. |
-| **Manuel de LogBeamOS** | Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, installer à côté de Windows et retirer LogBeamOS. Dans sa propre fenêtre, dans la langue de la session. Il peut aussi être lu ici : [manuel en français](docs/manual/manual-fr.md). |
-| **Lanceurs** | N1MM Logger+ via Wine, recevant la radio partagée tant qu'il est ouvert ; Direwolf, avec une configuration créée si elle manque ; Xastir, relié à Direwolf. |
+| **Radio et Matériel** | Détecte les radios, les câbles CAT, les cartes son et les récepteurs SDR. Partage la radio entre les logiciels via `rigctld` de Hamlib, avec détection automatique de la vitesse, et configure WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ et Log4OM pour l'utiliser ; N1MM+ et Log4OM partagent la radio ou l'utilisent seuls, au choix de l'utilisateur. Il garde WaveLogGate sur un port à lui, avec son certificat accepté par Firefox. |
+| **Manuel de LogBeamOS** | Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, installer à côté de Windows et retirer LogBeamOS. Dans sa propre fenêtre, dans la langue de la session. Il peut aussi être lu ici : [manuel en français](docs/manual/manual-fr.md), et sur le site : [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
+| **Rapport de diagnostic** | Rassemble dans un fichier texte ce qu'il faut pour signaler un problème : versions, ordinateur, périphériques USB et série, le réglage de la radio dans chaque logiciel, et les avertissements et erreurs du système. Ni mots de passe ni clés ; le nom de l'utilisateur, celui de l'ordinateur et les adresses réseau en sont retirés. Dans le menu, ou `logbeamos-diagnostic` dans un terminal. |
+| **Lanceurs** | N1MM Logger+ et Log4OM via Wine, utilisant la radio comme l'utilisateur l'a choisi ; WIRES-X, installé à partir du fichier de Yaesu, avec le port COM de la radio ; Direwolf, avec une configuration créée si elle manque ; Xastir, relié à Direwolf. |
 
 Toutes les fenêtres sont en portugais, anglais, espagnol et français.
+
+LogBeamOS prend aussi **muffin**, le gestionnaire de fenêtres de Cinnamon, dans son dépôt apt, avec une correction d'une ligne qui empêche Cinnamon de planter à la fermeture puis à la réouverture de N1MM+ ou de Log4OM : voir [fontes/muffin](fontes/muffin/).
 
 ### Installer et mettre à jour
 
@@ -478,7 +490,7 @@ LogBeamOS contient deux logiciels gratuits, mais qui ne sont pas à code source 
 
 ### Contribuer et sécurité
 
-Les contributions sont les bienvenues : voir [CONTRIBUTING.md](CONTRIBUTING.md). Les failles de sécurité se signalent en privé : voir [SECURITY.md](SECURITY.md).
+Pour signaler un problème : **Issues → New issue → Problem report**, avec le rapport de diagnostic en pièce jointe ([comment signaler un problème](https://logbeam.org/logbeamos/relatar/?hl=fr)). Les contributions sont les bienvenues : voir [CONTRIBUTING.md](CONTRIBUTING.md). Les failles de sécurité se signalent en privé : voir [SECURITY.md](SECURITY.md).
 
 ### Licence
 

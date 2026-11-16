@@ -1,0 +1,10 @@
+[Unit]
+Description=LogBeamOS: WaveLogGate certificate trusted by Firefox as soon as WaveLogGate creates it
+
+[Path]
+PathChanged=%h/.config/WavelogGate/certs/ca.crt
+PathChanged=%h/.mozilla/firefox/profiles.ini
+PathChanged=%h/.config/mozilla/firefox/profiles.ini
+
+[Install]
+WantedBy=default.target

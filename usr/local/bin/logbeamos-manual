@@ -26,6 +26,7 @@ ACCOES = {
     "xastir": ["logbeamos-xastir"],
     "direwolf": ["x-terminal-emulator", "-e", "logbeamos-direwolf"],
     "antes": ["xdg-open", "/usr/share/logbeamos/antes-de-instalar.html"],
+    "diagnostico": ["logbeamos-diagnostico", "--janela"],
 }
 
 

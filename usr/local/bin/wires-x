@@ -10,6 +10,7 @@
 # Usage: wires-x            install if needed, then open
 #        wires-x --instalar FILE.zip   install only (no questions)
 . /usr/local/lib/logbeamos/wine-env.sh
+. /usr/local/lib/logbeamos/equipamento/radio-wine.sh
 DIR="$WINEPREFIX/drive_c/Program Files (x86)/YAESUMUSEN/WIRES-X"
 EXE="$DIR/Wires-X.exe"
 VISTO="$HOME/.config/logbeamos/wires-x-portas-vistas"
@@ -75,14 +76,28 @@ LogBeamOS installs it in Wine and shows the port of the HRI-200 or of the radio 
   esac
 }
 
-# Serial ports that wine-env.sh mapped (COM3 onwards), with the name the device gives itself
+# USB serial ports as Wine will number them, with the name the device gives itself. The numbers come from the Wine
+# registry that portas_wine (radio-wine.sh) writes, the same COM3, COM4… that "Radio and Equipment" shows. Only when
+# the registry could not be written (another Wine program was open) do they come from the links Wine itself made at
+# its last start (then the first USB cable is COM33). Up to tools 0.3.21 this read the links that wine-env.sh makes,
+# which Wine replaces at every start: the launcher said COM3 while WIRES-X saw the cable on COM33.
 portas() {
-  local c d n id
-  for c in "$WINEPREFIX"/dosdevices/com*; do
-    [ -L "$c" ] || continue
-    d=$(readlink "$c"); [ -e "$d" ] || continue
+  local c d n id reg
+  reg=$(awk '/^\[Software\\\\Wine\\\\Ports\]/ {p = 1; next} /^\[/ {p = 0} p && /^"COM/' "$WINEPREFIX/system.reg" 2>/dev/null)
+  {
+    if [ -n "$reg" ]; then
+      printf '%s\n' "$reg" | sed -n 's/^"\(COM[0-9]*\)"="\([^"]*\)".*/\1 \2/p'
+    else    # Wine's own numbering: COM1 to COM32 are the motherboard ports, the USB cables come after (the COM3… links
+            # that wine-env.sh makes are not what Wine uses)
+      for c in "$WINEPREFIX"/dosdevices/com*; do
+        n=${c##*/com}; case "$n" in ''|*[!0-9]*) continue ;; esac
+        [ -L "$c" ] && [ "$n" -ge 33 ] && echo "${c##*/} $(readlink "$c")"
+      done
+    fi
+  } | while read -r n d; do
+    [ -e "$d" ] || continue
     case "$d" in /dev/ttyUSB*|/dev/ttyACM*) ;; *) continue ;; esac
-    n=${c##*/}; id=""
+    id=""
     for s in /dev/serial/by-id/*; do [ "$(readlink -f "$s")" = "$d" ] && id=" — ${s##*/}"; done
     echo "${n^^} ($d)$id"
   done | sort -V
@@ -119,17 +134,25 @@ if [ ! -f "$EXE" ]; then
   instalar "$f" || exit 1
 fi
 
-# Until the user has seen it once with a device connected: which COM port to choose in WIRES-X
-if [ ! -f "$VISTO" ]; then
-  p=$(portas)
-  if [ -n "$p" ]; then
+# The cables declared to Wine, then which COM port to choose in WIRES-X: shown again whenever the cables changed
+# since the user last saw it (the marker keeps the list shown; the empty marker of tools 0.3.21 counts as changed).
+# The ports can only be declared with Wine closed: a wineserver left by a program that has just closed, or by the
+# WIRES-X installer (with its menu shortcuts still being made), ends by itself within seconds, so wait for it, unless
+# one of the programs LogBeamOS runs in this Wine prefix is open (then Wine keeps the numbers it already gave)
+if ! pgrep -u "$(id -u)" -f 'N1MMLogger[.]net[.]exe|L4ONG[.]exe|Wires-X[.]exe' > /dev/null; then
+  timeout 15 "$(dirname "$(readlink -f "$(command -v wine)")")/wineserver" -w 2>/dev/null
+fi
+portas_wine
+p=$(portas)
+if [ -n "$p" ]; then
+  if [ "$p" != "$(cat "$VISTO" 2>/dev/null)" ]; then
     zenity --info --title=WIRES-X --width=480 --text="$(t portas)
 
 $p" 2>/dev/null
-    mkdir -p "$(dirname "$VISTO")"; : > "$VISTO"
-  else
-    zenity --warning --title=WIRES-X --width=440 --text="$(t semportas)" 2>/dev/null
+    mkdir -p "$(dirname "$VISTO")"; printf '%s' "$p" > "$VISTO"
   fi
+elif [ ! -s "$VISTO" ]; then
+  zenity --warning --title=WIRES-X --width=440 --text="$(t semportas)" 2>/dev/null
 fi
 
 cd "$DIR" || exit 1

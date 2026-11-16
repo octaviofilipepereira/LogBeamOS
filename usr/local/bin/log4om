@@ -1,0 +1,16 @@
+#!/bin/bash
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# Log4OM 2 (Windows) through Wine.
+# Log4OM uses the radio the way the user chose in "Radio and Equipment": together with the other programs (it attaches
+# to the sharing) or alone; alone, the sharing stops while Log4OM is open and comes back when it closes (see
+# radio-wine.sh).
+. /usr/local/lib/logbeamos/wine-env.sh
+. /usr/local/lib/logbeamos/equipamento/radio-wine.sh
+radio_antes log4om
+cd "$WINEPREFIX/drive_c/Program Files (x86)/IW3HMH/Log4OM NextGen" || { radio_depois; exit 1; }
+wine L4ONG.exe "$@"
+r=$?
+radio_depois
+exit $r

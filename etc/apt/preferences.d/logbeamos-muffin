@@ -1,0 +1,6 @@
+# LogBeamOS: muffin (the Cinnamon window manager) from the LogBeamOS repository, with the correction that keeps
+# Cinnamon from aborting when N1MM+ or Log4OM is closed and opened again. A newer muffin from Linux Mint waits until
+# LogBeamOS publishes it with the same correction.
+Package: muffin muffin-common libmuffin0 gir1.2-meta-muffin-0.0 muffin-dbg
+Pin: release o=LogBeamOS
+Pin-Priority: 1001
