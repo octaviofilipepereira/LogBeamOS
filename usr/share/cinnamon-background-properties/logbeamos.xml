@@ -8,6 +8,14 @@
         <shade_type>solid</shade_type>
         <pcolor>#0d1117</pcolor>
         <scolor>#0d1117</scolor>
+    </wallpaper>
+    <wallpaper deleted="false">
+        <name>LogBeamOS</name>
+        <filename>/usr/share/logbeamos/fundo-cr7bqy.jpg</filename>
+        <options>zoom</options>
+        <shade_type>solid</shade_type>
+        <pcolor>#0d1117</pcolor>
+        <scolor>#0d1117</scolor>
         <artist>CR7BQY</artist>
     </wallpaper>
 </wallpapers>
