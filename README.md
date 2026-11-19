@@ -131,6 +131,11 @@ The LogBeamOS tools are free software, distributed under the [GNU General Public
 
 Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 
+### Contributors and testers
+
+- CR7BQY
+- CT7APZ
+
 ---
 
 ## Português
@@ -264,6 +269,11 @@ As ferramentas do LogBeamOS são software livre, distribuído com a [GNU General
 
 Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 
+### Colaboradores e testers
+
+- CR7BQY
+- CT7APZ
+
 ---
 
 ## Español
@@ -385,6 +395,11 @@ Las herramientas de LogBeamOS son software libre, distribuido con la [GNU Genera
 
 Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 
+### Colaboradores y testers
+
+- CR7BQY
+- CT7APZ
+
 ---
 
 ## Français
@@ -505,3 +520,8 @@ Les outils de LogBeamOS sont des logiciels libres, distribués sous la [GNU Gene
 ### Auteur
 
 Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
+
+### Contributeurs et testeurs
+
+- CR7BQY
+- CT7APZ

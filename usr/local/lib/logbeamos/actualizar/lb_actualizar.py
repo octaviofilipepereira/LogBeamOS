@@ -429,6 +429,13 @@ INFORMACOES_UI_TROCAS = {
     '                                <property name="icon-name">linuxmint-logo-filled-ring</property>':
         '                                <property name="icon-name">logbeamos-logo</property>',
 }
+# The Cinnamon "Backgrounds" settings name each collection after its XML file and keep only the first capital letter:
+# the LogBeamOS background (logbeamos.xml, tools 0.3.24) would be listed as "Logbeamos" (author's decision of
+# 18/11/2026: show "LogBeamOS"). A Cinnamon update puts the original line back, so it is applied with the identity.
+FUNDOS = "usr/share/cinnamon/cinnamon-settings/modules/cs_backgrounds.py"
+_NOME_COLECCAO = ('                    display_name = i.replace(".xml", "").replace("-", " ").replace("_", " ")'
+                  '.split(" ")[-1].capitalize()')
+FUNDOS_TROCAS = {_NOME_COLECCAO: _NOME_COLECCAO + '.replace("Logbeamos", "LogBeamOS")  # LogBeamOS'}
 
 
 def versao_sistema(raiz="/"):
@@ -496,7 +503,8 @@ def _troca_linhas(caminho, trocas):
 
 def identidade(raiz="/"):
     """Applies the LogBeamOS identity. Returns what changed: 'descricao', 'versao', 'grub' (the GRUB title: an installed
-    system then needs update-grub), 'instalador' and 'informacoes' (the "System information" screen)."""
+    system then needs update-grub), 'instalador', 'informacoes' (the "System information" screen) and 'fundos' (the
+    name of the LogBeamOS collection in the Cinnamon "Backgrounds" settings)."""
     v = versao_sistema(raiz)
     if not v:
         return []
@@ -513,6 +521,8 @@ def identidade(raiz="/"):
     if _troca_linhas(os.path.join(raiz, INFORMACOES), INFORMACOES_TROCAS) | \
             _troca_linhas(os.path.join(raiz, INFORMACOES_UI), INFORMACOES_UI_TROCAS):
         mudou.append("informacoes")
+    if _troca_linhas(os.path.join(raiz, FUNDOS), FUNDOS_TROCAS):
+        mudou.append("fundos")
     return mudou
 
 

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE wallpapers SYSTEM "cinnamon-wp-list.dtd">
+<wallpapers>
+    <wallpaper deleted="false">
+        <name>LogBeamOS</name>
+        <filename>/usr/share/logbeamos/fundo.jpg</filename>
+        <options>zoom</options>
+        <shade_type>solid</shade_type>
+        <pcolor>#0d1117</pcolor>
+        <scolor>#0d1117</scolor>
+        <artist>CR7BQY</artist>
+    </wallpaper>
+</wallpapers>

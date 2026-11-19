@@ -8,7 +8,7 @@
 
 *Distribución Linux para radioaficionados*
 
-Este es el manual que acompaña a LogBeamOS (herramientas 0.3.23).
+Este es el manual que acompaña a LogBeamOS (herramientas 0.3.24).
 
 [Português](manual-pt.md) · [English](manual-en.md) · **Español** · [Français](manual-fr.md)
 
@@ -58,7 +58,7 @@ Este es el manual que acompaña a LogBeamOS (herramientas 0.3.23).
 | EchoLink | Qtel (el router debe dejar pasar los puertos UDP 5198–5199 y TCP 5200, o use un proxy EchoLink) |
 | WIRES-X (Yaesu) | WIRES-X, a través de Wine. No viene con LogBeamOS: descárguelo en el sitio WIRES-X de Yaesu (hay que entrar con su ID), abra *WIRES-X* e indique el archivo .zip descargado. Después se indica el puerto COM de la HRI-200 o de la radio (modo PDN), para elegirlo en la pantalla *COM port setting* de WIRES-X. |
 | Simulación de antenas | xnec2c |
-| Análisis de las bandas | 4ham Spectrum Analysis |
+| Análisis de espectro y análisis académicos del espectro radioeléctrico | 4ham Spectrum Analysis |
 
 > En Xastir, antes de transmitir: indique su indicativo (Xastir lo pregunta la primera vez), cambie *MYCALL* en el archivo `direwolf.conf` de su carpeta personal y active la transmisión en *Interfaces*. Por defecto, Xastir solo recibe.
 
