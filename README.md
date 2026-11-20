@@ -18,7 +18,7 @@
 
 LogBeamOS is a distribution for radio amateurs, based on Ubuntu 24.04 LTS. It starts from a USB drive, keeping your data, or installs alongside Windows, with the amateur radio programs already installed: native Linux programs and, through Wine, N1MM Logger+ and Log4OM.
 
-Those programs belong to their authors and come from the usual places: the Ubuntu repositories, the authors' own releases and Flathub. **This repository contains only what was written for LogBeamOS**: the tools below. LogBeam Uplink, which sends QSOs to [LogBeam](https://logbeam.org), has its own repository: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Those programs belong to their authors and come from the usual places: the Ubuntu repositories, the authors' own releases and Flathub. **This repository contains only what was written for LogBeamOS**: LogBeamOS Update, below. LogBeam Uplink, which sends QSOs to [LogBeam](https://logbeam.org), has its own repository: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ### Download
 
@@ -63,7 +63,7 @@ sudo apt update
 sudo apt install logbeamos-ferramentas
 ```
 
-The tools were made for LogBeamOS. On another system, the parts that depend on the programs LogBeamOS installs (WSJT-X in `/opt/ham`, N1MM+ in Wine, and so on) will not work.
+LogBeamOS Update was made for LogBeamOS. On another system, the parts that depend on the programs LogBeamOS installs (WSJT-X in `/opt/ham`, N1MM+ in Wine, and so on) will not work.
 
 
 ### Amateur radio programs in LogBeamOS
@@ -119,11 +119,11 @@ To report a problem: **Issues → New issue → Problem report**, with the diagn
 
 ### Licence
 
-The LogBeamOS tools are free software, distributed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). The full text is in the [LICENSE](LICENSE) file.
+LogBeamOS Update is free software, distributed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). The full text is in the [LICENSE](LICENSE) file.
 
 ### Disclaimer
 
-- The LogBeamOS tools are distributed without any warranty, under the GPL v3 (sections 15 and 16). The author is not liable for any damage or loss arising from their use, whether in the official release or in a modified version.
+- LogBeamOS Update is distributed without any warranty, under the GPL v3 (sections 15 and 16). The author is not liable for any damage or loss arising from its use, whether in the official release or in a modified version.
 - Whoever modifies and distributes a version is solely responsible for it.
 - Official releases are only those distributed by the repository at `https://logbeam.org/apt`, signed with the key above.
 
@@ -144,7 +144,7 @@ Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 
 O LogBeamOS é uma distribuição para radioamadores, baseada no Ubuntu 24.04 LTS. Arranca de uma pen, guardando os dados, ou instala-se ao lado do Windows, já com os programas de radioamador instalados: programas nativos de Linux e, através do Wine, o N1MM Logger+ e o Log4OM.
 
-Esses programas são dos respectivos autores e vêm dos sítios habituais: os repositórios do Ubuntu, as publicações dos próprios autores e o Flathub. **Este repositório tem só o que foi escrito para o LogBeamOS**: as ferramentas abaixo. O LogBeam Uplink, que envia os QSOs para o [LogBeam](https://logbeam.org), tem repositório próprio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Esses programas são dos respectivos autores e vêm dos sítios habituais: os repositórios do Ubuntu, as publicações dos próprios autores e o Flathub. **Este repositório tem só o que foi escrito para o LogBeamOS**: o LogBeamOS Update, abaixo. O LogBeam Uplink, que envia os QSOs para o [LogBeam](https://logbeam.org), tem repositório próprio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ### Descarregar
 
@@ -201,7 +201,7 @@ sudo apt update
 sudo apt install logbeamos-ferramentas
 ```
 
-As ferramentas foram feitas para o LogBeamOS. Noutro sistema, as partes que dependem dos programas que o LogBeamOS instala (o WSJT-X em `/opt/ham`, o N1MM+ no Wine, etc.) não funcionam.
+O LogBeamOS Update foi feito para o LogBeamOS. Noutro sistema, as partes que dependem dos programas que o LogBeamOS instala (o WSJT-X em `/opt/ham`, o N1MM+ no Wine, etc.) não funcionam.
 
 
 ### Programas de radioamador do LogBeamOS
@@ -257,11 +257,11 @@ Para relatar um problema: **Issues → New issue → Problem report**, com o rel
 
 ### Licença
 
-As ferramentas do LogBeamOS são software livre, distribuído com a [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). O texto completo está no ficheiro [LICENSE](LICENSE).
+O LogBeamOS Update é software livre, distribuído com a [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). O texto completo está no ficheiro [LICENSE](LICENSE).
 
 ### Exclusão de responsabilidade
 
-- As ferramentas do LogBeamOS são distribuídas sem qualquer garantia, nos termos da GPL v3 (secções 15 e 16). O autor não é responsável por danos ou perdas resultantes do seu uso, seja na versão oficial, seja numa versão modificada.
+- O LogBeamOS Update é distribuído sem qualquer garantia, nos termos da GPL v3 (secções 15 e 16). O autor não é responsável por danos ou perdas resultantes do seu uso, seja na versão oficial, seja numa versão modificada.
 - Quem modificar e distribuir uma versão é o único responsável por ela.
 - As versões oficiais são só as distribuídas pelo repositório em `https://logbeam.org/apt`, assinadas com a chave acima.
 
@@ -282,7 +282,7 @@ Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 
 LogBeamOS es una distribución para radioaficionados basada en Ubuntu 24.04 LTS. Arranca desde una memoria USB, guardando los datos, o se instala junto a Windows, con los programas de radioaficionado ya instalados: programas nativos de Linux y, a través de Wine, N1MM Logger+ y Log4OM.
 
-Esos programas son de sus autores y vienen de los sitios habituales: los repositorios de Ubuntu, las publicaciones de los propios autores y Flathub. **Este repositorio contiene solo lo que se escribió para LogBeamOS**: las herramientas de abajo. LogBeam Uplink, que envía los QSO a [LogBeam](https://logbeam.org), tiene su propio repositorio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Esos programas son de sus autores y vienen de los sitios habituales: los repositorios de Ubuntu, las publicaciones de los propios autores y Flathub. **Este repositorio contiene solo lo que se escribió para LogBeamOS**: LogBeamOS Update, más abajo. LogBeam Uplink, que envía los QSO a [LogBeam](https://logbeam.org), tiene su propio repositorio: [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ### Descargar
 
@@ -327,7 +327,7 @@ sudo apt update
 sudo apt install logbeamos-ferramentas
 ```
 
-Las herramientas se hicieron para LogBeamOS. En otro sistema, las partes que dependen de los programas que instala LogBeamOS (WSJT-X en `/opt/ham`, N1MM+ en Wine, etc.) no funcionan.
+LogBeamOS Update se hizo para LogBeamOS. En otro sistema, las partes que dependen de los programas que instala LogBeamOS (WSJT-X en `/opt/ham`, N1MM+ en Wine, etc.) no funcionan.
 
 
 ### Programas de radioaficionado de LogBeamOS
@@ -383,11 +383,11 @@ Para informar de un problema: **Issues → New issue → Problem report**, con e
 
 ### Licencia
 
-Las herramientas de LogBeamOS son software libre, distribuido con la [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). El texto completo está en el archivo [LICENSE](LICENSE).
+LogBeamOS Update es software libre, distribuido con la [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). El texto completo está en el archivo [LICENSE](LICENSE).
 
 ### Exención de responsabilidad
 
-- Las herramientas de LogBeamOS se distribuyen sin ninguna garantía, según la GPL v3 (secciones 15 y 16). El autor no es responsable de daños o pérdidas derivados de su uso, ya sea en la versión oficial o en una versión modificada.
+- LogBeamOS Update se distribuye sin ninguna garantía, según la GPL v3 (secciones 15 y 16). El autor no es responsable de daños o pérdidas derivados de su uso, ya sea en la versión oficial o en una versión modificada.
 - Quien modifique y distribuya una versión es el único responsable de ella.
 - Las versiones oficiales son solo las distribuidas por el repositorio en `https://logbeam.org/apt`, firmadas con la clave de arriba.
 
@@ -408,7 +408,7 @@ Octávio Filipe Pereira Gonçalves, CT7BFV · [logbeam.org](https://logbeam.org)
 
 LogBeamOS est une distribution pour radioamateurs basée sur Ubuntu 24.04 LTS. Elle démarre depuis une clé USB, en gardant les données, ou s'installe à côté de Windows, avec les logiciels de radioamateur déjà installés : des logiciels natifs Linux et, via Wine, N1MM Logger+ et Log4OM.
 
-Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles : les dépôts d'Ubuntu, les publications des auteurs eux-mêmes et Flathub. **Ce dépôt ne contient que ce qui a été écrit pour LogBeamOS** : les outils ci-dessous. LogBeam Uplink, qui envoie les QSO à [LogBeam](https://logbeam.org), a son propre dépôt : [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
+Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles : les dépôts d'Ubuntu, les publications des auteurs eux-mêmes et Flathub. **Ce dépôt ne contient que ce qui a été écrit pour LogBeamOS** : LogBeamOS Update, ci-dessous. LogBeam Uplink, qui envoie les QSO à [LogBeam](https://logbeam.org), a son propre dépôt : [LogBeam-Uplink](https://github.com/octaviofilipepereira/LogBeam-Uplink).
 
 ### Télécharger
 
@@ -453,7 +453,7 @@ sudo apt update
 sudo apt install logbeamos-ferramentas
 ```
 
-Les outils ont été faits pour LogBeamOS. Sur un autre système, les parties qui dépendent des logiciels que LogBeamOS installe (WSJT-X dans `/opt/ham`, N1MM+ dans Wine, etc.) ne fonctionnent pas.
+LogBeamOS Update a été fait pour LogBeamOS. Sur un autre système, les parties qui dépendent des logiciels que LogBeamOS installe (WSJT-X dans `/opt/ham`, N1MM+ dans Wine, etc.) ne fonctionnent pas.
 
 
 ### Logiciels de radioamateur de LogBeamOS
@@ -509,11 +509,11 @@ Pour signaler un problème : **Issues → New issue → Problem report**, avec l
 
 ### Licence
 
-Les outils de LogBeamOS sont des logiciels libres, distribués sous la [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). Le texte complet se trouve dans le fichier [LICENSE](LICENSE).
+LogBeamOS Update est un logiciel libre, distribué sous la [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). Le texte complet se trouve dans le fichier [LICENSE](LICENSE).
 
 ### Exclusion de responsabilité
 
-- Les outils de LogBeamOS sont distribués sans aucune garantie, selon la GPL v3 (articles 15 et 16). L'auteur n'est pas responsable des dommages ou pertes résultant de leur utilisation, que ce soit dans la version officielle ou dans une version modifiée.
+- LogBeamOS Update est distribué sans aucune garantie, selon la GPL v3 (articles 15 et 16). L'auteur n'est pas responsable des dommages ou pertes résultant de son utilisation, que ce soit dans la version officielle ou dans une version modifiée.
 - Quiconque modifie et distribue une version en est seul responsable.
 - Les versions officielles sont uniquement celles distribuées par le dépôt à `https://logbeam.org/apt`, signées avec la clé ci-dessus.
 
