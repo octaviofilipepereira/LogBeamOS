@@ -1,0 +1,25 @@
+#!/bin/sh
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+#
+# LogBeamOS (LogBeamOS Update 0.3.27): file manager bookmarks (GTK, ~/.config/gtk-3.0/bookmarks) that point to the
+# home folder of a user that does not exist on this computer (file:///home/<other>/...) move to the home folder of the
+# owner of the file. It happened to whoever answered "Yes" to "Copy your data from this USB drive?" at installation
+# time (90logbeamos-dados up to 0.3.26): the bookmarks of the USB drive user ("logbeam") were copied as they were, and
+# Documents, Music, Pictures, Videos and Downloads showed a question mark and did not open (CT7APZ, 20/11/2026).
+# Bookmarks of users that exist on this computer are left as they are.
+# Usage: corrigir-marcadores FILE HOME   (run as the owner of FILE; called by the postinst and at the session start)
+f=$1
+casa=$2
+[ -f "$f" ] && [ -n "$casa" ] || exit 0
+case "$casa" in /home/?*) ;; *) exit 0 ;; esac
+case "$casa" in *[!A-Za-z0-9._/-]*) exit 0 ;; esac
+casa=${casa%/}
+for u in $(sed -n 's|^file:///home/\([A-Za-z0-9._-]*\)\([/ ].*\)\{0,1\}$|\1|p' "$f" 2>/dev/null | sort -u); do
+  [ "/home/$u" = "$casa" ] && continue
+  [ -e "/home/$u" ] && continue
+  ue=$(printf '%s' "$u" | sed 's/\./\\./g')
+  sed -i "s|^file:///home/$ue\([/ ]\)|file://$casa\1|; s|^file:///home/$ue\$|file://$casa|" "$f" 2>/dev/null || exit 0
+done
+exit 0

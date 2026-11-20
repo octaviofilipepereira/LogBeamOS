@@ -8,7 +8,7 @@
 
 *Linux distribution for radio amateurs*
 
-This is the manual that comes with LogBeamOS (tools 0.3.26).
+This is the manual that comes with LogBeamOS (tools 0.3.27).
 
 [Português](manual-pt.md) · **English** · [Español](manual-es.md) · [Français](manual-fr.md)
 

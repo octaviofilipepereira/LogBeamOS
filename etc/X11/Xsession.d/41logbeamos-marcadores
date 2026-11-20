@@ -14,4 +14,10 @@ if [ -f "$lb_marcadores" ]; then
       || rm -f "$lb_marcadores"
   fi
 fi
+# Bookmarks that point to the home folder of a user that does not exist here (data copied from the USB drive at
+# installation time, up to 0.3.26) move to this user's folder (LogBeamOS Update 0.3.27; the postinst already does it
+# when the package is installed, this covers what comes later). Xsession runs with "set -e": nothing here may fail.
+if [ -x /usr/local/lib/logbeamos/corrigir-marcadores ]; then
+  /usr/local/lib/logbeamos/corrigir-marcadores "$lb_marcadores" "$HOME" || true
+fi
 unset lb_marcadores

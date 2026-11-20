@@ -1,0 +1,65 @@
+#!/bin/bash
+# LogBeamOS: no fim da instalação, oferece copiar os dados da pen para o novo utilizador.
+# Corre no sistema live (ubiquity, target-config); o sistema instalado está em /target.
+# Copia o que está guardado na sessão: pasta pessoal e prefixo do Wine (N1MM+, Log4OM).
+# Na instalação automática, "logbeamos.copiar=sim" nos parâmetros de arranque responde sem perguntar.
+# Utilizador da pen: o próprio, se foi criado no primeiro arranque (uid 1000); senão o live (username= no arranque)
+LIVE_U=$(getent passwd 1000 | cut -d: -f1)
+if [ -z "$LIVE_U" ]; then
+  LIVE_U=logbeam
+  for p in $(cat /proc/cmdline); do case "$p" in username=*) LIVE_U=${p#username=} ;; esac; done
+fi
+LIVE=/home/$LIVE_U
+ALVO=/target
+PREF=/opt/ham/wine
+
+[ -d "$ALVO/home" ] || exit 0
+UTIL=$(chroot "$ALVO" getent passwd 1000 | cut -d: -f1)
+[ -n "$UTIL" ] || exit 0
+GRUPO=$(chroot "$ALVO" id -gn "$UTIL")
+
+# O atalho do guia só faz sentido na pen
+rm -f "$ALVO/etc/skel/Desktop/antes-de-instalar.desktop" "$ALVO/home/$UTIL/Desktop/antes-de-instalar.desktop" \
+      "$ALVO/home/$UTIL/Ambiente de trabalho/antes-de-instalar.desktop"
+
+# Sem persistência não há dados guardados
+blkid -L writable >/dev/null 2>&1 || blkid -L casper-rw >/dev/null 2>&1 || exit 0
+
+. /etc/default/locale 2>/dev/null
+case "${LANG%%_*}" in
+  pt) T="Copiar os seus dados desta pen?"
+      D="Documentos, definições e logbooks passam para o utilizador $UTIL. Os programas instalados depois não são copiados."
+      S="Sim"; N="Não" ;;
+  es) T="¿Copiar sus datos de esta memoria USB?"
+      D="Los documentos, ajustes y logbooks pasan al usuario $UTIL. Los programas instalados después no se copian."
+      S="Sí"; N="No" ;;
+  fr) T="Copier vos données depuis cette clé USB ?"
+      D="Les documents, réglages et logbooks passent à l'utilisateur $UTIL. Les programmes installés ensuite ne sont pas copiés."
+      S="Oui"; N="Non" ;;
+  *)  T="Copy your data from this USB drive?"
+      D="Documents, settings and logbooks move to user $UTIL. Programs installed later are not copied."
+      S="Yes"; N="No" ;;
+esac
+
+if grep -qw 'logbeamos.copiar=sim' /proc/cmdline; then
+  R=0
+else
+  su "$LIVE_U" -c "DISPLAY=:0 XAUTHORITY=$LIVE/.Xauthority zenity --question --no-wrap --title='LogBeamOS' --ok-label='$S' --cancel-label='$N' --text='<b>$T</b>\n\n$D'" 2>/dev/null
+  R=$?
+fi
+[ "$R" = 0 ] || exit 0
+
+rsync -a --exclude='.cache' --exclude='.dbus' --exclude='.gvfs' --exclude='.Xauthority' --exclude='.ICEauthority' \
+      --exclude='.xsession-errors*' --exclude='.local/share/Trash' --exclude='*/ubiquity*.desktop' \
+      --exclude='*/antes-de-instalar.desktop' "$LIVE/" "$ALVO/home/$UTIL/"
+rsync -a --force "$PREF/" "$ALVO$PREF/"
+# The file manager bookmarks of the USB drive point to the folders of the USB drive user (file:///home/<that user>/...):
+# they move to the new user (LogBeamOS Update 0.3.27; up to 0.3.26 they were copied as they were and did not open)
+M="$ALVO/home/$UTIL/.config/gtk-3.0/bookmarks"
+if [ "$LIVE_U" != "$UTIL" ] && [ -f "$M" ]; then
+  LE=$(printf '%s' "$LIVE_U" | sed 's/\./\\./g')
+  sed -i "s|^file:///home/$LE\([/ ]\)|file:///home/$UTIL\1|; s|^file:///home/$LE\$|file:///home/$UTIL|" "$M" || true
+fi
+chroot "$ALVO" chown -R "$UTIL:$GRUPO" "/home/$UTIL" "$PREF"
+logger -t logbeamos "dados da pen copiados para $UTIL"
+exit 0
