@@ -2,7 +2,8 @@ LogBeamOS (21/11/2026): Wine 11.0 msgsm32.acm, acmFormatSuggest to GSM 6.10 fill
 format, as on Windows, instead of refusing a destination that does not have it yet. Programs pass a zeroed destination:
 WIRES-X 2.010 asks for PCM 8 kHz to GSM 6.10 that way, never got its conversion and closed on the first voice frame of
 a radio in PDN mode.
-Found and reported by Bráulio Sousa, CT7APZ (LogBeamOS tester), November 2026.
+Correction by Octávio Filipe Pereira Gonçalves, CT7BFV; found and reported by Bráulio Sousa, CT7APZ (LogBeamOS tester),
+November 2026.
 Apply with: patch -d wine-11.0 -p1 < msgsm32-cbsize.patch
 
 --- a/dlls/msgsm32.acm/msgsm32.c

@@ -1,3 +1,9 @@
+LogBeamOS (16/11/2026): muffin 6.6.3+zena, meta_workspace_add_window() returns with a warning instead of aborting when
+the window is already in the MRU list, as mutter does since January 2021 (GNOME/mutter#992, merge request !1692).
+Applied to muffin by Octávio Filipe Pereira Gonçalves, CT7BFV; crash found and reported by Bráulio Sousa, CT7APZ (LogBeamOS tester),
+November 2026.
+Apply in the muffin source folder with: patch -p1 < workspace.patch
+
 --- a/src/core/workspace.c
 +++ b/src/core/workspace.c
 @@ -363,7 +363,7 @@

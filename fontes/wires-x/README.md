@@ -6,7 +6,7 @@
 
 ## English
 
-For **WIRES-X** alone, LogBeamOS brings two DLLs of Wine 11.0 (the Wine of LogBeamOS), each with one correction. Both errors were found and reported by **Bráulio Sousa, CT7APZ**, in November 2026, with a Yaesu radio and WIRES-X 2.010 on LogBeamOS.
+For **WIRES-X** alone, LogBeamOS brings two DLLs of Wine 11.0 (the Wine of LogBeamOS), each with one correction. The corrections are by **Octávio Filipe Pereira Gonçalves, CT7BFV**. Both errors were found and reported by **Bráulio Sousa, CT7APZ**, in November 2026, with a Yaesu radio and WIRES-X 2.010 on LogBeamOS.
 
 | DLL | Correction | Since | Without it |
 |---|---|---|---|
@@ -23,7 +23,7 @@ For **WIRES-X** alone, LogBeamOS brings two DLLs of Wine 11.0 (the Wine of LogBe
 
 ## Português
 
-Só para o **WIRES-X**, o LogBeamOS traz duas DLLs do Wine 11.0 (o Wine do LogBeamOS), cada uma com uma correcção. Os dois erros foram descobertos e relatados por **Bráulio Sousa, CT7APZ**, em Novembro de 2026, com um rádio Yaesu e o WIRES-X 2.010 no LogBeamOS.
+Só para o **WIRES-X**, o LogBeamOS traz duas DLLs do Wine 11.0 (o Wine do LogBeamOS), cada uma com uma correcção. As correcções são de **Octávio Filipe Pereira Gonçalves, CT7BFV**. Os dois erros foram descobertos e relatados por **Bráulio Sousa, CT7APZ**, em Novembro de 2026, com um rádio Yaesu e o WIRES-X 2.010 no LogBeamOS.
 
 | DLL | Correcção | Desde | Sem ela |
 |---|---|---|---|
@@ -40,7 +40,7 @@ Só para o **WIRES-X**, o LogBeamOS traz duas DLLs do Wine 11.0 (o Wine do LogBe
 
 ## Español
 
-Solo para **WIRES-X**, LogBeamOS trae dos DLL de Wine 11.0 (el Wine de LogBeamOS), cada una con una corrección. Los dos errores los descubrió y comunicó **Bráulio Sousa, CT7APZ**, en noviembre de 2026, con una radio Yaesu y WIRES-X 2.010 en LogBeamOS.
+Solo para **WIRES-X**, LogBeamOS trae dos DLL de Wine 11.0 (el Wine de LogBeamOS), cada una con una corrección. Las correcciones son de **Octávio Filipe Pereira Gonçalves, CT7BFV**. Los dos errores los descubrió y comunicó **Bráulio Sousa, CT7APZ**, en noviembre de 2026, con una radio Yaesu y WIRES-X 2.010 en LogBeamOS.
 
 | DLL | Corrección | Desde | Sin ella |
 |---|---|---|---|
@@ -57,7 +57,7 @@ Solo para **WIRES-X**, LogBeamOS trae dos DLL de Wine 11.0 (el Wine de LogBeamOS
 
 ## Français
 
-Pour **WIRES-X** seulement, LogBeamOS apporte deux DLL de Wine 11.0 (le Wine de LogBeamOS), chacune avec une correction. Les deux erreurs ont été découvertes et signalées par **Bráulio Sousa, CT7APZ**, en novembre 2026, avec une radio Yaesu et WIRES-X 2.010 sous LogBeamOS.
+Pour **WIRES-X** seulement, LogBeamOS apporte deux DLL de Wine 11.0 (le Wine de LogBeamOS), chacune avec une correction. Les corrections sont de **Octávio Filipe Pereira Gonçalves, CT7BFV**. Les deux erreurs ont été découvertes et signalées par **Bráulio Sousa, CT7APZ**, en novembre 2026, avec une radio Yaesu et WIRES-X 2.010 sous LogBeamOS.
 
 | DLL | Correction | Depuis | Sans elle |
 |---|---|---|---|

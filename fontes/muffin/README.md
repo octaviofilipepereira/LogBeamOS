@@ -6,7 +6,7 @@
 
 ## English
 
-LogBeamOS takes **muffin**, the window manager of the Cinnamon desktop, from its own apt repository (`https://logbeam.org/apt`), with a one-line correction. Without it, Cinnamon could crash ("fallback mode") when N1MM+ or Log4OM, which run through Wine, was closed and opened again: muffin aborted on an assertion in `meta_workspace_add_window`. The crash was found and reported by Bráulio Sousa, CT7APZ.
+LogBeamOS takes **muffin**, the window manager of the Cinnamon desktop, from its own apt repository (`https://logbeam.org/apt`), with a one-line correction. Without it, Cinnamon could crash ("fallback mode") when N1MM+ or Log4OM, which run through Wine, was closed and opened again: muffin aborted on an assertion in `meta_workspace_add_window`. The correction was made for LogBeamOS by Octávio Filipe Pereira Gonçalves, CT7BFV; the crash was found and reported by Bráulio Sousa, CT7APZ.
 
 The same assertion was turned into a warning in mutter, the GNOME window manager muffin derives from, in January 2021 ([GNOME/mutter#992](https://gitlab.gnome.org/GNOME/mutter/-/issues/992), merge request !1692). [workspace.patch](workspace.patch) does the same in muffin.
 
@@ -16,7 +16,7 @@ The same assertion was turned into a warning in mutter, the GNOME window manager
 
 ## Português
 
-O LogBeamOS vai buscar o **muffin**, o gestor de janelas do ambiente de trabalho Cinnamon, ao seu repositório apt (`https://logbeam.org/apt`), com uma correcção de uma linha. Sem ela, o Cinnamon podia ir abaixo («modo de recurso») ao fechar e voltar a abrir o N1MM+ ou o Log4OM, que correm através do Wine: o muffin abortava numa verificação em `meta_workspace_add_window`. A queda foi descoberta e relatada por Bráulio Sousa, CT7APZ.
+O LogBeamOS vai buscar o **muffin**, o gestor de janelas do ambiente de trabalho Cinnamon, ao seu repositório apt (`https://logbeam.org/apt`), com uma correcção de uma linha. Sem ela, o Cinnamon podia ir abaixo («modo de recurso») ao fechar e voltar a abrir o N1MM+ ou o Log4OM, que correm através do Wine: o muffin abortava numa verificação em `meta_workspace_add_window`. A correcção foi feita para o LogBeamOS por Octávio Filipe Pereira Gonçalves, CT7BFV; a queda foi descoberta e relatada por Bráulio Sousa, CT7APZ.
 
 A mesma verificação passou a aviso no mutter, o gestor de janelas do GNOME de que o muffin deriva, em Janeiro de 2021 ([GNOME/mutter#992](https://gitlab.gnome.org/GNOME/mutter/-/issues/992), merge request !1692). O [workspace.patch](workspace.patch) faz o mesmo no muffin.
 
@@ -26,7 +26,7 @@ A mesma verificação passou a aviso no mutter, o gestor de janelas do GNOME de 
 
 ## Español
 
-LogBeamOS toma **muffin**, el gestor de ventanas del escritorio Cinnamon, de su propio repositorio apt (`https://logbeam.org/apt`), con una corrección de una línea. Sin ella, Cinnamon podía caerse («modo de emergencia») al cerrar y volver a abrir N1MM+ o Log4OM, que funcionan a través de Wine: muffin abortaba en una comprobación de `meta_workspace_add_window`. La caída la descubrió y comunicó Bráulio Sousa, CT7APZ.
+LogBeamOS toma **muffin**, el gestor de ventanas del escritorio Cinnamon, de su propio repositorio apt (`https://logbeam.org/apt`), con una corrección de una línea. Sin ella, Cinnamon podía caerse («modo de emergencia») al cerrar y volver a abrir N1MM+ o Log4OM, que funcionan a través de Wine: muffin abortaba en una comprobación de `meta_workspace_add_window`. La corrección la hizo para LogBeamOS Octávio Filipe Pereira Gonçalves, CT7BFV; la caída la descubrió y comunicó Bráulio Sousa, CT7APZ.
 
 La misma comprobación pasó a ser un aviso en mutter, el gestor de ventanas de GNOME del que deriva muffin, en enero de 2021 ([GNOME/mutter#992](https://gitlab.gnome.org/GNOME/mutter/-/issues/992), merge request !1692). [workspace.patch](workspace.patch) hace lo mismo en muffin.
 
@@ -36,7 +36,7 @@ La misma comprobación pasó a ser un aviso en mutter, el gestor de ventanas de 
 
 ## Français
 
-LogBeamOS prend **muffin**, le gestionnaire de fenêtres du bureau Cinnamon, dans son propre dépôt apt (`https://logbeam.org/apt`), avec une correction d'une ligne. Sans elle, Cinnamon pouvait planter (« mode de secours ») à la fermeture puis à la réouverture de N1MM+ ou de Log4OM, qui fonctionnent via Wine : muffin s'arrêtait sur une vérification dans `meta_workspace_add_window`. Le plantage a été découvert et signalé par Bráulio Sousa, CT7APZ.
+LogBeamOS prend **muffin**, le gestionnaire de fenêtres du bureau Cinnamon, dans son propre dépôt apt (`https://logbeam.org/apt`), avec une correction d'une ligne. Sans elle, Cinnamon pouvait planter (« mode de secours ») à la fermeture puis à la réouverture de N1MM+ ou de Log4OM, qui fonctionnent via Wine : muffin s'arrêtait sur une vérification dans `meta_workspace_add_window`. La correction a été faite pour LogBeamOS par Octávio Filipe Pereira Gonçalves, CT7BFV ; le plantage a été découvert et signalé par Bráulio Sousa, CT7APZ.
 
 La même vérification est devenue un avertissement dans mutter, le gestionnaire de fenêtres de GNOME dont muffin dérive, en janvier 2021 ([GNOME/mutter#992](https://gitlab.gnome.org/GNOME/mutter/-/issues/992), merge request !1692). [workspace.patch](workspace.patch) fait de même dans muffin.
 
