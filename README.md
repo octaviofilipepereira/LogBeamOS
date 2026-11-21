@@ -24,8 +24,8 @@ Those programs belong to their authors and come from the usual places: the Ubunt
 
 The ISO image, its SHA-256 fingerprint and the instructions for writing the USB drive and installing alongside Windows are on the LogBeamOS page: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=en)**.
 
-- Current version: **LogBeamOS 0.3.17**, of 15/11/2026
-- SHA-256: `78eaca3487b9a96034bd99df089282d8494e51f810c5e91930ad6536b274d4e1`
+- Current version: **LogBeamOS 0.9.0**, of 21/11/2026
+- SHA-256: `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
 - What's new in each version: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=en)
 - To install on the disk: at least 50 GB free. The system takes about 20 GB once installed, because it already includes N1MM+ and Log4OM with everything they need to run on Linux; the rest is room for updates and for your logs. In the installer, drag the divider to give LogBeamOS at least 50 GB: it suggests less.
 
@@ -152,8 +152,8 @@ Esses programas são dos respectivos autores e vêm dos sítios habituais: os re
 
 A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e instalar ao lado do Windows estão na página do LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/)**.
 
-- Versão actual: **LogBeamOS 0.3.17**, de 15/11/2026
-- SHA-256: `78eaca3487b9a96034bd99df089282d8494e51f810c5e91930ad6536b274d4e1`
+- Versão actual: **LogBeamOS 0.9.0**, de 21/11/2026
+- SHA-256: `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
 - Novidades de cada versão: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/)
 - Para instalar no disco: pelo menos 50 GB livres. O sistema ocupa cerca de 20 GB depois de instalado, porque já traz o N1MM+ e o Log4OM com tudo o que precisam para correr no Linux; o resto é o espaço para as actualizações e para os seus registos. No instalador, arraste a divisória para dar ao LogBeamOS pelo menos 50 GB: ele propõe menos.
 
@@ -292,8 +292,8 @@ Esos programas son de sus autores y vienen de los sitios habituales: los reposit
 
 La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memoria USB e instalar junto a Windows están en la página de LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=es)**.
 
-- Versión actual: **LogBeamOS 0.3.17**, del 15/11/2026
-- SHA-256: `78eaca3487b9a96034bd99df089282d8494e51f810c5e91930ad6536b274d4e1`
+- Versión actual: **LogBeamOS 0.9.0**, del 21/11/2026
+- SHA-256: `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
 - Novedades de cada versión: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=es)
 - Para instalar en el disco: al menos 50 GB libres. El sistema ocupa unos 20 GB una vez instalado, porque ya incluye N1MM+ y Log4OM con todo lo que necesitan para funcionar en Linux; el resto es el espacio para las actualizaciones y para sus registros. En el instalador, arrastre el divisor para dar a LogBeamOS al menos 50 GB: propone menos.
 
@@ -420,8 +420,8 @@ Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles
 
 L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé USB et installer à côté de Windows sont sur la page de LogBeamOS : **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=fr)**.
 
-- Version actuelle : **LogBeamOS 0.3.17**, du 15/11/2026
-- SHA-256 : `78eaca3487b9a96034bd99df089282d8494e51f810c5e91930ad6536b274d4e1`
+- Version actuelle : **LogBeamOS 0.9.0**, du 21/11/2026
+- SHA-256 : `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
 - Nouveautés de chaque version : [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=fr)
 - Pour installer sur le disque : au moins 50 Go libres. Le système occupe environ 20 Go une fois installé, car il inclut déjà N1MM+ et Log4OM avec tout ce qu'il leur faut pour fonctionner sous Linux ; le reste sert aux mises à jour et à vos journaux. Dans l'installateur, faites glisser le séparateur pour donner au moins 50 Go à LogBeamOS : il en propose moins.
 

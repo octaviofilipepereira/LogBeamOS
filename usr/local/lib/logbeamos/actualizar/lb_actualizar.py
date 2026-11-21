@@ -444,7 +444,8 @@ def versao_sistema(raiz="/"):
             v = f.read().strip()
     except OSError:
         return None
-    return v if re.fullmatch(r"\d+(\.\d+)+", v) else None
+    # Since 0.9.0 (author, 21/11/2026) the updates after an image are numbered from it: 0.9.0-1, 0.9.0-2, ...
+    return v if re.fullmatch(r"\d+(\.\d+)+(-\d+)?", v) else None
 
 
 def versao_update(raiz="/"):
@@ -453,12 +454,15 @@ def versao_update(raiz="/"):
             v = f.read().strip()
     except OSError:
         return None
-    return v if re.fullmatch(r"\d+(\.\d+)+([~+][\w.]+)?", v) else None
+    return v if re.fullmatch(r"\d+(\.\d+)+(-\d+)?([~+][\w.]+)?", v) else None
 
 
 def versoes_logbeamos():
-    """'LogBeamOS 0.3.17 · LogBeamOS Update 0.3.23' (what the Update window shows under its title), or '' if unknown."""
+    """'LogBeamOS 0.3.17 · LogBeamOS Update 0.3.23' (what the Update window shows under its title), or '' if unknown.
+    Since 0.9.0 LogBeamOS has a single version number (system = LogBeamOS Update): then only 'LogBeamOS 0.9.0'."""
     s, u = versao_sistema(), versao_update()
+    if s and s == u:
+        return f"LogBeamOS {s}"
     return " · ".join(x for x in (f"LogBeamOS {s}" if s else "", f"LogBeamOS Update {u}" if u else "") if x)
 
 
