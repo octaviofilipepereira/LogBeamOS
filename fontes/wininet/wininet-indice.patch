@@ -1,0 +1,39 @@
+LogBeamOS (21/11/2026): Wine 11.0 wininet, HttpQueryInfo with HTTP_QUERY_RAW_HEADERS or HTTP_QUERY_RAW_HEADERS_CRLF
+and an index above 0 fails with ERROR_HTTP_HEADER_NOT_FOUND, as on Windows. Wine returned the headers for any index,
+so a program that reads them with an index until the call fails (WIRES-X 2.010) never left its loop.
+Apply with: patch -d wine-11.0 -p1 < wininet-indice.patch
+
+--- a/dlls/wininet/http.c
++++ b/dlls/wininet/http.c
+@@ -3706,6 +3706,15 @@
+             DWORD len = 0;
+             DWORD res = ERROR_INVALID_PARAMETER;
+
++            /* There is only one instance of the raw headers: as on Windows, a higher index is not found.
++             * Programs that enumerate with an index until the call fails (MFC CHttpFile::QueryInfo loops,
++             * such as WIRES-X reading UpdateInfoX_New.bin) never stop otherwise. */
++            if (requested_index > 0)
++            {
++                LeaveCriticalSection( &request->headers_section );
++                return ERROR_HTTP_HEADER_NOT_FOUND;
++            }
++
+             if (request_only)
+                 headers = build_request_header(request, request->verb, request->path, request->version, TRUE);
+             else
+@@ -3739,6 +3748,15 @@
+             LPWSTR headers;
+             DWORD len;
+
++            /* There is only one instance of the raw headers: as on Windows, a higher index is not found.
++             * Programs that enumerate with an index until the call fails (MFC CHttpFile::QueryInfo loops,
++             * such as WIRES-X reading UpdateInfoX_New.bin) never stop otherwise. */
++            if (requested_index > 0)
++            {
++                LeaveCriticalSection( &request->headers_section );
++                return ERROR_HTTP_HEADER_NOT_FOUND;
++            }
++
+             if (request_only)
+                 headers = build_request_header(request, request->verb, request->path, request->version, FALSE);
+             else

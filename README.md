@@ -43,6 +43,8 @@ Every window is in Portuguese, English, Spanish and French.
 
 LogBeamOS also takes **muffin**, the Cinnamon window manager, from its apt repository, with a one-line correction that keeps Cinnamon from crashing when N1MM+ or Log4OM is closed and opened again: see [fontes/muffin](fontes/muffin/).
 
+For WIRES-X alone, LogBeamOS brings the `wininet.dll` of Wine 11.0 with a correction, without which WIRES-X stayed OFFLINE under Wine: see [fontes/wininet](fontes/wininet/).
+
 ### Installing and updating
 
 Together they are **LogBeamOS Update**, the part of LogBeamOS that arrives through **Update LogBeamOS**; its version is shown at the top of that window and in the "System Information" screen. They come with LogBeamOS. They are distributed by the LogBeamOS apt repository, at `https://logbeam.org/apt`, which also carries LogBeam Uplink. On LogBeamOS, they are updated by **Update LogBeamOS**, like any other program.
@@ -181,6 +183,8 @@ Todas as janelas estão em português, inglês, espanhol e francês.
 
 O LogBeamOS vai também buscar o **muffin**, o gestor de janelas do Cinnamon, ao seu repositório apt, com uma correcção de uma linha que impede o Cinnamon de ir abaixo ao fechar e voltar a abrir o N1MM+ ou o Log4OM: ver [fontes/muffin](fontes/muffin/).
 
+Só para o WIRES-X, o LogBeamOS traz a `wininet.dll` do Wine 11.0 com uma correcção, sem a qual o WIRES-X ficava OFFLINE no Wine: ver [fontes/wininet](fontes/wininet/).
+
 ### Instalar e actualizar
 
 Em conjunto são o **LogBeamOS Update**, a parte do LogBeamOS que chega pelo **Actualizar LogBeamOS**; a sua versão aparece no topo dessa janela e no ecrã «Informações do sistema». Vêm com o LogBeamOS. São distribuídas pelo repositório apt do LogBeamOS, em `https://logbeam.org/apt`, que traz também o LogBeam Uplink. No LogBeamOS, actualizam-se pelo **Actualizar LogBeamOS**, como qualquer outro programa.
@@ -307,6 +311,8 @@ Todas las ventanas están en portugués, inglés, español y francés.
 
 LogBeamOS toma además **muffin**, el gestor de ventanas de Cinnamon, de su repositorio apt, con una corrección de una línea que impide que Cinnamon se caiga al cerrar y volver a abrir N1MM+ o Log4OM: ver [fontes/muffin](fontes/muffin/).
 
+Solo para WIRES-X, LogBeamOS trae la `wininet.dll` de Wine 11.0 con una corrección, sin la cual WIRES-X se quedaba OFFLINE en Wine: ver [fontes/wininet](fontes/wininet/).
+
 ### Instalar y actualizar
 
 En conjunto son **LogBeamOS Update**, la parte de LogBeamOS que llega con **Actualizar LogBeamOS**; su versión aparece en la parte superior de esa ventana y en la pantalla «Información del sistema». Vienen con LogBeamOS. Se distribuyen desde el repositorio apt de LogBeamOS, en `https://logbeam.org/apt`, que también trae LogBeam Uplink. En LogBeamOS se actualizan con **Actualizar LogBeamOS**, como cualquier otro programa.
@@ -432,6 +438,8 @@ L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé US
 Toutes les fenêtres sont en portugais, anglais, espagnol et français.
 
 LogBeamOS prend aussi **muffin**, le gestionnaire de fenêtres de Cinnamon, dans son dépôt apt, avec une correction d'une ligne qui empêche Cinnamon de planter à la fermeture puis à la réouverture de N1MM+ ou de Log4OM : voir [fontes/muffin](fontes/muffin/).
+
+Pour WIRES-X seulement, LogBeamOS apporte la `wininet.dll` de Wine 11.0 avec une correction, sans laquelle WIRES-X restait OFFLINE sous Wine : voir [fontes/wininet](fontes/wininet/).
 
 ### Installer et mettre à jour
 
