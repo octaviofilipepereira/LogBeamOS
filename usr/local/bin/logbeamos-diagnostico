@@ -196,7 +196,8 @@ def junta(anterior):
         f"Kernel: {corre(['uname', '-r'])} · language: {os.environ.get('LANG', '')} {os.environ.get('LANGUAGE', '')} · "
         f"session: {os.environ.get('XDG_CURRENT_DESKTOP', '')} {os.environ.get('XDG_SESSION_TYPE', '')}",
         cmd("dpkg-query", "-W", "-f=${Package} ${Version} ${db:Status-Abbrev}\\n", "logbeamos-ferramentas",
-            "logbeamos-tqsl", "logbeam-uplink", "libhamlib-utils", "libhamlib4", "wine-stable", "cinnamon"),
+            "logbeamos-tqsl", "logbeam-uplink", "libhamlib-utils", "libhamlib4t64", "wine-stable", "cinnamon",
+            "libavcodec-extra60", "libavcodec-extra60:i386", "mint-meta-codecs"),
         cmd("uptime"), cmd("timedatectl", "show", "-p", "Timezone", "-p", "NTPSynchronized", "-p", "LocalRTC"))
     sec("2. Computer",
         f"{dmi('sys_vendor')} {dmi('product_name')} {dmi('product_version')} · BIOS {dmi('bios_version')} {dmi('bios_date')}",

@@ -8,7 +8,7 @@
 
 *Distribution Linux pour radioamateurs*
 
-C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 0.3.29).
+C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 0.3.30).
 
 [Português](manual-pt.md) · [English](manual-en.md) · [Español](manual-es.md) · **Français**
 
