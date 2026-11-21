@@ -8,7 +8,7 @@
 
 *Distribución Linux para radioaficionados*
 
-Este es el manual que acompaña a LogBeamOS (herramientas 0.3.28).
+Este es el manual que acompaña a LogBeamOS (LogBeamOS Update 0.3.29).
 
 [Português](manual-pt.md) · [English](manual-en.md) · **Español** · [Français](manual-fr.md)
 

@@ -1,0 +1,22 @@
+LogBeamOS (21/11/2026): Wine 11.0 msgsm32.acm, acmFormatSuggest to GSM 6.10 fills in the cbSize of the destination
+format, as on Windows, instead of refusing a destination that does not have it yet. Programs pass a zeroed destination:
+WIRES-X 2.010 asks for PCM 8 kHz to GSM 6.10 that way, never got its conversion and closed on the first voice frame of
+a radio in PDN mode.
+Found and reported by Bráulio Sousa, CT7APZ (LogBeamOS tester), November 2026.
+Apply with: patch -d wine-11.0 -p1 < msgsm32-cbsize.patch
+
+--- a/dlls/msgsm32.acm/msgsm32.c
++++ b/dlls/msgsm32.acm/msgsm32.c
+@@ -276,8 +276,11 @@
+         adfs->pwfxDst->nAvgBytesPerSec = adfs->pwfxDst->nSamplesPerSec * 2;
+         break;
+     case WAVE_FORMAT_GSM610:
+-        if (adfs->pwfxDst->cbSize < sizeof(WORD))
++        /* The codec fills in cbSize, as on Windows: programs pass a zeroed destination format (WIRES-X 2.010 asks for
++         * PCM 8 kHz to GSM 6.10 that way, never gets its conversion and crashes on the first voice frame). */
++        if (adfs->cbwfxDst < sizeof(GSM610WAVEFORMAT))
+             return ACMERR_NOTPOSSIBLE;
++        adfs->pwfxDst->cbSize = sizeof(WORD);
+         adfs->pwfxDst->nBlockAlign = 65;
+         adfs->pwfxDst->nAvgBytesPerSec = adfs->pwfxDst->nSamplesPerSec * 65 / 320;
+         ((GSM610WAVEFORMAT*)adfs->pwfxDst)->wSamplesPerBlock = 320;

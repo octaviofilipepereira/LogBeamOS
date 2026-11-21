@@ -7,7 +7,8 @@
 # login) and this launcher installs it into the LogBeamOS Wine prefix and shows which COM port is the HRI-200 or the
 # radio (author's decision, 13/11/2026). Checked in the workshop on 14/11/2026 with WIRES-X 2.010 (wx2010en.zip):
 # it installs and opens at its "COM port setting" screen. A test with an HRI-200 or a radio in PDN mode is still due.
-# Since 0.3.28 it starts WIRES-X with a corrected wininet.dll (see the end of this file).
+# Since 0.3.28 (wininet.dll) and 0.3.29 (msgsm32.acm) it starts WIRES-X with corrected Wine DLLs (see the end of this
+# file); both errors were found and reported by Bráulio Sousa, CT7APZ.
 # Usage: wires-x            install if needed, then open
 #        wires-x --instalar FILE.zip   install only (no questions)
 . /usr/local/lib/logbeamos/wine-env.sh
@@ -159,16 +160,22 @@ elif [ ! -s "$VISTO" ]; then
   zenity --warning --title=WIRES-X --width=440 --text="$(t semportas)" 2>/dev/null
 fi
 
-# WIRES-X reads the replies of the Yaesu servers by asking for the headers with an index until the call fails. Wine's
-# wininet ignored that index, so WIRES-X never got past its first file and stayed OFFLINE ("Server or ID Not Found." at
-# the ID activation; CT7APZ, 20/11/2026). LogBeamOS brings the wininet.dll of Wine 11.0 with that one correction
-# (0.3.28; source, patch and build in /usr/share/doc/logbeamos-ferramentas/wininet): copied into the WIRES-X folder and
-# loaded as a native DLL by WIRES-X alone. Workshop, 21/11/2026: OFFLINE without it, ONLINE(IPv4) with it
-WININET=/usr/local/lib/logbeamos/wires-x/wininet.dll
-if [ -f "$WININET" ]; then
-  cmp -s "$WININET" "$DIR/wininet.dll" || cp -f "$WININET" "$DIR/wininet.dll" 2>/dev/null || true
-  [ -f "$DIR/wininet.dll" ] && WINEDLLOVERRIDES="$WINEDLLOVERRIDES;wininet=n,b"
-fi
+# Two DLLs of Wine 11.0 with one correction each, for WIRES-X alone; both errors were found and reported by Bráulio
+# Sousa, CT7APZ (November 2026). Source, patches and build in /usr/share/doc/logbeamos-ferramentas/wires-x.
+# - wininet.dll (0.3.28): WIRES-X reads the replies of the Yaesu servers by asking for the headers with an index until
+#   the call fails. Wine's wininet ignored that index, so WIRES-X never got past its first file and stayed OFFLINE
+#   ("Server or ID Not Found." at the ID activation). Workshop, 21/11/2026: OFFLINE without it, ONLINE(IPv4) with it.
+# - msgsm32.acm (0.3.29): WIRES-X converts the voice to GSM 6.10 and asks for that format with a zeroed destination;
+#   Wine's codec refused it, the conversion was never opened and WIRES-X closed without a word on the first voice frame
+#   of a radio in PDN mode. Workshop, 21/11/2026: no conversion opened without it, all of them with it.
+# Each one is copied into the WIRES-X folder (when it differs) and loaded as a native DLL by WIRES-X alone; the
+# override takes the module name (wininet for wininet.dll, the whole name for msgsm32.acm)
+WX=/usr/local/lib/logbeamos/wires-x
+for f in wininet.dll msgsm32.acm; do
+  [ -f "$WX/$f" ] || continue
+  cmp -s "$WX/$f" "$DIR/$f" || cp -f "$WX/$f" "$DIR/$f" 2>/dev/null || true
+  [ -f "$DIR/$f" ] && WINEDLLOVERRIDES="$WINEDLLOVERRIDES;${f%.dll}=n,b"
+done
 
 cd "$DIR" || exit 1
 exec wine Wires-X.exe "$@"

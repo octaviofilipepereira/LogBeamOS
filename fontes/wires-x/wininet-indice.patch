@@ -1,6 +1,7 @@
 LogBeamOS (21/11/2026): Wine 11.0 wininet, HttpQueryInfo with HTTP_QUERY_RAW_HEADERS or HTTP_QUERY_RAW_HEADERS_CRLF
 and an index above 0 fails with ERROR_HTTP_HEADER_NOT_FOUND, as on Windows. Wine returned the headers for any index,
 so a program that reads them with an index until the call fails (WIRES-X 2.010) never left its loop.
+Found and reported by Bráulio Sousa, CT7APZ (LogBeamOS tester), November 2026.
 Apply with: patch -d wine-11.0 -p1 < wininet-indice.patch
 
 --- a/dlls/wininet/http.c

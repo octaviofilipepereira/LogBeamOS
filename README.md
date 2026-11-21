@@ -43,7 +43,7 @@ Every window is in Portuguese, English, Spanish and French.
 
 LogBeamOS also takes **muffin**, the Cinnamon window manager, from its apt repository, with a one-line correction that keeps Cinnamon from crashing when N1MM+ or Log4OM is closed and opened again: see [fontes/muffin](fontes/muffin/).
 
-For WIRES-X alone, LogBeamOS brings the `wininet.dll` of Wine 11.0 with a correction, without which WIRES-X stayed OFFLINE under Wine: see [fontes/wininet](fontes/wininet/).
+For WIRES-X alone, LogBeamOS brings two DLLs of Wine 11.0 with a correction each: `wininet.dll`, without which WIRES-X stayed OFFLINE under Wine, and `msgsm32.acm`, without which WIRES-X closed on the first voice frame of a radio in PDN mode. Both errors were found and reported by Bráulio Sousa, CT7APZ: see [fontes/wires-x](fontes/wires-x/).
 
 ### Installing and updating
 
@@ -183,7 +183,7 @@ Todas as janelas estão em português, inglês, espanhol e francês.
 
 O LogBeamOS vai também buscar o **muffin**, o gestor de janelas do Cinnamon, ao seu repositório apt, com uma correcção de uma linha que impede o Cinnamon de ir abaixo ao fechar e voltar a abrir o N1MM+ ou o Log4OM: ver [fontes/muffin](fontes/muffin/).
 
-Só para o WIRES-X, o LogBeamOS traz a `wininet.dll` do Wine 11.0 com uma correcção, sem a qual o WIRES-X ficava OFFLINE no Wine: ver [fontes/wininet](fontes/wininet/).
+Só para o WIRES-X, o LogBeamOS traz duas DLLs do Wine 11.0, cada uma com uma correcção: a `wininet.dll`, sem a qual o WIRES-X ficava OFFLINE no Wine, e a `msgsm32.acm`, sem a qual o WIRES-X fechava na primeira trama de voz de um rádio em modo PDN. Os dois erros foram descobertos e relatados por Bráulio Sousa, CT7APZ: ver [fontes/wires-x](fontes/wires-x/).
 
 ### Instalar e actualizar
 
@@ -311,7 +311,7 @@ Todas las ventanas están en portugués, inglés, español y francés.
 
 LogBeamOS toma además **muffin**, el gestor de ventanas de Cinnamon, de su repositorio apt, con una corrección de una línea que impide que Cinnamon se caiga al cerrar y volver a abrir N1MM+ o Log4OM: ver [fontes/muffin](fontes/muffin/).
 
-Solo para WIRES-X, LogBeamOS trae la `wininet.dll` de Wine 11.0 con una corrección, sin la cual WIRES-X se quedaba OFFLINE en Wine: ver [fontes/wininet](fontes/wininet/).
+Solo para WIRES-X, LogBeamOS trae dos DLL de Wine 11.0, cada una con una corrección: la `wininet.dll`, sin la cual WIRES-X se quedaba OFFLINE en Wine, y la `msgsm32.acm`, sin la cual WIRES-X se cerraba con la primera trama de voz de una radio en modo PDN. Los dos errores los descubrió y comunicó Bráulio Sousa, CT7APZ: ver [fontes/wires-x](fontes/wires-x/).
 
 ### Instalar y actualizar
 
@@ -439,7 +439,7 @@ Toutes les fenêtres sont en portugais, anglais, espagnol et français.
 
 LogBeamOS prend aussi **muffin**, le gestionnaire de fenêtres de Cinnamon, dans son dépôt apt, avec une correction d'une ligne qui empêche Cinnamon de planter à la fermeture puis à la réouverture de N1MM+ ou de Log4OM : voir [fontes/muffin](fontes/muffin/).
 
-Pour WIRES-X seulement, LogBeamOS apporte la `wininet.dll` de Wine 11.0 avec une correction, sans laquelle WIRES-X restait OFFLINE sous Wine : voir [fontes/wininet](fontes/wininet/).
+Pour WIRES-X seulement, LogBeamOS apporte deux DLL de Wine 11.0, chacune avec une correction : la `wininet.dll`, sans laquelle WIRES-X restait OFFLINE sous Wine, et la `msgsm32.acm`, sans laquelle WIRES-X se fermait à la première trame vocale d'une radio en mode PDN. Les deux erreurs ont été découvertes et signalées par Bráulio Sousa, CT7APZ : voir [fontes/wires-x](fontes/wires-x/).
 
 ### Installer et mettre à jour
 
