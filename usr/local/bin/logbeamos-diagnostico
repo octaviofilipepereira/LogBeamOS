@@ -5,7 +5,8 @@
 # LogBeamOS: diagnostic report. One command that gathers, in a single text file on the desktop, what is needed to
 # understand a problem: versions, computer, USB and serial devices, the shared radio (CAT) and how each program is set
 # up to use it, sound, Wine, updates and the warnings and errors of the system log.
-# It only reads; it changes nothing and needs no password. It never opens files that hold passwords or keys, and it
+# It only reads; it changes nothing and needs no password (since 0.9.0-1 it refreshes the package lists that "Update
+# LogBeamOS" keeps in its own cache folder, as the window itself does, to show which package source fails). It never opens files that hold passwords or keys, and it
 # takes the user name, the computer name and network addresses out of what it writes. The report is in English so
 # that anyone helping can read it; the user reads it before sending it.
 # It is the one tool that testers type by hand, so it answers in their language (author, 15/11/2026): two names,
@@ -172,6 +173,23 @@ def portas_abertas():
     return "\n".join(sorted(set(r))) or "(no program has a serial port open, or they belong to another user)"
 
 
+def verificacao_apt():
+    """The same apt-get update that "Update LogBeamOS" makes before showing what can be updated, with the same options
+    (as the user, into the lists it keeps in ~/.cache/logbeamos-actualizar; nothing else is changed): its last lines
+    say which package source failed, if any (0.9.0-1; on Bráulio Sousa's computer, CT7APZ, a source of Google Earth
+    without its key hid every apt line of the window, 22/11/2026)."""
+    try:
+        sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
+        import lb_actualizar as lb
+        pasta = os.path.join(CASA, ".cache", "logbeamos-actualizar")
+        os.makedirs(os.path.join(pasta, "lists", "partial"), exist_ok=True)
+        opcoes = lb.apt_opcoes(pasta)
+    except Exception as e:  # noqa: BLE001 — the report goes on without this part
+        return f"(could not prepare it: {e})"
+    saida = corre(["apt-get", "-q", *opcoes, "update"], 180)
+    return "\n".join(saida.splitlines()[-25:])
+
+
 def junta(anterior):
     S = []
 
@@ -195,9 +213,11 @@ def junta(anterior):
         f"{'UEFI' if os.path.isdir('/sys/firmware/efi') else 'BIOS (legacy)'} · Secure Boot: {corre(['mokutil', '--sb-state'], 5).splitlines()[0]}",
         f"Kernel: {corre(['uname', '-r'])} · language: {os.environ.get('LANG', '')} {os.environ.get('LANGUAGE', '')} · "
         f"session: {os.environ.get('XDG_CURRENT_DESKTOP', '')} {os.environ.get('XDG_SESSION_TYPE', '')}",
-        cmd("dpkg-query", "-W", "-f=${Package} ${Version} ${db:Status-Abbrev}\\n", "logbeamos-ferramentas",
+        # ${binary:Package} carries the architecture of the packages installed for both (libavcodec-extra60:i386)
+        cmd("dpkg-query", "-W", "-f=${binary:Package} ${Version} ${db:Status-Abbrev}\\n", "logbeamos-ferramentas",
             "logbeamos-tqsl", "logbeam-uplink", "libhamlib-utils", "libhamlib4t64", "wine-stable", "cinnamon",
-            "libavcodec-extra60", "libavcodec-extra60:i386", "mint-meta-codecs"),
+            "libavcodec-extra", "libavcodec-extra:i386", "libavcodec-extra60", "libavcodec-extra60:i386",
+            "mint-meta-codecs"),
         cmd("uptime"), cmd("timedatectl", "show", "-p", "Timezone", "-p", "NTPSynchronized", "-p", "LocalRTC"))
     sec("2. Computer",
         f"{dmi('sys_vendor')} {dmi('product_name')} {dmi('product_version')} · BIOS {dmi('bios_version')} {dmi('bios_date')}",
@@ -226,6 +246,8 @@ def junta(anterior):
         "$ pactl info\n" + "\n".join(l for l in corre(["pactl", "info"]).splitlines() if re.match("Server Name|Default", l)),
         cmd("pactl", "list", "short", "sinks"), cmd("pactl", "list", "short", "sources"))
     sec("6. Updates",
+        lambda: "The package lists as Update LogBeamOS reads them (apt-get update as the user, into its own cache):\n"
+        + verificacao_apt(),
         "$ tail /var/log/apt/history.log\n" + le("/var/log/apt/history.log", 60),
         cmd("dpkg", "--audit"),
         "$ apt sources with logbeam\n" + corre(["sh", "-c", "grep -rhs logbeam /etc/apt/sources.list /etc/apt/sources.list.d/ | grep -v '^#'"], 5),

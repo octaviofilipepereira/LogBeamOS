@@ -48,6 +48,10 @@ TXT = {
         "a_correr": "A actualizar. Aguarde até ao fim.",
         "flatpak": "Flatpak", "cinnamon": "Extensões do Cinnamon",
         "n_act": "{n} actualizações", "n_act1": "1 actualização",
+        "fonte_falhou": "Fonte de pacotes com erro: {f} — {m}",
+        "fontes_erro1": "Uma fonte de pacotes falhou: veja os detalhes.",
+        "fontes_erro": "{n} fontes de pacotes falharam: veja os detalhes.",
+        "sessao": "Para concluir a actualização, termine a sessão e volte a entrar.",
     },
     "en": {
         "titulo": "Update LogBeamOS", "sub": "Ham Radio Programs and operating system",
@@ -74,6 +78,10 @@ TXT = {
         "a_correr": "Updating. Please wait until it finishes.",
         "flatpak": "Flatpak", "cinnamon": "Cinnamon extensions",
         "n_act": "{n} updates", "n_act1": "1 update",
+        "fonte_falhou": "Package source with an error: {f} — {m}",
+        "fontes_erro1": "One package source failed: see the details.",
+        "fontes_erro": "{n} package sources failed: see the details.",
+        "sessao": "To complete the update, log out and log in again.",
     },
     "es": {
         "titulo": "Actualizar LogBeamOS", "sub": "Programas de Radioaficionado y sistema operativo",
@@ -100,6 +108,10 @@ TXT = {
         "a_correr": "Actualizando. Espere hasta el final.",
         "flatpak": "Flatpak", "cinnamon": "Extensiones de Cinnamon",
         "n_act": "{n} actualizaciones", "n_act1": "1 actualización",
+        "fonte_falhou": "Fuente de paquetes con error: {f} — {m}",
+        "fontes_erro1": "Una fuente de paquetes ha fallado: vea los detalles.",
+        "fontes_erro": "{n} fuentes de paquetes han fallado: vea los detalles.",
+        "sessao": "Para completar la actualización, cierre la sesión y vuelva a entrar.",
     },
     "fr": {
         "titulo": "Mettre à jour LogBeamOS", "sub": "Logiciels Radioamateur et système d'exploitation",
@@ -126,15 +138,23 @@ TXT = {
         "a_correr": "Mise à jour en cours. Patientez jusqu'à la fin.",
         "flatpak": "Flatpak", "cinnamon": "Extensions de Cinnamon",
         "n_act": "{n} mises à jour", "n_act1": "1 mise à jour",
+        "fonte_falhou": "Source de paquets en erreur : {f} — {m}",
+        "fontes_erro1": "Une source de paquets a échoué : voir les détails.",
+        "fontes_erro": "{n} sources de paquets ont échoué : voir les détails.",
+        "sessao": "Pour terminer la mise à jour, fermez la session et reconnectez-vous.",
     },
 }
 LINGUA = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "en")[:2]
 T = TXT.get(LINGUA, TXT["en"])
 
 
-def curta(v):
-    """Versão para mostrar: sem época nem sufixos da distribuição."""
+def curta(v, pacote=""):
+    """Versão para mostrar: sem época nem sufixos da distribuição. The LogBeamOS Update keeps its "-N" (0.9.0-1): since
+    0.9.0 it is the LogBeamOS version itself, not a distribution suffix (seen in the 0.9.0-1 test, 22/11/2026: the line
+    said "0.9.0 → 0.9.0, new version")."""
     v = (v or "").split(":")[-1]
+    if pacote == "logbeamos-ferramentas":
+        return v
     return v.split("-")[0].split("+")[0].split("~")[0]
 
 
@@ -144,6 +164,12 @@ def falha(e):
     if lb.limite_github(e):
         return T["limite"]
     return T["erro"] if isinstance(e, urllib.error.HTTPError) else T["sem_rede"]
+
+
+def falha_local(e):
+    """For the Flatpak and Cinnamon lines (0.9.0-1): "No Internet connection" only when the message says so; any other
+    failure is an error, with the message in the details (until 0.9.0 every failure showed "No Internet connection")."""
+    return T["sem_rede"] if lb.e_rede(str(e)) else T["erro"]
 
 
 def bytes_texto(n):
@@ -181,7 +207,8 @@ def procura():
     tem caixa, desmarcada)."""
     linhas = []
     sistema = []
-    extra = {"flatpak_sistema": 0, "flatpak_utilizador": 0}
+    # "avisos": lines for the details (sources that failed, errors); "fontes_falhadas": how many package sources failed
+    extra = {"flatpak_sistema": 0, "flatpak_utilizador": 0, "avisos": [], "fontes_falhadas": 0}
     # Programas do GitHub
     for item in lb.GITHUB:
         chave, nome = item[0], item[1]
@@ -210,9 +237,15 @@ def procura():
         except Exception as e:
             linhas.append(("not1mm", "Not1MM", inst, "", falha(e), False, None))
     # Pacotes do sistema: os de rádio com nome próprio (um nome pode juntar vários pacotes, como o Hamlib);
-    # os outros, um a um, debaixo de "Sistema operativo"
+    # os outros, um a um, debaixo de "Sistema operativo".
+    # A package source that fails (one of another program without its signing key, for example) no longer hides the
+    # apt lines: the other sources are used, and the one that failed is named in the details (0.9.0-1, reported by
+    # Bráulio Sousa, CT7APZ). "No Internet connection" only when no source answered.
     try:
-        pend = lb.apt_pendentes(CACHE)
+        falhas = lb.apt_actualiza_listas(CACHE)
+        extra["fontes_falhadas"] = len(falhas)
+        extra["avisos"] += [T["fonte_falhou"].format(f=f, m=m) for f, m in falhas]
+        pend = lb.apt_pendentes(CACHE, listas=False)
         try:
             tamanhos = lb.apt_tamanhos(CACHE)
         except Exception:
@@ -229,15 +262,21 @@ def procura():
             n = novos[com_nova[0]][1] if com_nova else None
             tam = sum(tamanhos.get(p, 0) for p in com_nova) or None
             chave = "apt:" + ",".join(com_nova or pacs)
-            linhas.append((chave, nome, curta(inst), curta(n or inst), T["nova"] if n else T["actualizado"],
-                           bool(n), tam))
+            linhas.append((chave, nome, curta(inst, pacs[0]), curta(n or inst, pacs[0]),
+                           T["nova"] if n else T["actualizado"], bool(n), tam))
         sistema = sorted((p, i, n, tamanhos.get(p)) for p, (i, n) in novos.items() if p not in lb.PACOTES_RADIO)
         tam = sum(t or 0 for *_, t in sistema) or None
         linhas.append(("sistema", T["sistema"], "", T["pacotes"].format(n=len(sistema)) if sistema else "",
                        T["nova"] if sistema else T["actualizado"], bool(sistema), tam))
         apt_ok = True
-    except Exception:
+    except lb.SemRede as e:
         linhas.append(("sistema", T["sistema"], "", "", T["sem_rede"], False, None))
+        extra["avisos"] += [T["fonte_falhou"].format(f=f, m=m) for f, m in e.falhas]
+        extra["sem_rede"] = True
+        apt_ok = False
+    except Exception as e:
+        linhas.append(("sistema", T["sistema"], "", "", T["erro"], False, None))
+        extra["avisos"].append(f"{T['sistema']}: {e}")
         apt_ok = False
     # Flatpak (system and user installations) and Cinnamon extensions; no line where they do not exist
     try:
@@ -247,15 +286,17 @@ def procura():
             extra.update(flatpak_sistema=len(fs or []), flatpak_utilizador=len(fu or []))
             linhas.append(("flatpak", T["flatpak"], "", conta(len(fp)), T["nova"] if fp else T["actualizado"],
                            bool(fp), sum(t or 0 for _, t in fp) or None))
-    except Exception:
-        linhas.append(("flatpak", T["flatpak"], "", "", T["sem_rede"], False, None))
+    except Exception as e:
+        linhas.append(("flatpak", T["flatpak"], "", "", falha_local(e), False, None))
+        extra["avisos"].append(f"{T['flatpak']}: {e}")
     try:
         cp = lb.cinnamon_pendentes()
         if cp is not None:
             linhas.append(("cinnamon", T["cinnamon"], "", conta(len(cp)), T["nova"] if cp else T["actualizado"],
                            bool(cp), None))
-    except Exception:
-        linhas.append(("cinnamon", T["cinnamon"], "", "", T["sem_rede"], False, None))
+    except Exception as e:
+        linhas.append(("cinnamon", T["cinnamon"], "", "", falha_local(e), False, None))
+        extra["avisos"].append(f"{T['cinnamon']}: {e}")
     # o que tem versão nova fica no topo; os opcionais por instalar, no fim
     linhas.sort(key=lambda x: (x[5] is not True, x[5] == "opcional", x[0] == "sistema", x[1].lower()))
     for chave, nome in lb.SOZINHOS:
@@ -415,7 +456,7 @@ def janela():
             self.detalhe = Gtk.Label(xalign=0, ellipsize=Pango.EllipsizeMode.END)
             caixa.pack_start(self.detalhe, False, False, 0)
 
-            exp = Gtk.Expander(label=T["detalhes"])
+            self.exp = exp = Gtk.Expander(label=T["detalhes"])
             self.registo = Gtk.TextView(editable=False, monospace=True, wrap_mode=Gtk.WrapMode.CHAR)
             rr = Gtk.ScrolledWindow(min_content_height=140)
             rr.add(self.registo)
@@ -558,6 +599,22 @@ def janela():
             self.GLib.source_remove(self.pulso)
             self.extra = extra
             self.mostra(linhas, total, sistema)
+            # Package sources that failed and the other errors of the search go to the details, which then open by
+            # themselves; the line under the list says how many sources failed (0.9.0-1)
+            avisos = extra.get("avisos") or []
+            for a in avisos:
+                self.escreve(a)
+            n = extra.get("fontes_falhadas", 0)
+            if extra.get("sem_rede"):
+                # No package source answered: the line under the list says so (0.9.0-1 test: it said "Everything is up
+                # to date." with the computer offline; the programs from GitHub may still show the answers kept for
+                # 15 minutes)
+                self.estado.set_text(T["sem_rede"] + ".")
+            elif n:
+                self.estado.set_text(self.estado.get_text() + " " +
+                                     (T["fontes_erro1"] if n == 1 else T["fontes_erro"].format(n=n)))
+            if avisos:
+                self.exp.set_expanded(True)
 
         # --- Actualização
         def actualizar(self):
@@ -572,6 +629,7 @@ def janela():
             self.botoes(False)
             self.erros = 0
             self.reiniciar = False
+            self.vu_antes = lb.versao_update()   # to know at the end whether the LogBeamOS Update itself was updated
             passos = len(args) + len(locais)
             self.feitos = 0
             self.parte = 0.0          # quanto do passo actual já foi feito (0 a 1)
@@ -677,6 +735,10 @@ def janela():
                 msg = T["feito"]
             if self.reiniciar:
                 msg += "\n" + T["reiniciar"]
+            elif codigo not in (126, 127) and lb.versao_update() != self.vu_antes:
+                # The LogBeamOS Update itself was updated: say it here, after "Update finished." (0.9.0-1). The
+                # notification of the package comes at the same time: it waits until the update has really ended
+                msg += "\n" + T["sessao"]
             d = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.INFO,
                                   buttons=Gtk.ButtonsType.OK, text=msg)
             d.run()

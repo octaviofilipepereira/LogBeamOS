@@ -221,14 +221,69 @@ def apt_opcoes(pasta):
             "-o", "Dir::Cache::pkgcache=", "-o", "Dir::Cache::srcpkgcache=", *apt_fontes(pasta)]
 
 
-def apt_pendentes(pasta=None):
-    """Lista (pacote, instalada, nova) do que o apt actualizaria. Sem root: usa uma cópia própria das listas."""
+class SemRede(RuntimeError):
+    """No package source answered apt-get update: there is no Internet connection. "falhas" lists (source, reason)."""
+
+    def __init__(self, falhas):
+        super().__init__("; ".join(f"{f}: {m}" for f, m in falhas))
+        self.falhas = falhas
+
+
+def falhas_apt(texto):
+    """From the output of apt-get update (LC_ALL=C): (how many indexes were reached, [(source, reason)] of the sources
+    that failed). Each failed source is an "Err:N URL SUITE …" line, followed by the reason, indented."""
+    ok, falhas, actual = 0, {}, None
+    for l in texto.splitlines():
+        m = re.match(r"^(Hit|Get|Err|Ign):\d+ (\S+ \S+)", l)
+        if m:
+            actual = None
+            if m.group(1) in ("Hit", "Get"):
+                ok += 1
+            elif m.group(1) == "Err":
+                actual = m.group(2)
+                falhas.setdefault(actual, "")
+        elif actual and l.startswith("  ") and not falhas[actual]:
+            falhas[actual] = l.strip()
+    return ok, list(falhas.items())
+
+
+def apt_actualiza_listas(pasta):
+    """apt-get update into this user's own copy of the package lists. Returns the sources that failed, as
+    [(source, reason)]: the others are updated and used. Raises SemRede when no source answered at all, and
+    RuntimeError when apt itself failed (a broken sources file, for example).
+    Until 0.9.0 any error here showed "No Internet connection" and hid every apt line, the LogBeamOS Update one
+    included: one source of another program without its signing key was enough (Google Earth, reported by Bráulio
+    Sousa, CT7APZ, 22/11/2026). apt 2.8 also ends with 0 when there is no network at all (the failures are warnings),
+    so the exit code tells neither case apart: the "Hit/Get/Err" lines do."""
+    env = dict(os.environ, LC_ALL="C")
+    os.makedirs(f"{pasta}/lists/partial", exist_ok=True)
+    r = subprocess.run(["apt-get", "-q", *apt_opcoes(pasta), "update"], capture_output=True, text=True, env=env)
+    ok, falhas = falhas_apt(r.stdout + "\n" + r.stderr)
+    if falhas and not ok:
+        raise SemRede(falhas)
+    if r.returncode and not falhas:
+        erros = [l for l in r.stderr.splitlines() if l.startswith("E: ")] or r.stderr.strip().splitlines()
+        raise RuntimeError(erros[-1] if erros else "apt-get update")
+    return falhas
+
+
+# Network problems in the messages of flatpak and cinnamon-spice-updater, so that they are not shown as errors
+_REDE = re.compile(r"(?i)could not resolve|temporary failure|could not connect|failed to connect|network is unreachable|"
+                   r"no route to host|timed? ?out|name or service not known|unable to load summary|urlopen error")
+
+
+def e_rede(texto):
+    """Does this error message say that the network could not be reached?"""
+    return bool(_REDE.search(texto or ""))
+
+
+def apt_pendentes(pasta=None, listas=True):
+    """Lista (pacote, instalada, nova) do que o apt actualizaria. Sem root: usa uma cópia própria das listas.
+    With listas=False the lists in pasta are not updated first (apt_actualiza_listas already did it)."""
     env = dict(os.environ, LC_ALL="C")
     if pasta:
-        os.makedirs(f"{pasta}/lists/partial", exist_ok=True)
-        r = subprocess.run(["apt-get", "-q", *apt_opcoes(pasta), "update"], capture_output=True, text=True, env=env)
-        if r.returncode:
-            raise RuntimeError(r.stderr.strip().splitlines()[-1] if r.stderr.strip() else "apt-get update")
+        if listas:
+            apt_actualiza_listas(pasta)
         extra = apt_opcoes(pasta)
     else:
         extra = []
@@ -416,13 +471,18 @@ INFORMACOES_UI = "usr/share/linuxmint/mintreport/mintreport.ui"
 _VS = "/" + VERSAO_SISTEMA
 _VU = "/" + VERSAO_UPDATE
 # Since tools 0.3.23 the screen also shows the LogBeamOS Update version: "LogBeamOS 0.3.17 · LogBeamOS Update 0.3.23".
-# The second key is the line written by tools 0.3.19 to 0.3.22, so that systems already patched get the new one
-_RELEASE = (f"        release = (open({_VS!r}).read().strip() + (' · LogBeamOS Update ' + open({_VU!r}).read().strip() "
-            f"if os.path.exists({_VU!r}) else '')) if os.path.exists({_VS!r}) else config['RELEASE']  # LogBeamOS")
+# Since 0.9.0-1 a single number when both are the same (single version number since 0.9.0): "LogBeamOS 0.9.0-1".
+# The other keys are the lines written by tools 0.3.19 to 0.3.22 ("release = open(") and 0.3.23 to 0.9.0
+# ("release = (open("), so that systems already patched get the new one; the new line starts differently, so a second
+# run leaves it as it is
+_RELEASE = (f"        release = (lambda s, u: s if u in ('', s) else s + ' · LogBeamOS Update ' + u)(open({_VS!r}).read()"
+            f".strip(), open({_VU!r}).read().strip() if os.path.exists({_VU!r}) else '') if os.path.exists({_VS!r}) "
+            f"else config['RELEASE']  # LogBeamOS")
 INFORMACOES_TROCAS = {
     '        distribution = "Linux Mint"': '        distribution = "LogBeamOS"  # LogBeamOS',
     "        release = config['RELEASE']": _RELEASE,
     "        release = open(": _RELEASE,
+    "        release = (open(": _RELEASE,
     "                background-color: #86be43;": "                background-color: #0d1117; /* LogBeamOS */",
 }
 INFORMACOES_UI_TROCAS = {

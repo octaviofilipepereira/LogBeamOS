@@ -1,0 +1,47 @@
+#!/bin/sh
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS Update: tells whoever is in a session to log out and in again, once an update to a new version of the
+# LogBeamOS Update has really ended (0.9.0-1, author, 22/11/2026).
+# Until 0.9.0 the notice came straight from the postinst of logbeamos-ferramentas, in the middle of the apt step:
+# "Update LogBeamOS" could still be installing other packages, the flatpaks and the programs from GitHub, and a less
+# experienced user who logged out at once could cut the update short. The postinst now starts this in the background,
+# detached from apt (a session of its own, no descriptor of dpkg or apt left open), and it waits until the helper of
+# "Update LogBeamOS" and apt/dpkg have finished. The notice then comes with "Update finished.", whatever the version of
+# the window that ran the update, and also after an update made in a terminal.
+# Usage (as root, started by the postinst): aviso-sessao VERSION
+VU=${1:-}
+AJUDANTE=/usr/local/lib/logbeamos/actualizar/actualizar-raiz
+
+ocupado() { # the helper of "Update LogBeamOS" is running, or apt/dpkg holds its locks
+  pgrep -f "$AJUDANTE" >/dev/null 2>&1 && return 0
+  fuser -s /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock 2>/dev/null
+}
+
+# Every 2 seconds, at most 3 hours (a slow download of a whole system update)
+i=0
+while ocupado && [ "$i" -lt 5400 ]; do
+  sleep 2
+  i=$((i + 1))
+done
+sleep 1
+
+# A notification of the session itself, in the system language
+LANG=; . /etc/default/locale 2>/dev/null || true
+case "${LANG%%_*}" in
+  pt) AV="Para concluir a actualização, termine a sessão e volte a entrar." ;;
+  es) AV="Para completar la actualización, cierre la sesión y vuelva a entrar." ;;
+  fr) AV="Pour terminer la mise à jour, fermez la session et reconnectez-vous." ;;
+  *)  AV="To complete the update, log out and log in again." ;;
+esac
+for b in /run/user/[0-9]*/bus; do
+  [ -S "$b" ] || continue
+  id=${b#/run/user/}; id=${id%/bus}
+  [ "$id" -ge 1000 ] 2>/dev/null || continue
+  u=$(getent passwd "$id" | cut -d: -f1)
+  [ -n "$u" ] || continue
+  runuser -u "$u" -- env DBUS_SESSION_BUS_ADDRESS="unix:path=$b" notify-send -u critical -i system-log-out \
+    "LogBeamOS Update${VU:+ $VU}" "$AV" 2>/dev/null || true
+done
+exit 0

@@ -55,10 +55,12 @@ def em_bytes(numero, unidade):
     return int(float(numero.replace(",", "")) * UNIDADES.get(unidade, 1))
 
 
-def corre_apt(cmd, env, listas=False):
+def corre_apt(cmd, env, listas=False, tolera=False):
     """apt-get com o canal de estado (APT::Status-Fd): a percentagem da transferência (por bytes) e da instalação.
     O total a descarregar vem da linha "Need to get" e o pacote em curso das linhas "Get:"; a velocidade é a média
-    dos últimos 4 segundos. Com listas=True (apt-get update) diz só o ficheiro i de n e de onde vem."""
+    dos últimos 4 segundos. Com listas=True (apt-get update) diz só o ficheiro i de n e de onde vem.
+    With tolera=True it does not raise when apt fails: it returns (exit code, every output line) (0.9.0-1)."""
+    todas = []
     ler, escrever = os.pipe()
     p = subprocess.Popen([cmd[0], "-o", f"APT::Status-Fd={escrever}", *cmd[1:]], stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT, env=env, pass_fds=(escrever,))
@@ -76,6 +78,7 @@ def corre_apt(cmd, env, listas=False):
         if not l:
             return
         ultima = l
+        todas.append(l)
         diz(l)
         m = re.match(r"^Need to get ([\d.,]+) ([kMG]?B)", l)
         if m:
@@ -142,7 +145,10 @@ def corre_apt(cmd, env, listas=False):
                 l = b.decode("utf-8", "replace").rstrip()
                 (linha_saida if chave.data == "saida" else linha_estado)(l)
     os.close(ler)
-    if p.wait():
+    codigo = p.wait()
+    if tolera:
+        return codigo, todas
+    if codigo:
         raise RuntimeError(ultima or " ".join(cmd))
 
 
@@ -158,7 +164,20 @@ def apt_update():
     if LISTAS_ACTUALIZADAS:
         return
     FONTES = lb.apt_fontes("/run/logbeamos-actualizar")
-    corre_apt(["apt-get", "update", "-q", "-o", "DPkg::Lock::Timeout=120", *FONTES], ENV, listas=True)
+    # A package source that fails (one of another program without its signing key, for example) does not stop the
+    # update: apt keeps using the other sources, and the one that failed is named in the details (0.9.0-1; until 0.9.0
+    # the whole step failed, as the window did: Google Earth on the computer of Bráulio Sousa, CT7APZ, 22/11/2026).
+    # It stops only when no source answered (no network) or when apt itself failed.
+    codigo, todas = corre_apt(["apt-get", "update", "-q", "-o", "DPkg::Lock::Timeout=120", *FONTES], ENV, listas=True,
+                              tolera=True)
+    ok, falhas = lb.falhas_apt("\n".join(todas))
+    for f, m in falhas:
+        diz(f"package source failed, left out: {f} — {m}")
+    if falhas and not ok:
+        raise RuntimeError("no package source answered: no Internet connection")
+    if codigo and not falhas:
+        erros = [l for l in todas if l.startswith("E: ")] or todas
+        raise RuntimeError(erros[-1] if erros else "apt-get update")
     LISTAS_ACTUALIZADAS = True
 
 
