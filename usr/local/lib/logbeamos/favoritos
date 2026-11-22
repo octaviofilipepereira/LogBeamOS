@@ -1,0 +1,9 @@
+#!/bin/sh
+# LogBeamOS (1.0.0): at the session start, the Linux Mint Software Manager left in the menu favourites of a user who
+# changed them becomes the LogBeamOS Software Manager (Cinnamon skips a favourite that no longer exists, silently)
+a=$(gsettings get org.cinnamon favorite-apps 2>/dev/null) || exit 0
+case "$a" in
+  *"'mintinstall.desktop'"*)
+    gsettings set org.cinnamon favorite-apps "$(printf '%s' "$a" | sed "s/'mintinstall.desktop'/'logbeamos-programas.desktop'/")" ;;
+esac
+exit 0

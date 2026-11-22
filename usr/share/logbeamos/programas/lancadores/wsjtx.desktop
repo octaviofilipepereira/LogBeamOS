@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=WSJT-X
+Exec=wsjtx
+Icon=/opt/ham/wsjtx/usr/share/icons/hicolor/128x128/apps/wsjtx_icon.png
+Comment=FT8, FT4, WSPR and other weak-signal modes
+Comment[pt]=FT8, FT4, WSPR e outros modos de sinal fraco
+Comment[es]=FT8, FT4, WSPR y otros modos de señal débil
+Comment[fr]=FT8, FT4, WSPR et autres modes à signal faible
+Terminal=false
+Categories=HamRadio;

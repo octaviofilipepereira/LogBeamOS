@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=QDMR
+Exec=logbeamos-abrir qdmr %U
+Icon=/usr/share/logbeamos/programas/qdmr.png
+Comment=Programming DMR radios (codeplugs)
+Comment[pt]=Programação de rádios DMR (codeplugs)
+Comment[es]=Programación de radios DMR (codeplugs)
+Comment[fr]=Programmation des radios DMR (codeplugs)
+Terminal=false
+Categories=HamRadio;

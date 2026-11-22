@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=JS8Call
+Exec=js8call
+Icon=/opt/ham/js8call/js8call.svg
+Comment=Keyboard messaging with weak signals
+Comment[pt]=Mensagens por teclado em sinal fraco
+Comment[es]=Mensajes por teclado con señal débil
+Comment[fr]=Messages au clavier à signal faible
+Terminal=false
+Categories=HamRadio;

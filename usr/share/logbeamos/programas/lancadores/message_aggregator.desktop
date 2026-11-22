@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=WSJT-X Message Aggregator
+Exec=message_aggregator
+Icon=/opt/ham/wsjtx/usr/share/icons/hicolor/128x128/apps/wsjtx_icon.png
+Comment=Collects WSJT-X messages
+Comment[pt]=Agrega as mensagens do WSJT-X
+Comment[es]=Reúne los mensajes de WSJT-X
+Comment[fr]=Regroupe les messages de WSJT-X
+Terminal=false
+Categories=HamRadio;

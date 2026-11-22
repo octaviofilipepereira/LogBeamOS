@@ -1,0 +1,21 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: helper of the "LogBeamOS Programs" manager (1.0.0). Runs as root through pkexec, with its own polkit
+# action (org.logbeamos.programas: "to install or remove programs"), or sudo on the USB drive. It accepts only
+# instalar=KEY and remover=KEY of the catalogue (lb_programas) and hands them to the "Update LogBeamOS" helper, which
+# installs and removes them with the same engine, progress lines and checks.
+import os
+import sys
+
+sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
+import lb_programas as cat  # noqa: E402
+
+if os.geteuid() != 0:
+    sys.exit("é preciso correr como root")
+pedidos = [a for a in sys.argv[1:] if a.partition("=")[0] in ("instalar", "remover") and a.partition("=")[2] in cat.POR_CHAVE]
+if not pedidos:
+    sys.exit("nada a fazer")
+AJUDANTE = "/usr/local/lib/logbeamos/actualizar/actualizar-raiz"
+os.execv("/usr/bin/python3", ["/usr/bin/python3", "-I", AJUDANTE, *pedidos])

@@ -8,7 +8,9 @@
 . /usr/local/lib/logbeamos/wine-env.sh
 . /usr/local/lib/logbeamos/equipamento/radio-wine.sh
 radio_antes n1mm
-cd "$WINEPREFIX/drive_c/Program Files (x86)/N1MM Logger+" || { radio_depois; exit 1; }
+# Removed through the "LogBeamOS Programs" manager (1.0.0): the manager opens on its page, to install it again
+cd "$WINEPREFIX/drive_c/Program Files (x86)/N1MM Logger+" 2>/dev/null && [ -f N1MMLogger.net.exe ] || {
+  radio_depois; exec logbeamos-programas --programa n1mm; }
 wine N1MMLogger.net.exe "$@"
 r=$?
 radio_depois

@@ -22,6 +22,7 @@ TITULO = {"pt": "Manual do LogBeamOS", "en": "LogBeamOS Manual", "es": "Manual d
 ACCOES = {
     "equipamento": ["logbeamos-equipamento"],
     "actualizar": ["logbeamos-actualizar"],
+    "gestor": ["logbeamos-programas"],   # the LogBeamOS Software Manager (1.0.0)
     "monitor": ["gnome-system-monitor"],
     "xastir": ["logbeamos-xastir"],
     "direwolf": ["x-terminal-emulator", "-e", "logbeamos-direwolf"],

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=N1MM Logger+
+Comment=Logger de concursos (Windows, através do Wine)
+Exec=n1mm
+Icon=n1mm-logger
+Terminal=false
+Categories=HamRadio;

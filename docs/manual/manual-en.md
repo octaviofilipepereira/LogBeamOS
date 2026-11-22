@@ -8,23 +8,24 @@
 
 *Linux distribution for radio amateurs*
 
-This is the manual that comes with LogBeamOS (LogBeamOS Update 0.9.0-1).
+This is the manual that comes with LogBeamOS (LogBeamOS Update 1.0.0).
 
 [Português](manual-pt.md) · **English** · [Español](manual-es.md) · [Français](manual-fr.md)
 
 - [1. First steps](#1-first-steps)
 - [2. Connecting the radio](#2-connecting-the-radio)
 - [3. Which program for what](#3-which-program-for-what)
-- [4. Updating](#4-updating)
-- [5. Alongside Windows](#5-installing-alongside-windows)
-- [6. Common problems](#6-common-problems)
-- [7. Reporting a problem](#7-reporting-a-problem)
+- [4. Installing and removing programs](#4-installing-and-removing-programs)
+- [5. Updating](#5-updating)
+- [6. Alongside Windows](#6-installing-alongside-windows)
+- [7. Common problems](#7-common-problems)
+- [8. Reporting a problem](#8-reporting-a-problem)
 
 ## 1. First steps
 
 - LogBeamOS starts from the USB drive without installing anything on the computer. On the first start you are asked whether you want your own user and password; without them, the session opens by itself.
 - What you do on the USB drive (settings, logs, files) is kept on it and is still there the next time you start.
-- On the desktop: the **Ham Radio Programs** folder (every program), **Radio and Equipment**, **Update LogBeamOS**, **LogBeam Uplink** and this manual. The programs are also in the menu, in the *Hamradio* group.
+- On the desktop: the **Ham Radio Programs** folder (every program), **Radio and Equipment**, **Update LogBeamOS**, **LogBeamOS Software Manager**, **LogBeam Uplink** and this manual. The programs are also in the menu, in the *Hamradio* group.
 - To switch off: menu → red button. Do not remove the USB drive while LogBeamOS is running.
 
 ## 2. Connecting the radio
@@ -54,15 +55,29 @@ This is the manual that comes with LogBeamOS (LogBeamOS Update 0.9.0-1).
 | Digital voice and pictures | FreeDV · SSTV: QSSTV |
 | Remote Icom and Kenwood radios | wfview |
 | Programming DMR radios | qdmr |
-| DMR without a radio (BrandMeister) | VoxDMR (optional: installed by *Update LogBeamOS*; asks for your DMR ID and BrandMeister hotspot password) |
+| DMR without a radio (BrandMeister) | VoxDMR (optional: installed by the *LogBeamOS Software Manager*; asks for your DMR ID and BrandMeister hotspot password) |
 | EchoLink | Qtel (the router must let UDP ports 5198–5199 and TCP port 5200 through, or use an EchoLink proxy) |
 | WIRES-X (Yaesu) | WIRES-X, through Wine. It does not come with LogBeamOS: download it from the Yaesu WIRES-X website (you need to log in with your ID), open *WIRES-X* and select the downloaded .zip file. The COM port of the HRI-200 or of the radio (PDN mode) is then shown, to choose on the WIRES-X *COM port setting* screen. |
 | Antenna modelling | xnec2c |
 | Spectrum analysis and academic analysis of the radio spectrum | 4ham Spectrum Analysis |
 
+> qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium and wfview are installed when you ask for them: the icon is there and, the first time, you are asked whether to install the program (an Internet connection is needed). See [4. Installing and removing programs](#4-installing-and-removing-programs).
+
 > In Xastir, before transmitting: enter your callsign (Xastir asks for it the first time), change *MYCALL* in the `direwolf.conf` file in your home folder and turn transmitting on under *Interfaces*. By default, Xastir only receives.
 
-## 4. Updating
+## 4. Installing and removing programs
+
+- The **LogBeamOS Software Manager** searches for, installs and removes programs. It replaces the Linux Mint Software Manager: it is for the radio programs and for all the other software.
+- The home page shows the **Ham Radio Programs**, in groups (digital modes, logging and contests, SDR, satellites, APRS and Winlink, digital voice, radio and utilities), each with its state. *Other radio programs* holds the remaining radio programs of Ubuntu.
+- Further down are the other categories, as in Linux Mint: Internet, sound and video, graphics, office, games, Flatpak, installed programs and more. The search, at the top, finds any program by its name or description.
+- Each program has its own page, with its description, version, source, the space it takes and the *Install*, *Remove* and *Open* buttons.
+- **On-demand programs:** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium and wfview are not installed, so that the image is smaller, but their icon is in the menu and in the **Ham Radio Programs** folder. Clicking it asks whether to install the program. The *Install all* button installs all of them at once: useful to get the USB drive ready at home, before going out without a network.
+- When a radio program is removed, its launcher leaves the menu and the folder (the on-demand programs keep their icon). For 4ham, the data and settings are kept in `/var/lib/logbeamos/guardado`.
+- N1MM+, Log4OM and WIRES-X (Windows programs, through Wine) are removed here too. To install them again, the installer is downloaded from the official website and the manager installs it into Wine.
+- In the menu, *Uninstall* on a radio program opens the manager on that program's page. The LogBeamOS tools (Update, Radio and Equipment, this manual, TQSL) are part of the system and cannot be removed.
+- On the USB drive, an installed program takes space on the part of the drive kept for your data; removing it later does not free the space of the programs that came in the image.
+
+## 5. Updating
 
 - **Update LogBeamOS** lists the radio programs and the operating system, with the installed version, the available one and the download size.
 - **LogBeamOS Update** (this updater, **Radio and Equipment** and this manual) and **LogBeam Uplink** are also updated here. They come from the LogBeamOS repository at logbeam.org, which is signed. The LogBeamOS version and the LogBeamOS Update version are shown at the top of the window.
@@ -74,7 +89,7 @@ This is the manual that comes with LogBeamOS (LogBeamOS Update 0.9.0-1).
 - On the USB drive no password is asked; on an installed LogBeamOS, the user's password is asked.
 - Ten minutes after logging in, a notice appears if there are updates.
 
-## 5. Installing alongside Windows
+## 6. Installing alongside Windows
 
 ### First, in Windows
 
@@ -96,7 +111,7 @@ This is the manual that comes with LogBeamOS (LogBeamOS Update 0.9.0-1).
    - if `S:\EFI\Boot\fbx64.efi` exists, the installer replaced the disk's fallback boot file: `copy /Y S:\EFI\Microsoft\Boot\bootmgfw.efi S:\EFI\Boot\bootx64.efi` and `del S:\EFI\Boot\fbx64.efi S:\EFI\Boot\mmx64.efi`;
    - finally, `mountvol S: /D`.
 
-## 6. Common problems
+## 7. Common problems
 
 **The USB drive does not start: "Unable to find a medium containing a live file system"**  
 Remove the USB drive, wait 5 seconds, plug it back in and start again.
@@ -128,7 +143,7 @@ In Radio and Equipment → *Set up the programs…*, choose the radio sound.
 **Direwolf closes straight away**  
 The window stays open with the explanation. The settings are in the `direwolf.conf` file in your home folder.
 
-## 7. Reporting a problem
+## 8. Reporting a problem
 
 When something fails, a report made with these three steps is enough to understand what happened.
 

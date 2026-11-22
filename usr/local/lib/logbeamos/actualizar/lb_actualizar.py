@@ -181,7 +181,7 @@ def instalada_github(item):
         return versao_pacote(alvo).split("-")[0].split("+")[0]
     if tipo == "deb" and not versao_pacote(alvo):
         return ""
-    if tipo == "flatpak" and not os.path.isdir(f"/var/lib/flatpak/app/{alvo}"):
+    if tipo == "flatpak" and not flatpak_instalado(alvo):
         return ""
     return estado().get(chave, "")
 
@@ -696,6 +696,72 @@ def instala_github(item, registo):
     return versao
 
 
+def flatpak_instalado(alvo):
+    """Is the flatpak app deployed? Its active deployment, not only its folder: on the USB drive a failed removal leaves
+    the folder behind (1.0.0, see flatpak_desinstala)."""
+    return os.path.exists(f"/var/lib/flatpak/app/{alvo}/current/active/metadata")
+
+
+def flatpak_refs(tipo):
+    """The refs ("name/arch/branch") of the system installation of one kind ("app" or "runtime"); None if flatpak
+    could not answer."""
+    r = subprocess.run(["flatpak", "list", "--system", "--all", f"--{tipo}", "--columns=ref"], capture_output=True,
+                       text=True, env=dict(os.environ, LC_ALL="C"))
+    if r.returncode:
+        return None
+    return {l.strip() for l in r.stdout.splitlines() if l.strip()}
+
+
+def limpa_flatpak_orfaos(registo):
+    """Folders of flatpaks that flatpak no longer lists. On the USB drive the flatpaks of the image are in the read-only
+    system image under an overlay: flatpak takes the ref out and then fails to move the folder away ("Invalid cross-
+    device link", EXDEV), so the folder stays (1.0.0 test, 22/11/2026: removing qdmr on the pen). Removed here, only when
+    flatpak answered with its list."""
+    import shutil
+    for tipo in ("app", "runtime"):
+        base = f"/var/lib/flatpak/{tipo}"
+        refs = flatpak_refs(tipo) if os.path.isdir(base) else None
+        if refs is None:
+            continue
+        for nome in os.listdir(base):
+            pn = os.path.join(base, nome)
+            if not os.path.isdir(pn) or os.path.islink(pn):
+                continue
+            for arq in os.listdir(pn):
+                pa = os.path.join(pn, arq)
+                if arq == "current" or os.path.islink(pa) or not os.path.isdir(pa):
+                    continue
+                for ramo in os.listdir(pa):
+                    if f"{nome}/{arq}/{ramo}" not in refs:
+                        shutil.rmtree(os.path.join(pa, ramo), ignore_errors=True)
+                        registo(f"flatpak: folder left behind removed: {tipo}/{nome}/{arq}/{ramo}")
+                if not os.listdir(pa):
+                    shutil.rmtree(pa, ignore_errors=True)
+            if not [x for x in os.listdir(pn) if x != "current"]:
+                shutil.rmtree(pn, ignore_errors=True)
+
+
+def flatpak_desinstala(alvo, registo, nao_usados=False):
+    """"flatpak uninstall" of an app (alvo) or of what nothing uses any more (nao_usados), also on the USB drive: when
+    flatpak took the ref out but could not move its folder (EXDEV, see limpa_flatpak_orfaos), the folder is removed and
+    the removal goes on (with --unused flatpak stops at the first one)."""
+    env = dict(os.environ, LC_ALL="C")
+    for _ in range(30):
+        antes = (flatpak_refs("app") or set()) | (flatpak_refs("runtime") or set())
+        r = subprocess.run(["flatpak", "uninstall", "--system", "-y", "--noninteractive",
+                            *(["--unused"] if nao_usados else [alvo])], capture_output=True, text=True, env=env)
+        registo((r.stdout + r.stderr)[-2000:])
+        if r.returncode == 0:
+            break
+        depois = (flatpak_refs("app") or set()) | (flatpak_refs("runtime") or set())
+        if depois == antes or (not nao_usados and flatpak_instalado(alvo)):
+            raise RuntimeError((r.stderr.strip() or "flatpak uninstall").splitlines()[-1])
+        limpa_flatpak_orfaos(registo)
+        if not nao_usados:
+            break
+    limpa_flatpak_orfaos(registo)
+
+
 def instala_flatpak(ficheiro, alvo, pasta, registo):
     """Flatpak dentro de um .zip (qdmr): instala-se para todos os utilizadores. Um flatpak avulso não se instala por
     cima de outro (nem com --reinstall nem com --or-update, flatpak 1.14): primeiro garante-se a base que a versão nova
@@ -720,20 +786,25 @@ def instala_flatpak(ficheiro, alvo, pasta, registo):
     with open(bundle, "rb") as f:
         m = re.search(rb"\nruntime=([\w.\-]+/[\w.\-]+/[\w.\-]+)\n", f.read(1 << 20))
     base = "runtime/" + m.group(1).decode() if m else None
-    if base and not os.path.isdir("/var/lib/flatpak/" + base):
+    limpa_flatpak_orfaos(registo)   # folders a failed removal on the pen left behind (1.0.0)
+    if base and base.split("/", 1)[1] not in (flatpak_refs("runtime") or set()):
         flatpak("install", "--system", "-y", "--noninteractive", "flathub", base)
     # Ao sair a versão anterior, o flatpak apagaria também a base (1,5 GB com as extensões), por já não ter quem a
     # use: fica fixada durante a troca
     if base:
         flatpak("pin", "--system", base)
     try:
-        if os.path.isdir(f"/var/lib/flatpak/app/{alvo}"):
-            flatpak("uninstall", "--system", "-y", "--noninteractive", alvo)
+        if flatpak_instalado(alvo):
+            flatpak_desinstala(alvo, registo)   # also on the pen (1.0.0: EXDEV, see limpa_flatpak_orfaos)
         flatpak("install", "--system", "-y", "--noninteractive", "--bundle", bundle)
     finally:
         if base:
             flatpak("pin", "--system", "--remove", base)
-    flatpak("uninstall", "--system", "-y", "--noninteractive", "--unused")  # a base antiga, se a nova mudou
+    flatpak_desinstala(None, registo, nao_usados=True)  # a base antiga, se a nova mudou
+    # The sound socket that the qdmr flatpak lacks (0.3.30: without it qdmr 0.15.1 crashes when it closes its melody
+    # player): given here too since 1.0.0, so that a qdmr installed again through the manager has it (until then only the
+    # package postinst gave it, to the qdmr already installed)
+    subprocess.run(["flatpak", "override", "--system", "--socket=pulseaudio", alvo], capture_output=True)
     regras = glob.glob(f"/var/lib/flatpak/app/{alvo}/current/active/files/OFF/*.rules")
     if regras:  # de.darc.dm3mat.qdmr → /etc/udev/rules.d/60-qdmr.rules (o mesmo nome que o pacote antigo do sistema usava)
         shutil.copyfile(regras[0], f"/etc/udev/rules.d/60-{alvo.rsplit('.', 1)[-1]}.rules")

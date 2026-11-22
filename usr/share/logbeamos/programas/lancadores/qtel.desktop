@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Qtel
+GenericName=EchoLink Client
+Exec=/usr/bin/qtel
+Terminal=false
+Categories=HamRadio;
+Keywords=radio;ham;ptt;
+Icon=qtel
+Comment=The Qt EchoLink Client
+Comment[pt]=Cliente EchoLink
+Comment[es]=Cliente EchoLink
+Comment[fr]=Client EchoLink
+Type=Application

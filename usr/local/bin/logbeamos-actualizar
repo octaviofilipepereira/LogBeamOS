@@ -17,6 +17,7 @@ import threading
 
 sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
 import lb_actualizar as lb  # noqa: E402
+import lb_programas as cat  # noqa: E402
 
 AJUDANTE = "/usr/local/lib/logbeamos/actualizar/actualizar-raiz"
 ICONE = "/usr/share/logbeamos/actualizar.png"
@@ -214,8 +215,10 @@ def procura():
         chave, nome = item[0], item[1]
         inst = lb.instalada_github(item)
         opcional = not inst and chave in lb.OPCIONAIS
-        if not inst and item[5] in ("deb", "flatpak") and not opcional:
-            continue  # não instalado: não aparece
+        # Not installed: not shown. Since 1.0.0 programs are installed and removed by the "LogBeamOS Programs"
+        # manager; until then a removed or missing AppImage (no version recorded) was offered as a "New version"
+        if not inst and not opcional:
+            continue
         try:
             disp, asset = lb.info_github(item)
             if opcional:
@@ -300,7 +303,8 @@ def procura():
     # o que tem versão nova fica no topo; os opcionais por instalar, no fim
     linhas.sort(key=lambda x: (x[5] is not True, x[5] == "opcional", x[0] == "sistema", x[1].lower()))
     for chave, nome in lb.SOZINHOS:
-        if not any(x[1] == nome for x in linhas):
+        # only when installed (1.0.0: they can be removed through the manager, and GridTracker2 is on demand)
+        if not any(x[1] == nome for x in linhas) and (chave not in cat.POR_CHAVE or cat.instalado(cat.POR_CHAVE[chave])):
             linhas.append((chave, nome, "", "", T["sozinho"], False, None))
     total = sum(1 for x in linhas if x[5] is True)
     return linhas, total, apt_ok, sistema, extra

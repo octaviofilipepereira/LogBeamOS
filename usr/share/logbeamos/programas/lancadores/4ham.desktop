@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=4ham Spectrum Analysis
+Comment=Amateur radio band analyser with an RTL-SDR (opens in the browser)
+Comment[pt]=Analisador das bandas de radioamador com RTL-SDR (abre no navegador)
+Comment[es]=Analizador de las bandas de radioaficionado con RTL-SDR (se abre en el navegador)
+Comment[fr]=Analyseur des bandes radioamateur avec un RTL-SDR (s'ouvre dans le navigateur)
+Exec=4ham
+Icon=/usr/share/logbeamos/4ham.png
+Terminal=false
+Categories=HamRadio;

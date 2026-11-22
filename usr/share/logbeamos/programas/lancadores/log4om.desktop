@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Log4OM 2
+Comment=Logger geral (Windows, através do Wine)
+Exec=log4om
+Icon=log4om
+Terminal=false
+Categories=HamRadio;

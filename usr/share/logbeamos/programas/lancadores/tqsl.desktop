@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=TQSL (LoTW)
+Exec=tqsl
+Icon=/usr/local/share/icons/hicolor/128x128/apps/org.arrl.trustedqsl.png
+Comment=Signs your QSOs and uploads them to ARRL Logbook of The World
+Comment[pt]=Assina os QSOs e envia-os para o Logbook of The World da ARRL
+Comment[es]=Firma los QSO y los envía al Logbook of The World de la ARRL
+Comment[fr]=Signe les QSO et les envoie au Logbook of The World de l'ARRL
+Terminal=false
+Categories=HamRadio;

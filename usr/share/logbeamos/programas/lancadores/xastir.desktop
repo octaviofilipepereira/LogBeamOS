@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Xastir
+Comment=X Amateur Station Tracking and Information Reporting
+Exec=logbeamos-xastir
+Icon=/usr/share/pixmaps/xastir/icon.png
+Terminal=false
+Type=Application
+Categories=HamRadio;
+Keywords=APRS;AX.25;HamRadio

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Exec=logbeamos-abrir satdump %U
+Name=SatDump
+Icon=/usr/share/logbeamos/programas/satdump.png
+StartupWMClass=SatDump v1.2.2
+Categories=HamRadio;
+Keywords=Satellite;SDR

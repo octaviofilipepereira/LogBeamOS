@@ -1,0 +1,1064 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: "LogBeamOS Programs" manager (Gestor de Programas LogBeamOS), 1.0.0. Author's decisions of 22/11/2026:
+# - it replaces the Linux Mint Software Manager for every kind of software, with categories like Mint's;
+# - the main category, on the home page, is the amateur radio programs one (the LogBeamOS catalogue, lb_programas);
+# - Windows programs (Wine) are installed and removed here too.
+# Radio programs are installed and removed by the LogBeamOS helper (programas-raiz → actualizar-raiz, one password);
+# Wine programs as the user, in the user's own prefix. The rest of the software goes through the Linux Mint engine
+# (mintcommon.installer, package mint-common: apt through PackageKit, Flatpak), which stays when the Mint Software
+# Manager leaves; its categories are Mint's (the lists come with this package, /usr/share/logbeamos/programas/categorias).
+# Usage: logbeamos-programas [--programa KEY | --instalar KEY | --pacote NAME | FILE.flatpakref | FILE.flatpakrepo]
+import os
+import shlex
+import subprocess
+import sys
+import threading
+import unicodedata
+
+sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
+import lb_actualizar as lb  # noqa: E402
+import lb_programas as cat  # noqa: E402
+
+AJUDANTE = "/usr/local/lib/logbeamos/programas/programas-raiz"
+ICONE = "/usr/share/logbeamos/programas.png"
+CATEGORIAS = "/usr/share/logbeamos/programas/categorias"
+ICONES_CATEGORIAS = "/usr/share/logbeamos/programas/icones-categorias"
+WINE_ENV = "/usr/local/lib/logbeamos/wine-env.sh"
+
+TXT = {
+    "pt": {
+        "titulo": "Gestor de Programas LogBeamOS", "radio": "Programas de Radioamador",
+        "radio_sub": "Os programas de rádio do LogBeamOS. Os que estão por instalar instalam-se quando se pedem.",
+        "outras": "Outras categorias", "outros_radio": "Outros programas de rádio", "procurar": "Procurar programas",
+        "a_carregar": "A carregar a lista dos outros programas… (da primeira vez pode demorar alguns minutos)",
+        "sem_lista": "A lista dos outros programas não está disponível: {e}",
+        "instalado": "Instalado", "por_instalar": "Por instalar", "a_pedido": "Instala-se quando se pede",
+        "b_instalar": "Instalar", "b_remover": "Remover", "b_abrir": "Abrir", "b_tudo": "Instalar tudo",
+        "d_tudo": "Instala os {n} programas a pedido que faltam (cerca de {t}). Serve para preparar a pen em casa antes de uma saída sem rede.",
+        "tudo_feito": "Os programas a pedido estão todos instalados.",
+        "versao": "Versão", "origem": "Origem", "espaco": "Espaço", "site": "Site", "livre": "Espaço livre: {t}",
+        "cerca": "cerca de {t}",
+        "o_apt": "Pacote do sistema", "o_github": "GitHub (publicação do autor do programa)",
+        "o_deb": "Pacote do autor do programa", "o_pipx": "Python (pipx)", "o_wine": "Programa do Windows, pelo Wine",
+        "o_logbeamos": "Faz parte do LogBeamOS", "o_flatpak": "Flatpak ({r})",
+        "parte": "Faz parte do LogBeamOS e não se remove.",
+        "a_instalar": "A instalar {nome}…", "a_remover": "A remover {nome}…", "a_preparar": "A preparar…",
+        "feito_inst": "{nome} ficou instalado.", "feito_rem": "{nome} foi removido.",
+        "erro": "Não foi possível concluir. Veja os detalhes.", "recusado": "A operação não foi autorizada.",
+        "detalhes": "Detalhes", "a_correr": "Há uma operação em curso. Aguarde até ao fim.",
+        "confirmar_rem": "Remover {nome}?",
+        "rem_pedido": "O ícone fica no menu e na pasta dos programas de rádio: ao carregar nele, o programa volta a ser instalado.",
+        "rem_normal": "O atalho sai do menu e da pasta dos programas de rádio. Pode voltar a instalá-lo aqui.",
+        "rem_4ham": "Os dados e as definições do 4ham ficam guardados em /var/lib/logbeamos/guardado.",
+        "rem_wine": "É usado o desinstalador do próprio programa, dentro do Wine. As definições do utilizador podem ficar.",
+        "rede": "É preciso ligação à Internet.",
+        "wine_inst": "O instalador do {nome} descarrega-se do site oficial.\n\n1. Carregue em «Abrir o site» e descarregue o instalador completo.\n2. Carregue em «Escolher o ficheiro» e indique o ficheiro .exe descarregado.\n\nO LogBeamOS instala-o no Wine sem mais perguntas.",
+        "b_site": "Abrir o site", "b_ficheiro": "Escolher o ficheiro…", "b_cancelar": "Cancelar",
+        "ficheiro_exe": "Indique o instalador descarregado (.exe)",
+        "sem_resultados": "Nenhum programa encontrado.", "resultados": "{n} programas", "resultados1": "1 programa",
+        "resultados_max": "Os primeiros {n} programas encontrados",
+        "flatpak_ref": "Instalar o programa deste ficheiro Flatpak?", "flatpak_repo": "Juntar a fonte Flatpak deste ficheiro?",
+        "fonte_junta": "Fonte Flatpak juntada: {n}.",
+        "c_internet": "Internet", "c_som_video": "Som e vídeo", "c_graficos": "Gráficos", "c_escritorio": "Escritório",
+        "c_jogos": "Jogos", "c_acessorios": "Acessórios", "c_sistema": "Ferramentas do sistema",
+        "c_letras": "Tipos de letra", "c_ciencia": "Ciência e educação", "c_programacao": "Programação",
+        "c_flatpak": "Flatpak", "c_instalados": "Programas instalados",
+    },
+    "en": {
+        "titulo": "LogBeamOS Software Manager", "radio": "Ham Radio Programs",
+        "radio_sub": "The radio programs of LogBeamOS. Those not installed yet are installed when you ask for them.",
+        "outras": "Other categories", "outros_radio": "Other radio programs", "procurar": "Search programs",
+        "a_carregar": "Loading the list of the other programs… (the first time may take a few minutes)",
+        "sem_lista": "The list of the other programs is not available: {e}",
+        "instalado": "Installed", "por_instalar": "Not installed", "a_pedido": "Installed when you ask for it",
+        "b_instalar": "Install", "b_remover": "Remove", "b_abrir": "Open", "b_tudo": "Install all",
+        "d_tudo": "Installs the {n} on-demand programs still missing (about {t}). Useful to get the USB drive ready at home before going out without a network.",
+        "tudo_feito": "All the on-demand programs are installed.",
+        "versao": "Version", "origem": "Source", "espaco": "Size", "site": "Website", "livre": "Free space: {t}",
+        "cerca": "about {t}",
+        "o_apt": "System package", "o_github": "GitHub (release of the program's author)",
+        "o_deb": "Package of the program's author", "o_pipx": "Python (pipx)", "o_wine": "Windows program, through Wine",
+        "o_logbeamos": "Part of LogBeamOS", "o_flatpak": "Flatpak ({r})",
+        "parte": "It is part of LogBeamOS and cannot be removed.",
+        "a_instalar": "Installing {nome}…", "a_remover": "Removing {nome}…", "a_preparar": "Preparing…",
+        "feito_inst": "{nome} is installed.", "feito_rem": "{nome} was removed.",
+        "erro": "It could not be completed. See the details.", "recusado": "The operation was not authorised.",
+        "detalhes": "Details", "a_correr": "An operation is running. Please wait until it ends.",
+        "confirmar_rem": "Remove {nome}?",
+        "rem_pedido": "The icon stays in the menu and in the radio programs folder: clicking it installs the program again.",
+        "rem_normal": "The launcher leaves the menu and the radio programs folder. You can install it again here.",
+        "rem_4ham": "The 4ham data and settings are kept in /var/lib/logbeamos/guardado.",
+        "rem_wine": "The program's own uninstaller is used, inside Wine. The user settings may stay.",
+        "rede": "An Internet connection is needed.",
+        "wine_inst": "The {nome} installer is downloaded from the official website.\n\n1. Click “Open the website” and download the full installer.\n2. Click “Choose the file” and point to the downloaded .exe file.\n\nLogBeamOS installs it into Wine without further questions.",
+        "b_site": "Open the website", "b_ficheiro": "Choose the file…", "b_cancelar": "Cancel",
+        "ficheiro_exe": "Point to the downloaded installer (.exe)",
+        "sem_resultados": "No program found.", "resultados": "{n} programs", "resultados1": "1 program",
+        "resultados_max": "The first {n} programs found",
+        "flatpak_ref": "Install the program of this Flatpak file?", "flatpak_repo": "Add the Flatpak source of this file?",
+        "fonte_junta": "Flatpak source added: {n}.",
+        "c_internet": "Internet", "c_som_video": "Sound and video", "c_graficos": "Graphics", "c_escritorio": "Office",
+        "c_jogos": "Games", "c_acessorios": "Accessories", "c_sistema": "System tools", "c_letras": "Fonts",
+        "c_ciencia": "Science and education", "c_programacao": "Programming", "c_flatpak": "Flatpak",
+        "c_instalados": "Installed programs",
+    },
+    "es": {
+        "titulo": "Gestor de Programas LogBeamOS", "radio": "Programas de Radioaficionado",
+        "radio_sub": "Los programas de radio de LogBeamOS. Los que aún no están instalados se instalan cuando se piden.",
+        "outras": "Otras categorías", "outros_radio": "Otros programas de radio", "procurar": "Buscar programas",
+        "a_carregar": "Cargando la lista de los demás programas… (la primera vez puede tardar unos minutos)",
+        "sem_lista": "La lista de los demás programas no está disponible: {e}",
+        "instalado": "Instalado", "por_instalar": "No instalado", "a_pedido": "Se instala cuando se pide",
+        "b_instalar": "Instalar", "b_remover": "Eliminar", "b_abrir": "Abrir", "b_tudo": "Instalar todo",
+        "d_tudo": "Instala los {n} programas bajo demanda que faltan (unos {t}). Sirve para preparar el USB en casa antes de salir sin red.",
+        "tudo_feito": "Todos los programas bajo demanda están instalados.",
+        "versao": "Versión", "origem": "Origen", "espaco": "Espacio", "site": "Sitio web", "livre": "Espacio libre: {t}",
+        "cerca": "unos {t}",
+        "o_apt": "Paquete del sistema", "o_github": "GitHub (versión publicada por el autor del programa)",
+        "o_deb": "Paquete del autor del programa", "o_pipx": "Python (pipx)", "o_wine": "Programa de Windows, mediante Wine",
+        "o_logbeamos": "Forma parte de LogBeamOS", "o_flatpak": "Flatpak ({r})",
+        "parte": "Forma parte de LogBeamOS y no se elimina.",
+        "a_instalar": "Instalando {nome}…", "a_remover": "Eliminando {nome}…", "a_preparar": "Preparando…",
+        "feito_inst": "{nome} quedó instalado.", "feito_rem": "{nome} fue eliminado.",
+        "erro": "No se pudo completar. Vea los detalles.", "recusado": "La operación no fue autorizada.",
+        "detalhes": "Detalles", "a_correr": "Hay una operación en curso. Espere hasta que termine.",
+        "confirmar_rem": "¿Eliminar {nome}?",
+        "rem_pedido": "El icono se queda en el menú y en la carpeta de los programas de radio: al pulsarlo, el programa se vuelve a instalar.",
+        "rem_normal": "El acceso directo sale del menú y de la carpeta de los programas de radio. Puede volver a instalarlo aquí.",
+        "rem_4ham": "Los datos y la configuración de 4ham se guardan en /var/lib/logbeamos/guardado.",
+        "rem_wine": "Se usa el desinstalador del propio programa, dentro de Wine. La configuración del usuario puede quedar.",
+        "rede": "Hace falta conexión a Internet.",
+        "wine_inst": "El instalador de {nome} se descarga del sitio web oficial.\n\n1. Pulse «Abrir el sitio web» y descargue el instalador completo.\n2. Pulse «Elegir el archivo» e indique el archivo .exe descargado.\n\nLogBeamOS lo instala en Wine sin más preguntas.",
+        "b_site": "Abrir el sitio web", "b_ficheiro": "Elegir el archivo…", "b_cancelar": "Cancelar",
+        "ficheiro_exe": "Indique el instalador descargado (.exe)",
+        "sem_resultados": "No se encontró ningún programa.", "resultados": "{n} programas", "resultados1": "1 programa",
+        "resultados_max": "Los primeros {n} programas encontrados",
+        "flatpak_ref": "¿Instalar el programa de este archivo Flatpak?", "flatpak_repo": "¿Añadir la fuente Flatpak de este archivo?",
+        "fonte_junta": "Fuente Flatpak añadida: {n}.",
+        "c_internet": "Internet", "c_som_video": "Sonido y vídeo", "c_graficos": "Gráficos", "c_escritorio": "Oficina",
+        "c_jogos": "Juegos", "c_acessorios": "Accesorios", "c_sistema": "Herramientas del sistema",
+        "c_letras": "Tipografías", "c_ciencia": "Ciencia y educación", "c_programacao": "Programación",
+        "c_flatpak": "Flatpak", "c_instalados": "Programas instalados",
+    },
+    "fr": {
+        "titulo": "Gestionnaire de logiciels LogBeamOS", "radio": "Logiciels Radioamateur",
+        "radio_sub": "Les logiciels radio de LogBeamOS. Ceux qui ne sont pas encore installés s'installent quand on les demande.",
+        "outras": "Autres catégories", "outros_radio": "Autres logiciels radio", "procurar": "Rechercher des logiciels",
+        "a_carregar": "Chargement de la liste des autres logiciels… (la première fois, cela peut prendre quelques minutes)",
+        "sem_lista": "La liste des autres logiciels n'est pas disponible : {e}",
+        "instalado": "Installé", "por_instalar": "Non installé", "a_pedido": "S'installe quand on le demande",
+        "b_instalar": "Installer", "b_remover": "Supprimer", "b_abrir": "Ouvrir", "b_tudo": "Tout installer",
+        "d_tudo": "Installe les {n} logiciels à la demande qui manquent (environ {t}). Utile pour préparer la clé USB à la maison avant une sortie sans réseau.",
+        "tudo_feito": "Tous les logiciels à la demande sont installés.",
+        "versao": "Version", "origem": "Source", "espaco": "Espace", "site": "Site web", "livre": "Espace libre : {t}",
+        "cerca": "environ {t}",
+        "o_apt": "Paquet du système", "o_github": "GitHub (version publiée par l'auteur du logiciel)",
+        "o_deb": "Paquet de l'auteur du logiciel", "o_pipx": "Python (pipx)", "o_wine": "Logiciel Windows, via Wine",
+        "o_logbeamos": "Fait partie de LogBeamOS", "o_flatpak": "Flatpak ({r})",
+        "parte": "Il fait partie de LogBeamOS et ne peut pas être supprimé.",
+        "a_instalar": "Installation de {nome}…", "a_remover": "Suppression de {nome}…", "a_preparar": "Préparation…",
+        "feito_inst": "{nome} est installé.", "feito_rem": "{nome} a été supprimé.",
+        "erro": "L'opération n'a pas abouti. Voir les détails.", "recusado": "L'opération n'a pas été autorisée.",
+        "detalhes": "Détails", "a_correr": "Une opération est en cours. Attendez qu'elle se termine.",
+        "confirmar_rem": "Supprimer {nome} ?",
+        "rem_pedido": "L'icône reste dans le menu et dans le dossier des logiciels radio : un clic dessus réinstalle le logiciel.",
+        "rem_normal": "Le lanceur quitte le menu et le dossier des logiciels radio. Vous pouvez le réinstaller ici.",
+        "rem_4ham": "Les données et les réglages de 4ham sont conservés dans /var/lib/logbeamos/guardado.",
+        "rem_wine": "Le désinstallateur du logiciel lui-même est utilisé, dans Wine. Les réglages de l'utilisateur peuvent rester.",
+        "rede": "Une connexion à Internet est nécessaire.",
+        "wine_inst": "L'installateur de {nome} se télécharge sur le site officiel.\n\n1. Cliquez sur « Ouvrir le site » et téléchargez l'installateur complet.\n2. Cliquez sur « Choisir le fichier » et indiquez le fichier .exe téléchargé.\n\nLogBeamOS l'installe dans Wine sans autre question.",
+        "b_site": "Ouvrir le site", "b_ficheiro": "Choisir le fichier…", "b_cancelar": "Annuler",
+        "ficheiro_exe": "Indiquez l'installateur téléchargé (.exe)",
+        "sem_resultados": "Aucun logiciel trouvé.", "resultados": "{n} logiciels", "resultados1": "1 logiciel",
+        "resultados_max": "Les {n} premiers logiciels trouvés",
+        "flatpak_ref": "Installer le logiciel de ce fichier Flatpak ?", "flatpak_repo": "Ajouter la source Flatpak de ce fichier ?",
+        "fonte_junta": "Source Flatpak ajoutée : {n}.",
+        "c_internet": "Internet", "c_som_video": "Son et vidéo", "c_graficos": "Graphisme", "c_escritorio": "Bureautique",
+        "c_jogos": "Jeux", "c_acessorios": "Accessoires", "c_sistema": "Outils système", "c_letras": "Polices",
+        "c_ciencia": "Science et éducation", "c_programacao": "Programmation", "c_flatpak": "Flatpak",
+        "c_instalados": "Logiciels installés",
+    },
+}
+LINGUA = cat.lingua()
+T = TXT.get(LINGUA, TXT["en"])
+
+# The categories of the other software, as the Linux Mint Software Manager 8.4 defines them (mintinstall.py): its
+# package lists and the Debian sections of the packages. (key, icon, lists, sections)
+GERAIS = [
+    ("internet", "mintinstall-web-symbolic", ["internet-web", "internet-email", "internet-chat", "internet-filesharing"],
+     ["web", "net", "mail"]),
+    ("som_video", "mintinstall-music-symbolic", ["sound-video"], ["sound", "video"]),
+    ("graficos", "mintinstall-drawing-symbolic", ["graphics", "graphics-3d", "graphics-drawing", "graphics-photography",
+                                                  "graphics-publishing", "graphics-scanning", "graphics-viewers"],
+     ["graphics"]),
+    ("escritorio", "mintinstall-office-symbolic", [], ["office", "editors"]),
+    ("jogos", "mintinstall-games-symbolic", ["games", "games-board", "games-fps", "games-rts", "games-tbs",
+                                             "games-emulators", "games-simulations"], ["games"]),
+    ("acessorios", "mintinstall-accessories-symbolic", [], ["accessories", "utils"]),
+    ("sistema", "mintinstall-system-symbolic", ["system-tools"], ["system", "admin"]),
+    ("letras", "mintinstall-fonts-symbolic", ["fonts"], ["fonts"]),
+    ("ciencia", "mintinstall-science-symbolic", ["education"], ["science", "math", "education", "electronics"]),
+    ("programacao", "mintinstall-programming-symbolic", ["development-essentials"], ["devel", "java", "php", "python"]),
+    ("flatpak", "mintinstall-package-flatpak-symbolic", None, None),
+    ("instalados", "mintinstall-all-symbolic", None, None),
+]
+MAX_RESULTADOS = 300
+
+
+def bytes_texto(n):
+    if not n or n < 0:
+        return ""
+    for lim, u in ((1000 ** 3, "GB"), (1000 ** 2, "MB"), (1000, "kB")):
+        if n >= lim:
+            t = f"{n / lim:.1f} {u}"
+            return t if LINGUA == "en" else t.replace(".", ",")
+    return f"{n} B"
+
+
+def simples(t):
+    """Lower case without accents, for the search."""
+    return "".join(c for c in unicodedata.normalize("NFD", (t or "").casefold()) if unicodedata.category(c) != "Mn")
+
+
+def livre():
+    st = os.statvfs("/")
+    return st.f_bavail * st.f_frsize
+
+
+def comando_ajudante(args):
+    if subprocess.run(["sudo", "-n", "true"], capture_output=True).returncode == 0:
+        return ["sudo", "-n", AJUDANTE, *args]
+    return ["pkexec", AJUDANTE, *args]
+
+
+def ler_lista(nome):
+    try:
+        with open(os.path.join(CATEGORIAS, nome + ".list"), encoding="utf-8") as f:
+            return [l.strip() for l in f if l.strip() and not l.startswith("#")]
+    except OSError:
+        return []
+
+
+def main():
+    import gi
+    gi.require_version("Gtk", "3.0")
+    gi.require_version("GdkPixbuf", "2.0")
+    from gi.repository import GdkPixbuf, GLib, Gtk, Pango
+
+    Gtk.IconTheme.get_default().append_search_path(ICONES_CATEGORIAS)
+
+    def imagem(fonte, tamanho):
+        """A Gtk.Image from a file or an icon name, at a fixed size."""
+        try:
+            if fonte and fonte.startswith("/") and os.path.exists(fonte):
+                return Gtk.Image.new_from_pixbuf(GdkPixbuf.Pixbuf.new_from_file_at_scale(fonte, tamanho, tamanho, True))
+            if fonte:
+                pb = Gtk.IconTheme.get_default().load_icon(fonte, tamanho, Gtk.IconLookupFlags.FORCE_SIZE)
+                return Gtk.Image.new_from_pixbuf(pb)
+        except Exception:
+            pass
+        return Gtk.Image.new_from_icon_name("application-x-executable", Gtk.IconSize.DIALOG)
+
+    def rotulo(texto, *, markup=False, classe=None, largura=None, xalign=0):
+        l = Gtk.Label(xalign=xalign)
+        l.set_line_wrap(True)
+        l.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+        (l.set_markup if markup else l.set_text)(texto)
+        if largura:
+            l.set_max_width_chars(largura)
+        if classe:
+            l.get_style_context().add_class(classe)
+        return l
+
+    class Gestor(Gtk.Window):
+        def __init__(self, inicio):
+            super().__init__(title=T["titulo"])
+            self.set_default_size(1040, 740)
+            if os.path.exists(ICONE):
+                self.set_icon_from_file(ICONE)
+            self.inst = None            # mintcommon.installer.Installer, once loaded
+            self.inst_erro = None
+            self.a_correr = False
+            self.historia = []
+            self.tarefa = None          # mintcommon task of the general program page open
+            self.connect("delete-event", self.ao_fechar)
+
+            cab = Gtk.HeaderBar(show_close_button=True, title=T["titulo"])
+            self.set_titlebar(cab)
+            self.b_voltar = Gtk.Button.new_from_icon_name("go-previous-symbolic", Gtk.IconSize.BUTTON)
+            self.b_voltar.connect("clicked", lambda *_: self.voltar())
+            b_inicio = Gtk.Button.new_from_icon_name("go-home-symbolic", Gtk.IconSize.BUTTON)
+            b_inicio.connect("clicked", lambda *_: self.mostra_inicio())
+            cab.pack_start(self.b_voltar)
+            cab.pack_start(b_inicio)
+            self.procura = Gtk.SearchEntry(placeholder_text=T["procurar"], width_chars=30)
+            self.procura.connect("search-changed", self.ao_procurar)
+            cab.pack_end(self.procura)
+
+            caixa = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            self.add(caixa)
+            self.pilha = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE)
+            caixa.pack_start(self.pilha, True, True, 0)
+
+            # The operation area (status, progress, details), at the bottom of every page
+            op = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin=10)
+            self.estado = Gtk.Label(xalign=0, ellipsize=Pango.EllipsizeMode.END)
+            self.barra = Gtk.ProgressBar()
+            self.detalhe = Gtk.Label(xalign=0, ellipsize=Pango.EllipsizeMode.END)
+            self.exp = Gtk.Expander(label=T["detalhes"])
+            self.registo = Gtk.TextView(editable=False, monospace=True, wrap_mode=Gtk.WrapMode.CHAR)
+            rr = Gtk.ScrolledWindow(min_content_height=120)
+            rr.add(self.registo)
+            self.exp.add(rr)
+            for w in (self.estado, self.barra, self.detalhe, self.exp):
+                op.pack_start(w, False, False, 0)
+            self.op = op
+            caixa.pack_end(op, False, False, 0)
+            caixa.pack_end(Gtk.Separator(), False, False, 0)
+
+            self.pagina_inicio()
+            self.show_all()
+            self.barra.hide()
+            self.detalhe.hide()
+            self.b_voltar.set_sensitive(False)
+            self.carrega_mint()
+            if inicio:
+                GLib.idle_add(inicio, self)
+
+        # --- Pages and navigation
+        def poe_pagina(self, nome, widget, historia=True):
+            antiga = self.pilha.get_child_by_name(nome)
+            if historia and self.pilha.get_visible_child_name():
+                self.historia.append(self.pilha.get_visible_child_name())
+            if antiga is not None and antiga is not widget:
+                self.pilha.remove(antiga)
+            if widget.get_parent() is None:
+                self.pilha.add_named(widget, nome)
+            widget.show_all()
+            self.pilha.set_visible_child_name(nome)
+            self.b_voltar.set_sensitive(bool(self.historia))
+            self.cancela_tarefa(nome)
+
+        def voltar(self):
+            while self.historia:
+                nome = self.historia.pop()
+                if self.pilha.get_child_by_name(nome) is not None:
+                    if nome == "inicio":
+                        self.actualiza_inicio()
+                    self.pilha.set_visible_child_name(nome)
+                    break
+            self.b_voltar.set_sensitive(bool(self.historia))
+            self.cancela_tarefa(self.pilha.get_visible_child_name())
+
+        def mostra_inicio(self):
+            self.historia = []
+            self.actualiza_inicio()
+            self.pilha.set_visible_child_name("inicio")
+            self.b_voltar.set_sensitive(False)
+            self.cancela_tarefa("inicio")
+
+        def cancela_tarefa(self, pagina):
+            if pagina != "programa" and self.tarefa is not None and not self.a_correr and self.inst is not None:
+                try:
+                    self.inst.cancel_task(self.tarefa)
+                except Exception:
+                    pass
+                self.tarefa = None
+
+        def rolavel(self, conteudo):
+            r = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
+            r.add(conteudo)
+            return r
+
+        # --- Home page: the amateur radio programs first, then the categories of the other software
+        def pagina_inicio(self):
+            v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, margin=18)
+            topo = Gtk.Box(spacing=14)
+            if os.path.exists(ICONE):
+                topo.pack_start(imagem(ICONE, 64), False, False, 0)
+            t = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            t.pack_start(rotulo(f"<span size='xx-large' weight='bold'>{GLib.markup_escape_text(T['radio'])}</span>",
+                                markup=True), False, False, 0)
+            t.pack_start(rotulo(T["radio_sub"]), False, False, 0)
+            topo.pack_start(t, True, True, 0)
+            tudo = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            self.b_tudo = Gtk.Button(label=T["b_tudo"])
+            self.b_tudo.get_style_context().add_class("suggested-action")
+            self.b_tudo.connect("clicked", lambda *_: self.instalar_tudo())
+            self.l_livre = Gtk.Label(xalign=1)
+            tudo.pack_start(self.b_tudo, False, False, 0)
+            tudo.pack_start(self.l_livre, False, False, 0)
+            topo.pack_end(tudo, False, False, 0)
+            v.pack_start(topo, False, False, 0)
+
+            subs = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=8, column_spacing=6,
+                               row_spacing=6, homogeneous=False)
+            for chave, nomes in cat.CATEGORIAS:
+                b = Gtk.Button(label=cat.texto(nomes))
+                b.connect("clicked", lambda _b, c=chave: self.mostra_radio(c))
+                subs.add(b)
+            b = Gtk.Button(label=T["outros_radio"])
+            b.connect("clicked", lambda *_: self.mostra_outros_radio())
+            self.b_outros_radio = b
+            subs.add(b)
+            v.pack_start(subs, False, False, 0)
+
+            self.grelha_radio = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=3,
+                                            min_children_per_line=2, column_spacing=10, row_spacing=10, homogeneous=True)
+            v.pack_start(self.grelha_radio, False, False, 0)
+
+            v.pack_start(Gtk.Separator(), False, False, 6)
+            v.pack_start(rotulo(f"<span size='x-large' weight='bold'>{GLib.markup_escape_text(T['outras'])}</span>",
+                                markup=True), False, False, 0)
+            self.l_mint = rotulo(T["a_carregar"])
+            v.pack_start(self.l_mint, False, False, 0)
+            self.grelha_cat = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=4,
+                                          min_children_per_line=2, column_spacing=10, row_spacing=10, homogeneous=True)
+            self.botoes_cat = []
+            for chave, icone, _, _ in GERAIS:
+                b = Gtk.Button()
+                h = Gtk.Box(spacing=10, margin=6)
+                h.pack_start(Gtk.Image.new_from_icon_name(icone, Gtk.IconSize.LARGE_TOOLBAR), False, False, 0)
+                h.pack_start(Gtk.Label(label=T["c_" + chave], xalign=0), True, True, 0)
+                b.add(h)
+                b.connect("clicked", lambda _b, c=chave: self.mostra_geral(c))
+                b.set_sensitive(False)
+                self.botoes_cat.append(b)
+                self.grelha_cat.add(b)
+            v.pack_start(self.grelha_cat, False, False, 0)
+            self.b_outros_radio.set_sensitive(False)
+            self.poe_pagina("inicio", self.rolavel(v), historia=False)
+            self.actualiza_inicio()
+
+        def cartao(self, nome, resumo, icone_w, estado, cor, accao):
+            b = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
+            h = Gtk.Box(spacing=12, margin=6)
+            h.pack_start(icone_w, False, False, 0)
+            t = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            t.pack_start(rotulo(f"<b>{GLib.markup_escape_text(nome)}</b>", markup=True), False, False, 0)
+            r = Gtk.Label(label=resumo, xalign=0, ellipsize=Pango.EllipsizeMode.END)
+            r.get_style_context().add_class("dim-label")
+            t.pack_start(r, False, False, 0)
+            if estado:
+                t.pack_start(rotulo(f"<span size='small' foreground='{cor}'>{GLib.markup_escape_text(estado)}</span>",
+                                    markup=True), False, False, 0)
+            h.pack_start(t, True, True, 0)
+            b.add(h)
+            b.connect("clicked", lambda *_: accao())
+            return b
+
+        def estado_radio(self, p, est):
+            if cat.instalado(p, est):
+                return T["instalado"], "#2ea043"
+            return (T["a_pedido"] if p["a_pedido"] else T["por_instalar"]), "#8b949e"
+
+        def actualiza_inicio(self):
+            for f in self.grelha_radio.get_children():
+                self.grelha_radio.remove(f)
+            est = cat.pacotes_estado(sorted({x for p in cat.PROGRAMAS for x in cat.pacotes_de(p)}))
+            for p in sorted(cat.PROGRAMAS, key=lambda p: p["nome"].casefold()):
+                e, cor = self.estado_radio(p, est)
+                self.grelha_radio.add(self.cartao(p["nome"], cat.texto(p["resumo"]), imagem(cat.icone(p), 48), e, cor,
+                                                  lambda p=p: self.mostra_programa(p["chave"])))
+            falta = cat.a_pedido_por_instalar()
+            mb = sum(cat.TAMANHOS_MB.get(k, 0) for k in falta)
+            self.b_tudo.set_sensitive(bool(falta) and not self.a_correr)
+            self.b_tudo.set_tooltip_text(T["d_tudo"].format(n=len(falta), t=bytes_texto(mb * 1000 ** 2)) if falta
+                                         else T["tudo_feito"])
+            self.l_livre.set_markup(f"<small>{GLib.markup_escape_text(T['livre'].format(t=bytes_texto(livre())))}</small>")
+            self.grelha_radio.show_all()
+
+        # --- Lists (a radio sub-category, a category of the other software, search results)
+        def pagina_lista(self, titulo, entradas, subtitulo=""):
+            """entradas: list of ("radio", program) or ("geral", pkginfo). Rows are added a few at a time, so that a
+            big category (thousands of packages) does not freeze the window."""
+            v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=18)
+            v.pack_start(rotulo(f"<span size='x-large' weight='bold'>{GLib.markup_escape_text(titulo)}</span>",
+                                markup=True), False, False, 0)
+            if subtitulo:
+                v.pack_start(rotulo(subtitulo, classe="dim-label"), False, False, 0)
+            lista = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE)
+            lista.get_style_context().add_class("frame")
+            v.pack_start(lista, False, False, 0)
+            if not entradas:
+                v.pack_start(rotulo(T["sem_resultados"]), False, False, 0)
+            est = cat.pacotes_estado(sorted({x for k, p in entradas if k == "radio" for x in cat.pacotes_de(p)}))
+            pendentes = list(entradas)
+
+            def mais():
+                if lista.get_toplevel() is not self:   # the page was replaced: stop
+                    return False
+                for _ in range(40):
+                    if not pendentes:
+                        return False
+                    k, p = pendentes.pop(0)
+                    if k == "radio":
+                        e, cor = self.estado_radio(p, est)
+                        w = self.cartao(p["nome"], cat.texto(p["resumo"]), imagem(cat.icone(p), 32), e, cor,
+                                        lambda p=p: self.mostra_programa(p["chave"]))
+                    else:
+                        instalado = self.inst.pkginfo_is_installed(p)
+                        e, cor = (T["instalado"], "#2ea043") if instalado else ("", "")
+                        icone = p.get_icon(32, None) if p.pkg_hash.startswith("a") else None
+                        w = self.cartao(p.get_display_name(), p.get_summary() or "", imagem(icone or p.name, 32), e, cor,
+                                        lambda p=p: self.mostra_geral_programa(p))
+                    lista.add(w)
+                    w.show_all()
+                return True
+            GLib.idle_add(mais)
+            return self.rolavel(v)
+
+        def mostra_radio(self, categoria):
+            nome = cat.texto(dict(cat.CATEGORIAS)[categoria])
+            entradas = [("radio", p) for p in sorted(cat.PROGRAMAS, key=lambda p: p["nome"].casefold())
+                        if p["categoria"] == categoria]
+            self.poe_pagina("lista", self.pagina_lista(nome, entradas, T["radio"]))
+
+        def mostra_outros_radio(self):
+            """The packages of the Debian "hamradio" section that are not in the LogBeamOS catalogue (the Mint Software
+            Manager has no category for them)."""
+            if self.inst is None:
+                return
+            nossos = {x for p in cat.PROGRAMAS for x in cat.pacotes_de(p)}
+            hashes = self.inst.cache.sections.get("hamradio", [])
+            pk = [self.inst.cache[h] for h in hashes if h in self.inst.cache]
+            pk = sorted((p for p in pk if p.name not in nossos), key=lambda p: p.get_display_name().casefold())
+            self.poe_pagina("lista", self.pagina_lista(T["outros_radio"], [("geral", p) for p in pk], T["radio"]))
+
+        def mostra_geral(self, chave):
+            if self.inst is None:
+                return
+            _, _, listas, seccoes = next(g for g in GERAIS if g[0] == chave)
+            c = self.inst.cache
+            if chave == "flatpak":
+                pk = list(c.get_subset_of_type("f").values())
+            elif chave == "instalados":
+                pk = [p for p in c.values() if self.inst.pkginfo_is_installed(p)]
+            else:
+                vistos = {}
+                for lista in listas:
+                    for nome in ler_lista(lista):
+                        if nome.startswith("flatpak:"):
+                            continue
+                        p = self.inst.find_pkginfo(nome, "a")
+                        if p is not None:
+                            vistos[p.pkg_hash] = p
+                for s in seccoes:
+                    for h in c.sections.get(s, []):
+                        if h in c:
+                            vistos[h] = c[h]
+                pk = list(vistos.values())
+            pk.sort(key=lambda p: p.get_display_name().casefold())
+            self.poe_pagina("lista", self.pagina_lista(T["c_" + chave], [("geral", p) for p in pk],
+                                                       T["resultados"].format(n=len(pk))))
+
+        def ao_procurar(self, entrada):
+            if getattr(self, "_procura_id", None):
+                GLib.source_remove(self._procura_id)
+            self._procura_id = GLib.timeout_add(350, self.procurar, entrada.get_text())
+
+        def procurar(self, texto):
+            self._procura_id = None
+            t = simples(texto.strip())
+            if len(t) < 2:
+                return False
+            entradas = []
+            for p in cat.PROGRAMAS:
+                alvos = [p["nome"], p["chave"]] + list(p["resumo"].values()) + [cat.texto(p["descricao"])]
+                if any(t in simples(a) for a in alvos):
+                    entradas.append(("radio", p))
+            if self.inst is not None:
+                nossos = {x for p in cat.PROGRAMAS for x in cat.pacotes_de(p)}
+                primeiros, outros = [], []
+                for p in self.inst.cache.values():
+                    if p.name in nossos:
+                        continue
+                    nome = simples(p.name) + " " + simples(p.get_display_name())
+                    if t in nome:
+                        primeiros.append(p)
+                    elif t in simples(p.get_summary() or "") or t in simples(" ".join(p.get_keywords() or [])
+                                                                              if not isinstance(p.get_keywords(), str)
+                                                                              else p.get_keywords()):
+                        outros.append(p)
+                    if len(primeiros) >= MAX_RESULTADOS:
+                        break
+                primeiros.sort(key=lambda p: (not simples(p.get_display_name()).startswith(t), len(p.name)))
+                entradas += [("geral", p) for p in (primeiros + outros)[:MAX_RESULTADOS]]
+            n = len(entradas)
+            sub = T["resultados_max"].format(n=n) if n >= MAX_RESULTADOS else \
+                (T["resultados1"] if n == 1 else T["resultados"].format(n=n))
+            self.poe_pagina("pesquisa", self.pagina_lista(f"“{texto.strip()}”", entradas, sub))
+            return False
+
+        # --- The page of one radio program
+        def mostra_programa(self, chave, instalar=False, historia=True):
+            p = cat.POR_CHAVE[chave]
+            est = cat.pacotes_estado(cat.pacotes_de(p))
+            inst = cat.instalado(p, est)
+            v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, margin=24)
+            topo = Gtk.Box(spacing=16)
+            topo.pack_start(imagem(cat.icone(p), 96), False, False, 0)
+            t = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+            t.pack_start(rotulo(f"<span size='xx-large' weight='bold'>{GLib.markup_escape_text(p['nome'])}</span>",
+                                markup=True), False, False, 0)
+            t.pack_start(rotulo(cat.texto(p["resumo"])), False, False, 0)
+            botoes = Gtk.Box(spacing=8)
+            if p["tipo"] == "logbeamos":
+                botoes.pack_start(rotulo(T["parte"], classe="dim-label"), False, False, 0)
+            elif inst:
+                b = Gtk.Button(label=T["b_remover"])
+                b.get_style_context().add_class("destructive-action")
+                b.connect("clicked", lambda *_: self.remover(p))
+                botoes.pack_start(b, False, False, 0)
+            else:
+                b = Gtk.Button(label=T["b_instalar"])
+                b.get_style_context().add_class("suggested-action")
+                b.connect("clicked", lambda *_: self.instalar(p))
+                botoes.pack_start(b, False, False, 0)
+            if inst:
+                b = Gtk.Button(label=T["b_abrir"])
+                b.connect("clicked", lambda *_: self.abrir(p))
+                botoes.pack_start(b, False, False, 0)
+            for b in botoes.get_children():
+                if isinstance(b, Gtk.Button):
+                    b.set_sensitive(not self.a_correr)
+            t.pack_start(botoes, False, False, 6)
+            topo.pack_start(t, True, True, 0)
+            v.pack_start(topo, False, False, 0)
+
+            g = Gtk.Grid(column_spacing=18, row_spacing=6)
+            origem = {"apt": T["o_apt"], "github": T["o_github"], "deb": T["o_deb"], "pipx": T["o_pipx"],
+                      "wine": T["o_wine"], "logbeamos": T["o_logbeamos"]}[p["tipo"]]
+            if p["tipo"] == "github" and cat._gh(p)[5] == "flatpak":
+                origem = T["o_flatpak"].format(r="GitHub")
+            linhas = [(T["versao"], cat.versao(p, est) if inst else ""), (T["origem"], origem)]
+            mb = cat.TAMANHOS_MB.get(chave)
+            if mb:
+                linhas.append((T["espaco"], T["cerca"].format(t=bytes_texto(mb * 1000 ** 2))))
+            for i, (a, b) in enumerate(linhas):
+                if not b:
+                    continue
+                g.attach(rotulo(f"<b>{GLib.markup_escape_text(a)}</b>", markup=True), 0, i, 1, 1)
+                g.attach(rotulo(b), 1, i, 1, 1)
+            site = Gtk.LinkButton(uri=p["site"], label=p["site"], xalign=0)
+            g.attach(rotulo(f"<b>{GLib.markup_escape_text(T['site'])}</b>", markup=True), 0, len(linhas), 1, 1)
+            g.attach(site, 1, len(linhas), 1, 1)
+            v.pack_start(g, False, False, 0)
+            v.pack_start(rotulo(cat.texto(p["descricao"]), largura=90), False, False, 6)
+            if not inst and p["tipo"] not in ("wine", "logbeamos"):
+                v.pack_start(rotulo(T["rede"] + " " + T["livre"].format(t=bytes_texto(livre())), classe="dim-label"),
+                             False, False, 0)
+            self.programa_aberto = chave
+            self.poe_pagina("programa", self.rolavel(v), historia=historia)
+            if instalar and not inst:
+                GLib.idle_add(self.instalar, p)
+
+        def abrir(self, p):
+            subprocess.Popen(shlex.split(p["comando"]), start_new_session=True,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        # --- Operations on radio programs: the LogBeamOS helper (root) or Wine (as the user)
+        def comeca(self, texto):
+            self.a_correr = True
+            self.estado.set_text(texto)
+            self.barra.set_fraction(0)
+            self.barra.show()
+            self.detalhe.set_text(T["a_preparar"])
+            self.detalhe.show()
+            self.parte = 0.0
+            self.com_progresso = False
+
+            def pulsa():
+                if not self.a_correr:
+                    return False
+                if not self.com_progresso:
+                    self.barra.pulse()
+                return True
+            GLib.timeout_add(150, pulsa)
+
+        def escreve(self, texto):
+            b = self.registo.get_buffer()
+            b.insert(b.get_end_iter(), texto + "\n")
+            self.registo.scroll_to_iter(b.get_end_iter(), 0, False, 0, 0)
+
+        def linha_ajudante(self, t, passos):
+            """The progress lines of the helper (the same as in "Update LogBeamOS")."""
+            if t.startswith("@passo "):
+                self.parte, self.com_progresso = 0.0, False
+                self.detalhe.set_text(T["a_preparar"])
+            elif t.startswith("@baixar "):
+                p = t.split(maxsplit=8)
+                if len(p) >= 9:
+                    pct, feito, total = float(p[1]), int(p[2]), int(p[3])
+                    texto = p[8] if p[8] != "-" else "…"
+                    if total > 0 and feito >= 0:
+                        texto += f" · {bytes_texto(feito)} / {bytes_texto(total)}"
+                    self.detalhe.set_text(texto)
+                    self.com_progresso = True
+                    self.barra.set_fraction(min(1.0, (self.feitos + 0.6 * pct / 100) / passos))
+            elif t.startswith("@instalar "):
+                p = t.split(maxsplit=2)
+                if len(p) >= 3:
+                    self.detalhe.set_text(p[2])
+                    self.com_progresso = True
+                    self.barra.set_fraction(min(1.0, (self.feitos + 0.6 + 0.4 * float(p[1]) / 100) / passos))
+            elif t.startswith("@ok ") or t.startswith("@erro "):
+                if t.startswith("@erro "):
+                    self.erros += 1
+                self.feitos += 1
+                self.barra.set_fraction(min(1.0, self.feitos / passos))
+                self.escreve(t[1:])
+            elif not t.startswith("@"):
+                self.escreve(t)
+
+        def corre_ajudante(self, args, texto, depois):
+            self.comeca(texto)
+            self.erros, self.feitos = 0, 0
+            passos = max(1, len(args))
+
+            def trabalho():
+                p = subprocess.Popen(comando_ajudante(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                for l in p.stdout:
+                    GLib.idle_add(self.linha_ajudante, l.rstrip(), passos)
+                codigo = p.wait()
+                GLib.idle_add(self.acaba, codigo, depois)
+            threading.Thread(target=trabalho, daemon=True).start()
+
+        def acaba(self, codigo, depois):
+            self.a_correr = False
+            self.barra.hide()
+            self.detalhe.hide()
+            if codigo in (126, 127):
+                msg = T["recusado"]
+            elif codigo or self.erros:
+                msg = T["erro"]
+                self.exp.set_expanded(True)
+            else:
+                msg = depois
+            self.estado.set_text(msg)
+            self.actualiza_inicio()
+            # The page of the program shows its new state (the same page: the history stays as it was)
+            if self.pilha.get_visible_child_name() == "programa" and getattr(self, "programa_aberto", None):
+                self.mostra_programa(self.programa_aberto, historia=False)
+
+        def instalar(self, p):
+            if self.a_correr:
+                return
+            self.programa_aberto = p["chave"]
+            if p["tipo"] == "wine":
+                return self.instalar_wine(p)
+            self.corre_ajudante([f"instalar={p['chave']}"], T["a_instalar"].format(nome=p["nome"]),
+                                T["feito_inst"].format(nome=p["nome"]))
+
+        def instalar_tudo(self):
+            falta = cat.a_pedido_por_instalar()
+            if not falta or self.a_correr:
+                return
+            self.programa_aberto = None
+            nomes = ", ".join(cat.POR_CHAVE[k]["nome"] for k in falta)
+            self.corre_ajudante([f"instalar={k}" for k in falta], T["a_instalar"].format(nome=nomes),
+                                T["feito_inst"].format(nome=nomes))
+
+        def confirma(self, titulo, texto):
+            d = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.QUESTION,
+                                  buttons=Gtk.ButtonsType.NONE, text=titulo)
+            d.format_secondary_text(texto)
+            d.add_buttons(T["b_cancelar"], Gtk.ResponseType.CANCEL, T["b_remover"], Gtk.ResponseType.OK)
+            d.get_widget_for_response(Gtk.ResponseType.OK).get_style_context().add_class("destructive-action")
+            r = d.run()
+            d.destroy()
+            return r == Gtk.ResponseType.OK
+
+        def remover(self, p):
+            if self.a_correr:
+                return
+            if p["tipo"] == "wine":
+                texto = T["rem_wine"]
+            elif p["chave"] == "4ham":
+                texto = T["rem_normal"] + " " + T["rem_4ham"]
+            else:
+                texto = T["rem_pedido"] if p["a_pedido"] else T["rem_normal"]
+            if not self.confirma(T["confirmar_rem"].format(nome=p["nome"]), texto):
+                return
+            self.programa_aberto = p["chave"]
+            if p["tipo"] == "wine":
+                return self.remover_wine(p)
+            self.corre_ajudante([f"remover={p['chave']}"], T["a_remover"].format(nome=p["nome"]),
+                                T["feito_rem"].format(nome=p["nome"]))
+
+        def wine(self, args, cwd, texto, depois):
+            """A Windows program run in the user's Wine prefix (wine-env.sh), waiting until Wine has finished."""
+            self.comeca(texto)
+            self.erros, self.feitos = 0, 0
+
+            def trabalho():
+                cmd = ". " + WINE_ENV + " && cd " + shlex.quote(cwd) + " && wine " + " ".join(shlex.quote(a) for a in args) + \
+                      " ; r=$?; wineserver -w; exit $r"
+                p = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                for l in p.stdout:
+                    GLib.idle_add(self.escreve, l.rstrip())
+                codigo = p.wait()
+                GLib.idle_add(self.acaba, codigo, depois)
+            threading.Thread(target=trabalho, daemon=True).start()
+
+        def remover_wine(self, p):
+            pasta, _, _, desinst = cat.WINE_PROGRAMAS[p["chave"]]
+            dir_ = os.path.join(cat.prefixo_wine(), "drive_c", "Program Files (x86)", pasta)
+            if desinst is None:   # WIRES-X: an MSI, removed by its product code in the Windows uninstall list
+                args = ["uninstaller", "--remove", cat.chave_desinstalar(p["chave"])]
+                dir_ = cat.prefixo_wine()
+            else:
+                args = desinst
+            self.wine(args, dir_, T["a_remover"].format(nome=p["nome"]), T["feito_rem"].format(nome=p["nome"]))
+
+        def instalar_wine(self, p):
+            if p["chave"] == "wiresx":   # the WIRES-X launcher asks for the Yaesu file and installs it
+                subprocess.Popen(["wires-x"], start_new_session=True)
+                return
+            site, opcoes = cat.WINE_INSTALADORES[p["chave"]]
+            d = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.INFO,
+                                  buttons=Gtk.ButtonsType.NONE, text=p["nome"])
+            d.format_secondary_text(T["wine_inst"].format(nome=p["nome"]))
+            d.add_buttons(T["b_cancelar"], Gtk.ResponseType.CANCEL, T["b_site"], 1, T["b_ficheiro"], 2)
+            while True:
+                r = d.run()
+                if r == 1:
+                    subprocess.Popen(["xdg-open", site], start_new_session=True)
+                    continue
+                break
+            d.destroy()
+            if r != 2:
+                return
+            fc = Gtk.FileChooserDialog(title=T["ficheiro_exe"], transient_for=self, action=Gtk.FileChooserAction.OPEN)
+            fc.add_buttons(T["b_cancelar"], Gtk.ResponseType.CANCEL, T["b_instalar"], Gtk.ResponseType.OK)
+            filtro = Gtk.FileFilter()
+            filtro.add_pattern("*.exe")
+            filtro.add_pattern("*.EXE")
+            fc.set_filter(filtro)
+            # the user's downloads folder, in the session language ("Transferências" in Portuguese, 1.0.0 test)
+            transf = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD)
+            fc.set_current_folder(transf if transf and os.path.isdir(transf) else os.path.expanduser("~"))
+            r = fc.run()
+            f = fc.get_filename()
+            fc.destroy()
+            if r != Gtk.ResponseType.OK or not f:
+                return
+            self.wine([f, *opcoes], os.path.dirname(f), T["a_instalar"].format(nome=p["nome"]),
+                      T["feito_inst"].format(nome=p["nome"]))
+
+        # --- The other software: the Linux Mint engine
+        def carrega_mint(self):
+            try:
+                from mintcommon.installer import installer
+                self.instalador = installer
+                self.inst = None
+                i = installer.Installer()
+                i.init(lambda: self.mint_pronto(i))
+            except Exception as e:
+                self.mint_falhou(e)
+
+        def mint_pronto(self, i):
+            self.inst = i
+            self.l_mint.hide()
+            for b in self.botoes_cat:
+                b.set_sensitive(True)
+            self.b_outros_radio.set_sensitive(True)
+            if getattr(self, "pendente_ficheiro", None):
+                self.abre_ficheiro_flatpak(self.pendente_ficheiro)
+            if getattr(self, "pendente_pacote", None):
+                # an apt package first (the Mint lookup needs the type for a name without "apt:"), then a flatpak
+                p = i.find_pkginfo(self.pendente_pacote, "a") or i.find_pkginfo(self.pendente_pacote, "f")
+                self.pendente_pacote = None
+                if p is not None:
+                    self.mostra_geral_programa(p)
+            return False
+
+        def mint_falhou(self, e):
+            self.inst_erro = e
+            self.l_mint.set_text(T["sem_lista"].format(e=e))
+
+        def mostra_geral_programa(self, p, historia=True):
+            i = self.inst
+            v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, margin=24)
+            topo = Gtk.Box(spacing=16)
+            icone = p.get_icon(96, i.get_appstream_pkg_for_pkginfo(p)) if not p.pkg_hash.startswith("a") else \
+                p.get_icon(96, None)
+            topo.pack_start(imagem(icone or p.name, 96), False, False, 0)
+            t = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+            t.pack_start(rotulo(f"<span size='xx-large' weight='bold'>{GLib.markup_escape_text(p.get_display_name())}</span>",
+                                markup=True), False, False, 0)
+            t.pack_start(rotulo(p.get_summary() or ""), False, False, 0)
+            self.g_botoes = Gtk.Box(spacing=8)
+            self.g_info = rotulo(T["a_preparar"], classe="dim-label")
+            self.g_botoes.pack_start(self.g_info, False, False, 0)
+            t.pack_start(self.g_botoes, False, False, 6)
+            topo.pack_start(t, True, True, 0)
+            v.pack_start(topo, False, False, 0)
+            g = Gtk.Grid(column_spacing=18, row_spacing=6)
+            remoto = p.remote if not p.pkg_hash.startswith("a") else ""
+            linhas = [(T["versao"], i.get_installed_version(p) or i.get_version(p) or ""),
+                      (T["origem"], T["o_flatpak"].format(r=remoto) if remoto else T["o_apt"])]
+            for n, (a, b) in enumerate(linhas):
+                g.attach(rotulo(f"<b>{GLib.markup_escape_text(a)}</b>", markup=True), 0, n, 1, 1)
+                g.attach(rotulo(b), 1, n, 1, 1)
+            url = i.get_homepage_url(p)
+            if url:
+                g.attach(rotulo(f"<b>{GLib.markup_escape_text(T['site'])}</b>", markup=True), 0, len(linhas), 1, 1)
+                g.attach(Gtk.LinkButton(uri=url, label=url, xalign=0), 1, len(linhas), 1, 1)
+            v.pack_start(g, False, False, 0)
+            try:
+                descricao = i.get_description(p) or ""
+            except Exception:
+                descricao = ""
+            v.pack_start(rotulo(descricao, largura=90), False, False, 6)
+            self.programa_aberto = None
+            self.geral_aberto = p
+            self.poe_pagina("programa", self.rolavel(v), historia=historia)
+            self.tarefa = None
+            # The engine works out whether it is an installation or a removal, and what it implies
+            i.select_pkginfo(p, self.geral_pronto, self.geral_erro, self.geral_fim, self.geral_progresso,
+                             use_mainloop=True, parent_window=self)
+
+        def geral_pronto(self, tarefa):
+            if self.geral_aberto is not tarefa.pkginfo:
+                return
+            self.tarefa = tarefa
+            for w in self.g_botoes.get_children():
+                self.g_botoes.remove(w)
+            if tarefa.info_ready_status == tarefa.STATUS_FORBIDDEN or self.protegido(tarefa):
+                self.g_botoes.pack_start(rotulo(T["parte"], classe="dim-label"), False, False, 0)
+            elif tarefa.info_ready_status != tarefa.STATUS_OK:
+                self.g_botoes.pack_start(rotulo(T["erro"], classe="dim-label"), False, False, 0)
+            else:
+                remover = tarefa.type == "remove"
+                rot = T["b_remover"] if remover else T["b_instalar"]
+                tam = tarefa.freed_size if remover else (tarefa.install_size or tarefa.download_size)
+                b = Gtk.Button(label=rot + (f" ({bytes_texto(tam)})" if tam else ""))
+                b.get_style_context().add_class("destructive-action" if remover else "suggested-action")
+                b.connect("clicked", lambda *_: self.geral_executa(tarefa))
+                b.set_sensitive(not self.a_correr)
+                self.g_botoes.pack_start(b, False, False, 0)
+            if tarefa.type == "remove":
+                cmd = self.comando_geral(tarefa.pkginfo)
+                if cmd:
+                    b = Gtk.Button(label=T["b_abrir"])
+                    b.connect("clicked", lambda *_: subprocess.Popen(cmd, start_new_session=True,
+                                                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+                    self.g_botoes.pack_start(b, False, False, 0)
+            self.g_botoes.show_all()
+
+        def comando_geral(self, p):
+            """How to open an installed program of the other software: its own menu launcher (apt), or flatpak run."""
+            if not p.pkg_hash.startswith("a"):
+                return ["flatpak", "run", p.name]
+            r = subprocess.run(["dpkg", "-L", p.name], capture_output=True, text=True)
+            for f in r.stdout.splitlines():
+                if f.startswith("/usr/share/applications/") and f.endswith(".desktop"):
+                    try:
+                        texto = open(f, encoding="utf-8", errors="replace").read()
+                    except OSError:
+                        continue
+                    if "\nNoDisplay=true" not in texto and "\nExec=" in texto:
+                        return ["gtk-launch", os.path.basename(f)[:-len(".desktop")]]
+            return None
+
+        def protegido(self, tarefa):
+            """An apt removal that would take LogBeamOS itself, the desktop or Wine is refused (the Mint engine only
+            refuses the packages of priority "required")."""
+            if tarefa.type != "remove" or not tarefa.pkginfo.pkg_hash.startswith("a"):
+                return False
+            r = subprocess.run(["apt-get", "-s", "-q", "remove", tarefa.pkginfo.name], capture_output=True, text=True,
+                               env=dict(os.environ, LC_ALL="C"))
+            sai = {l.split()[1] for l in r.stdout.splitlines() if l.startswith("Remv ")}
+            return bool(sai & {"logbeamos-ferramentas", "logbeamos-tqsl", "cinnamon", "cinnamon-core", "wine-stable",
+                               "mint-common", "packagekit", "flatpak", "lightdm", "network-manager"})
+
+        def geral_erro(self, tarefa):
+            self.escreve(str(getattr(tarefa, "error_message", "") or ""))
+            if self.geral_aberto is tarefa.pkginfo:
+                for w in self.g_botoes.get_children():
+                    self.g_botoes.remove(w)
+                self.g_botoes.pack_start(rotulo(T["erro"], classe="dim-label"), False, False, 0)
+                self.g_botoes.show_all()
+
+        def geral_executa(self, tarefa):
+            if self.a_correr:
+                return
+            nome = tarefa.pkginfo.get_display_name()
+            if tarefa.type == "remove" and not self.confirma(T["confirmar_rem"].format(nome=nome), ""):
+                return
+            if not self.inst.confirm_task(tarefa):
+                return
+            self.geral_texto = (T["feito_rem"] if tarefa.type == "remove" else T["feito_inst"]).format(nome=nome)
+            self.comeca((T["a_remover"] if tarefa.type == "remove" else T["a_instalar"]).format(nome=nome))
+            self.com_progresso = True
+            self.inst.execute_task(tarefa)
+
+        def geral_progresso(self, pkginfo, percent, estimating, status_text=None):
+            self.com_progresso = not estimating
+            if not estimating:
+                self.barra.set_fraction(max(0.0, min(1.0, percent / 100)))
+            if status_text:
+                self.detalhe.set_text(status_text)
+
+        def geral_fim(self, tarefa):
+            erro = getattr(tarefa, "error_message", None)
+            if erro:
+                self.escreve(str(erro))
+            self.erros = 1 if erro else 0
+            self.tarefa = None
+            self.acaba(1 if erro else 0, getattr(self, "geral_texto", ""))
+            if self.pilha.get_visible_child_name() == "programa" and self.geral_aberto is tarefa.pkginfo:
+                self.mostra_geral_programa(tarefa.pkginfo, historia=False)
+
+        # --- .flatpakref and .flatpakrepo files (opened from the file manager or the browser)
+        def abre_ficheiro_flatpak(self, caminho):
+            from gi.repository import Gio
+            if self.inst is None:
+                self.pendente_ficheiro = caminho
+                return
+            self.pendente_ficheiro = None
+            f = Gio.File.new_for_path(caminho)
+            if caminho.endswith(".flatpakrepo"):
+                d = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.QUESTION,
+                                      buttons=Gtk.ButtonsType.OK_CANCEL, text=T["flatpak_repo"])
+                d.format_secondary_text(os.path.basename(caminho))
+                r = d.run()
+                d.destroy()
+                if r == Gtk.ResponseType.OK:
+                    self.inst.add_remote_from_repo_file(
+                        f, lambda nome, erro=None: self.estado.set_text(T["fonte_junta"].format(n=nome) if nome else
+                                                                         T["erro"]))
+                return
+            self.inst.get_pkginfo_from_ref_file(f, lambda p, erro=None: p and self.mostra_geral_programa(p))
+
+        def ao_fechar(self, *_):
+            if self.a_correr:
+                self.estado.set_text(T["a_correr"])
+                return True
+            Gtk.main_quit()
+            return False
+
+    inicio = None
+    args = sys.argv[1:]
+    if len(args) >= 2 and args[0] in ("--programa", "--instalar") and args[1] in cat.POR_CHAVE:
+        chave, instalar = args[1], args[0] == "--instalar"
+        inicio = lambda j: j.mostra_programa(chave, instalar=instalar) and False  # noqa: E731
+    elif len(args) >= 2 and args[0] == "--pacote":
+        # the page of a program of the other software (apt package or flatpak id), once the Mint engine is loaded
+        nome = args[1]
+        inicio = lambda j: setattr(j, "pendente_pacote", nome) or (j.inst and j.mint_pronto(j.inst)) and False  # noqa: E731
+    elif args and (args[0].endswith(".flatpakref") or args[0].endswith(".flatpakrepo")):
+        caminho = os.path.abspath(args[0])
+        inicio = lambda j: j.abre_ficheiro_flatpak(caminho) and False  # noqa: E731
+    Gestor(inicio)
+    Gtk.main()
+
+
+if __name__ == "__main__":
+    if os.geteuid() == 0:
+        sys.exit("Abra o Gestor de Programas LogBeamOS como utilizador normal.")
+    main()

@@ -10,6 +10,9 @@
 #   pacotes=a,b    só estes pacotes do sistema (escolhidos na lista)
 #   flatpak        "flatpak update" of the system installation (qdmr keeps its own line, from GitHub)
 #   not1mm, wsjtx, … programas que não vêm por pacote
+#   instalar=KEY   install a program of the catalogue of the "LogBeamOS Programs" manager (lb_programas, 1.0.0)
+#   remover=KEY    remove one (its menu entries go with it, except the on-demand ones, which ask to install again)
+# The manager calls this helper through programas-raiz (its own polkit action, 1.0.0).
 # After "sistema" or "pacotes", on an installed system, the old kernels are removed: the one in use and the newest
 # stay (14/11/2026, when the Mint Update Manager left LogBeamOS).
 # At the end of every run the LogBeamOS identity (description, GRUB title, installer minimum) is applied again.
@@ -30,6 +33,7 @@ import time
 
 sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
 import lb_actualizar as lb  # noqa: E402
+import lb_programas as cat  # noqa: E402
 
 
 def diz(*partes):
@@ -268,15 +272,111 @@ def not1mm():
     return lb.versao_not1mm()
 
 
+# --- "LogBeamOS Programs" manager (1.0.0): install and remove the programs of the catalogue
+# Packages a removal may never take: LogBeamOS itself, the desktop, Wine (N1MM+ and Log4OM) and the manager's engine
+NUNCA_REMOVER = {"logbeamos-ferramentas", "logbeamos-tqsl", "cinnamon", "cinnamon-core", "nemo", "lightdm",
+                 "xserver-xorg-core", "wine-stable", "mint-common", "packagekit", "flatpak", "python3-gi", "apt", "dpkg",
+                 "sudo", "pkexec", "network-manager", "casper"}
+
+
+def quem_pediu():
+    """(uid, gid) of the user who asked (pkexec or sudo), for what is installed in their name (4ham)."""
+    import pwd
+    uid = int(os.environ.get("PKEXEC_UID") or os.environ.get("SUDO_UID") or 1000)
+    try:
+        return uid, pwd.getpwuid(uid).pw_gid
+    except KeyError:
+        return uid, uid
+
+
+def protege():
+    """The packages that programs outside apt use are marked as manually installed, so that the autoremove of a removal
+    never takes them (lb_programas.PROTEGIDOS)."""
+    instalados = list(cat.pacotes_estado(cat.PROTEGIDOS))
+    if instalados:
+        subprocess.run(["apt-mark", "manual", *instalados], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def instalar_programa(chave):
+    import tempfile
+    p = cat.POR_CHAVE[chave]
+    if p["tipo"] in ("wine", "logbeamos"):
+        raise RuntimeError(f"{chave}: not installed by this helper")
+    if cat.instalado(p):
+        cat.poe_lancadores(p, diz)
+        return cat.versao(p)
+    t = p["tipo"]
+    retidos = retem(fixos())
+    try:
+        if t == "apt":
+            apt_update()
+            corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "install", *p["pacotes"]], ENV)
+        elif t == "deb":
+            with tempfile.TemporaryDirectory(prefix="lb-programas-") as pasta:
+                f = cat.descarrega_deb(p, pasta, diz)
+                apt_update()
+                corre_apt(["apt-get", "-y", "-q", *OPC, *FONTES, "install", f], ENV)
+        elif t == "github":
+            item = {g[0]: g for g in lb.GITHUB}[p["github"]]
+            if item[5] == "fonte":
+                cat.instala_4ham_novo(diz, *quem_pediu())
+            else:
+                if item[5] == "deb":
+                    apt_update()   # the .deb may need packages newer than the lists the system has
+                lb.instala_github(item, diz)
+        elif t == "pipx":
+            cat.instala_not1mm(diz)
+    finally:
+        solta(retidos)
+    if not cat.instalado(p):
+        raise RuntimeError(f"{chave}: not installed")
+    cat.poe_lancadores(p, diz)
+    return cat.versao(p)
+
+
+def remover_programa(chave):
+    p = cat.POR_CHAVE[chave]
+    if p["tipo"] in ("wine", "logbeamos"):
+        raise RuntimeError(f"{chave}: not removed by this helper")
+    if not cat.instalado(p):
+        cat.tira_lancadores(p, diz)
+        return ""
+    pacotes = cat.pacotes_de(p)
+    if pacotes:
+        protege()
+        r = subprocess.run(["apt-get", "-s", "-q", "remove", "--autoremove", *pacotes], capture_output=True, text=True,
+                           env=ENV)
+        sai = [l.split()[1] for l in r.stdout.splitlines() if l.startswith("Remv ")]
+        proibidos = sorted(set(sai) & NUNCA_REMOVER)
+        if r.returncode or proibidos:
+            raise RuntimeError("refused: it would also remove " + (", ".join(proibidos) or r.stderr.strip()[-200:]))
+        diz("packages to remove: " + " ".join(sai))
+        retidos = retem(fixos())
+        try:
+            corre_apt(["apt-get", "-y", "-q", *OPC, "remove", "--autoremove", *pacotes], ENV)
+        finally:
+            solta(retidos)
+    elif p["tipo"] == "github":
+        cat.remove_github(p, diz)
+    elif p["tipo"] == "pipx":
+        cat.remove_not1mm(diz)
+    if cat.instalado(p):
+        raise RuntimeError(f"{chave}: still installed")
+    cat.tira_lancadores(p, diz)
+    return ""
+
+
 def purga_mintupdate():
     """The tools package (0.3.17 onwards) conflicts with the Mint Update Manager, so apt removes it, but only removes:
     its configuration files (autostart, sudoers, logrotate) stay until it is purged. Done at the start of every run
     of this helper; not inside the package scripts, where dpkg is busy."""
-    r = subprocess.run(["dpkg-query", "-W", "-f=${db:Status-Abbrev}", "mintupdate"], capture_output=True, text=True)
-    if r.stdout.startswith("rc"):
-        p = subprocess.run(["dpkg", "--purge", "mintupdate"], capture_output=True, text=True,
-                           env=dict(os.environ, LC_ALL="C"))
-        diz("Mint Update Manager: configuration files " + ("removed" if p.returncode == 0 else "not removed"))
+    # Since 1.0.0 also the Mint Software Manager (Conflicts: mintinstall; the LogBeamOS Software Manager replaces it)
+    for pacote, nome in (("mintupdate", "Mint Update Manager"), ("mintinstall", "Mint Software Manager")):
+        r = subprocess.run(["dpkg-query", "-W", "-f=${db:Status-Abbrev}", pacote], capture_output=True, text=True)
+        if r.stdout.startswith("rc"):
+            p = subprocess.run(["dpkg", "--purge", pacote], capture_output=True, text=True,
+                               env=dict(os.environ, LC_ALL="C"))
+            diz(f"{nome}: configuration files " + ("removed" if p.returncode == 0 else "not removed"))
 
 
 def identidade():
@@ -334,6 +434,8 @@ def main():
             pedidos.append((chave, lista(valor) if valor else None, a))
         elif chave == "pacotes" and valor:
             pedidos.append((chave, lista(valor), a))
+        elif chave in ("instalar", "remover") and valor in cat.POR_CHAVE:
+            pedidos.append((f"{chave}:{valor}", None, a))
     chaves = [c for c, _, _ in pedidos]
     antes = versao_ferramentas()
     for i, (c, pacotes, _) in enumerate(pedidos):
@@ -354,6 +456,10 @@ def main():
                 v = not1mm()
             elif c == "flatpak":
                 v = lb.actualiza_flatpak("--system", diz)
+            elif c.startswith("instalar:"):
+                v = instalar_programa(c.split(":", 1)[1])
+            elif c.startswith("remover:"):
+                v = remover_programa(c.split(":", 1)[1])
             else:
                 v = lb.instala_github(github[c], diz)
             diz(f"@ok {c} {v}")

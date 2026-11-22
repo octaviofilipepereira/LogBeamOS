@@ -24,16 +24,17 @@ Those programs belong to their authors and come from the usual places: the Ubunt
 
 The ISO image, its SHA-256 fingerprint and the instructions for writing the USB drive and installing alongside Windows are on the LogBeamOS page: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=en)**.
 
-- Current version: **LogBeamOS 0.9.0**, of 21/11/2026
-- SHA-256: `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
+- Current version: **LogBeamOS 1.0.0**, of 22/11/2026
+- SHA-256: `34b50e86fd4189ba3bb370e5338b2f02040e48cc01cf4d326e051d59c9d56e69`
 - What's new in each version: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=en)
-- To install on the disk: at least 50 GB free. The system takes about 20 GB once installed, because it already includes N1MM+ and Log4OM with everything they need to run on Linux; the rest is room for updates and for your logs. In the installer, drag the divider to give LogBeamOS at least 50 GB: it suggests less.
+- To install on the disk: at least 50 GB free. The system takes about 16 GB once installed, because it already includes N1MM+ and Log4OM with everything they need to run on Linux; the rest is room for updates and for your logs. In the installer, drag the divider to give LogBeamOS at least 50 GB: it suggests less.
 
 ### LogBeamOS Update
 
 | Tool | What it does |
 |---|---|
 | **Update LogBeamOS** | One window to update the amateur radio programs and the operating system. It shows the installed version, the available one and the download size, and updates only what is ticked, with the progress in MB, speed and time left. It covers the system packages, the programs published on GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr and others), Not1MM, and LogBeamOS Update itself. Ten minutes after login, a notice appears if there are updates. |
+| **LogBeamOS Software Manager** | Searches for, installs and removes programs, in place of the Linux Mint Software Manager: the amateur radio programs first, in groups, each with its page (description, version, source, space), and all the other software in categories, as in Linux Mint (apt and Flatpak). Some radio programs are installed on demand: their icon is there and asks to install them, and an "Install all" button gets the USB drive ready before going out without a network. The menu's "Uninstall" on a radio program opens its page; the LogBeamOS tools cannot be removed. Windows programs (N1MM+, Log4OM, WIRES-X) are removed and installed again here too. |
 | **Radio and Equipment** | Detects radios, CAT cables, sound cards and SDR receivers. It shares the radio among the programs through Hamlib's `rigctld`, with automatic speed detection, and configures WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ and Log4OM to use it; N1MM+ and Log4OM either share the radio or have it to themselves, as the user chooses. It keeps WaveLogGate on a port of its own, with its certificate trusted by Firefox. |
 | **LogBeamOS manual** | First steps, connecting the radio, which program for what, updating, installing alongside Windows and removing LogBeamOS. Its own window, in the language of the session. It can also be read here: [manual in English](docs/manual/manual-en.md), and on the website: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Diagnostic report** | Gathers in one text file what is needed to report a problem: versions, computer, USB and serial devices, the radio settings of each program, and the warnings and errors of the system. No passwords or keys; the user name, the computer name and the network addresses are taken out. In the menu, or `logbeamos-diagnostic` in a terminal. |
@@ -71,6 +72,8 @@ LogBeamOS Update was made for LogBeamOS. On another system, the parts that depen
 ### Amateur radio programs in LogBeamOS
 
 Each program belongs to its authors and keeps its own licence. LogBeamOS installs them unchanged.
+
+Since LogBeamOS 1.0.0, qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium, wfview and VoxDMR are installed on demand, by the LogBeamOS Software Manager, so that the image is smaller: their icons are there from the start.
 
 | Program | What for | Licence | Official page |
 |---|---|---|---|
@@ -152,10 +155,10 @@ Esses programas são dos respectivos autores e vêm dos sítios habituais: os re
 
 A imagem ISO, a impressão digital SHA-256 e as instruções para gravar a pen e instalar ao lado do Windows estão na página do LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/)**.
 
-- Versão actual: **LogBeamOS 0.9.0**, de 21/11/2026
-- SHA-256: `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
+- Versão actual: **LogBeamOS 1.0.0**, de 22/11/2026
+- SHA-256: `34b50e86fd4189ba3bb370e5338b2f02040e48cc01cf4d326e051d59c9d56e69`
 - Novidades de cada versão: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/)
-- Para instalar no disco: pelo menos 50 GB livres. O sistema ocupa cerca de 20 GB depois de instalado, porque já traz o N1MM+ e o Log4OM com tudo o que precisam para correr no Linux; o resto é o espaço para as actualizações e para os seus registos. No instalador, arraste a divisória para dar ao LogBeamOS pelo menos 50 GB: ele propõe menos.
+- Para instalar no disco: pelo menos 50 GB livres. O sistema ocupa cerca de 16 GB depois de instalado, porque já traz o N1MM+ e o Log4OM com tudo o que precisam para correr no Linux; o resto é o espaço para as actualizações e para os seus registos. No instalador, arraste a divisória para dar ao LogBeamOS pelo menos 50 GB: ele propõe menos.
 
 ### Capturas de ecrã
 
@@ -174,6 +177,7 @@ Carregue numa imagem para a ver em tamanho real.
 | Ferramenta | O que faz |
 |---|---|
 | **Actualizar LogBeamOS** | Uma janela para actualizar os programas de radioamador e o sistema operativo. Mostra a versão instalada, a disponível e o tamanho a descarregar, e actualiza só o que estiver marcado, com o progresso em MB, a velocidade e o tempo que falta. Abrange os pacotes do sistema, os programas publicados no GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr e outros), o Not1MM e o próprio LogBeamOS Update. Dez minutos depois de entrar na sessão, aparece um aviso se houver actualizações. |
+| **Gestor de Programas LogBeamOS** | Procura, instala e remove programas, no lugar do Gestor de Programas do Linux Mint: primeiro os programas de radioamador, por grupos, cada um com a sua página (descrição, versão, origem, espaço), e todo o outro software por categorias, como no Linux Mint (apt e Flatpak). Alguns programas de rádio instalam-se quando se pedem: o ícone está lá e pergunta se é para instalar, e o botão «Instalar tudo» prepara a pen antes de uma saída sem rede. O «Desinstalar» do menu num programa de rádio abre a página dele; as ferramentas do LogBeamOS não se removem. Os programas do Windows (N1MM+, Log4OM, WIRES-X) também se removem e voltam a instalar aqui. |
 | **Rádio e Equipamento** | Detecta rádios, cabos de CAT, placas de som e receptores SDR. Partilha o rádio entre os programas através do `rigctld` do Hamlib, com detecção automática da velocidade, e configura o WSJT-X, o JTDX, o Decodium, o Fldigi, o Not1MM, o Direwolf, o N1MM+ e o Log4OM para o usarem; o N1MM+ e o Log4OM partilham o rádio ou ficam com ele só para si, como o utilizador escolher. Mantém o WaveLogGate numa porta própria, com o certificado aceite pelo Firefox. |
 | **Manual do LogBeamOS** | Primeiros passos, ligar o rádio, que programa para quê, actualizar, instalar ao lado do Windows e retirar o LogBeamOS. Em janela própria, na língua da sessão. Também se pode ler aqui: [manual em português](docs/manual/manual-pt.md), e no site: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Relatório de diagnóstico** | Junta num ficheiro de texto o que é preciso para relatar um problema: versões, computador, aparelhos USB e série, a configuração do rádio em cada programa, e os avisos e erros do sistema. Sem passwords nem chaves; o nome do utilizador, o do computador e os endereços de rede são retirados. No menu, ou `logbeamos-diagnostico` num terminal. |
@@ -211,6 +215,8 @@ O LogBeamOS Update foi feito para o LogBeamOS. Noutro sistema, as partes que dep
 ### Programas de radioamador do LogBeamOS
 
 Cada programa é dos respectivos autores e mantém a sua própria licença. O LogBeamOS instala-os sem alterações.
+
+Desde o LogBeamOS 1.0.0, o qdmr, o SatDump, o Not1MM, o Gqrx, o GNU Radio, o GridTracker2, o Decodium, o wfview e o VoxDMR instalam-se quando se pedem, pelo Gestor de Programas LogBeamOS, para a imagem ser mais pequena: os ícones estão lá desde o início.
 
 | Programa | Para quê | Licença | Página oficial |
 |---|---|---|---|
@@ -292,16 +298,17 @@ Esos programas son de sus autores y vienen de los sitios habituales: los reposit
 
 La imagen ISO, su huella digital SHA-256 y las instrucciones para grabar la memoria USB e instalar junto a Windows están en la página de LogBeamOS: **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=es)**.
 
-- Versión actual: **LogBeamOS 0.9.0**, del 21/11/2026
-- SHA-256: `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
+- Versión actual: **LogBeamOS 1.0.0**, del 22/11/2026
+- SHA-256: `34b50e86fd4189ba3bb370e5338b2f02040e48cc01cf4d326e051d59c9d56e69`
 - Novedades de cada versión: [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=es)
-- Para instalar en el disco: al menos 50 GB libres. El sistema ocupa unos 20 GB una vez instalado, porque ya incluye N1MM+ y Log4OM con todo lo que necesitan para funcionar en Linux; el resto es el espacio para las actualizaciones y para sus registros. En el instalador, arrastre el divisor para dar a LogBeamOS al menos 50 GB: propone menos.
+- Para instalar en el disco: al menos 50 GB libres. El sistema ocupa unos 16 GB una vez instalado, porque ya incluye N1MM+ y Log4OM con todo lo que necesitan para funcionar en Linux; el resto es el espacio para las actualizaciones y para sus registros. En el instalador, arrastre el divisor para dar a LogBeamOS al menos 50 GB: propone menos.
 
 ### LogBeamOS Update
 
 | Herramienta | Qué hace |
 |---|---|
 | **Actualizar LogBeamOS** | Una ventana para actualizar los programas de radioaficionado y el sistema operativo. Muestra la versión instalada, la disponible y el tamaño a descargar, y actualiza solo lo que esté marcado, con el progreso en MB, la velocidad y el tiempo restante. Abarca los paquetes del sistema, los programas publicados en GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr y otros), Not1MM y el propio LogBeamOS Update. Diez minutos después de iniciar la sesión, aparece un aviso si hay actualizaciones. |
+| **Gestor de Programas LogBeamOS** | Busca, instala y elimina programas, en lugar del Gestor de Programas de Linux Mint: primero los programas de radioaficionado, por grupos, cada uno con su página (descripción, versión, origen, espacio), y todo el demás software por categorías, como en Linux Mint (apt y Flatpak). Algunos programas de radio se instalan cuando se piden: el icono está ahí y pregunta si instalarlo, y el botón «Instalar todo» prepara el USB antes de salir sin red. «Desinstalar» del menú en un programa de radio abre su página; las herramientas de LogBeamOS no se eliminan. Los programas de Windows (N1MM+, Log4OM, WIRES-X) también se eliminan y se vuelven a instalar aquí. |
 | **Radio y Equipo** | Detecta radios, cables CAT, tarjetas de sonido y receptores SDR. Comparte la radio entre los programas a través de `rigctld` de Hamlib, con detección automática de la velocidad, y configura WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ y Log4OM para que la usen; N1MM+ y Log4OM comparten la radio o la usan solos, como elija el usuario. Mantiene WaveLogGate en un puerto propio, con su certificado aceptado por Firefox. |
 | **Manual de LogBeamOS** | Primeros pasos, conectar la radio, qué programa para qué, actualizar, instalar junto a Windows y quitar LogBeamOS. En su propia ventana, en el idioma de la sesión. También se puede leer aquí: [manual en español](docs/manual/manual-es.md), y en el sitio web: [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Informe de diagnóstico** | Reúne en un archivo de texto lo necesario para informar de un problema: versiones, ordenador, dispositivos USB y serie, la configuración de la radio en cada programa, y los avisos y errores del sistema. Sin contraseñas ni claves; se eliminan el nombre del usuario, el del ordenador y las direcciones de red. En el menú, o `logbeamos-diagnostico` en un terminal. |
@@ -339,6 +346,8 @@ LogBeamOS Update se hizo para LogBeamOS. En otro sistema, las partes que depende
 ### Programas de radioaficionado de LogBeamOS
 
 Cada programa es de sus autores y mantiene su propia licencia. LogBeamOS los instala sin cambios.
+
+Desde LogBeamOS 1.0.0, qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium, wfview y VoxDMR se instalan cuando se piden, con el Gestor de Programas LogBeamOS, para que la imagen sea más pequeña: sus iconos están ahí desde el principio.
 
 | Programa | Para qué | Licencia | Página oficial |
 |---|---|---|---|
@@ -420,16 +429,17 @@ Ces logiciels appartiennent à leurs auteurs et viennent des sources habituelles
 
 L'image ISO, son empreinte SHA-256 et les instructions pour préparer la clé USB et installer à côté de Windows sont sur la page de LogBeamOS : **[logbeam.org/logbeamos](https://logbeam.org/logbeamos/?hl=fr)**.
 
-- Version actuelle : **LogBeamOS 0.9.0**, du 21/11/2026
-- SHA-256 : `41ce331d993b895bb5117e38f94041b4d6689650d69eddae2675648245313da7`
+- Version actuelle : **LogBeamOS 1.0.0**, du 22/11/2026
+- SHA-256 : `34b50e86fd4189ba3bb370e5338b2f02040e48cc01cf4d326e051d59c9d56e69`
 - Nouveautés de chaque version : [logbeam.org/logbeamos/novidades](https://logbeam.org/logbeamos/novidades/?hl=fr)
-- Pour installer sur le disque : au moins 50 Go libres. Le système occupe environ 20 Go une fois installé, car il inclut déjà N1MM+ et Log4OM avec tout ce qu'il leur faut pour fonctionner sous Linux ; le reste sert aux mises à jour et à vos journaux. Dans l'installateur, faites glisser le séparateur pour donner au moins 50 Go à LogBeamOS : il en propose moins.
+- Pour installer sur le disque : au moins 50 Go libres. Le système occupe environ 16 Go une fois installé, car il inclut déjà N1MM+ et Log4OM avec tout ce qu'il leur faut pour fonctionner sous Linux ; le reste sert aux mises à jour et à vos journaux. Dans l'installateur, faites glisser le séparateur pour donner au moins 50 Go à LogBeamOS : il en propose moins.
 
 ### LogBeamOS Update
 
 | Outil | Ce qu'il fait |
 |---|---|
 | **Mettre à jour LogBeamOS** | Une fenêtre pour mettre à jour les logiciels de radioamateur et le système d'exploitation. Elle affiche la version installée, la version disponible et la taille à télécharger, et ne met à jour que ce qui est coché, avec la progression en Mo, la vitesse et le temps restant. Elle couvre les paquets du système, les logiciels publiés sur GitHub (WSJT-X, JS8Call, wfview, SatDump, SDR++, Decodium, qdmr et d'autres), Not1MM et LogBeamOS Update lui-même. Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour. |
+| **Gestionnaire de logiciels LogBeamOS** | Recherche, installe et supprime des logiciels, à la place du Gestionnaire de logiciels de Linux Mint : d'abord les logiciels radioamateur, par groupes, chacun avec sa page (description, version, source, espace), puis tous les autres logiciels par catégories, comme dans Linux Mint (apt et Flatpak). Certains logiciels radio s'installent à la demande : leur icône est là et propose de les installer, et le bouton « Tout installer » prépare la clé USB avant une sortie sans réseau. « Désinstaller » dans le menu, sur un logiciel radio, ouvre sa page ; les outils de LogBeamOS ne peuvent pas être supprimés. Les logiciels Windows (N1MM+, Log4OM, WIRES-X) se suppriment et se réinstallent aussi ici. |
 | **Radio et Matériel** | Détecte les radios, les câbles CAT, les cartes son et les récepteurs SDR. Partage la radio entre les logiciels via `rigctld` de Hamlib, avec détection automatique de la vitesse, et configure WSJT-X, JTDX, Decodium, Fldigi, Not1MM, Direwolf, N1MM+ et Log4OM pour l'utiliser ; N1MM+ et Log4OM partagent la radio ou l'utilisent seuls, au choix de l'utilisateur. Il garde WaveLogGate sur un port à lui, avec son certificat accepté par Firefox. |
 | **Manuel de LogBeamOS** | Premiers pas, brancher la radio, quel logiciel pour quoi, mettre à jour, installer à côté de Windows et retirer LogBeamOS. Dans sa propre fenêtre, dans la langue de la session. Il peut aussi être lu ici : [manuel en français](docs/manual/manual-fr.md), et sur le site : [logbeam.org/logbeamos/manual](https://logbeam.org/logbeamos/manual/). |
 | **Rapport de diagnostic** | Rassemble dans un fichier texte ce qu'il faut pour signaler un problème : versions, ordinateur, périphériques USB et série, le réglage de la radio dans chaque logiciel, et les avertissements et erreurs du système. Ni mots de passe ni clés ; le nom de l'utilisateur, celui de l'ordinateur et les adresses réseau en sont retirés. Dans le menu, ou `logbeamos-diagnostic` dans un terminal. |
@@ -467,6 +477,8 @@ LogBeamOS Update a été fait pour LogBeamOS. Sur un autre système, les parties
 ### Logiciels de radioamateur de LogBeamOS
 
 Chaque logiciel appartient à ses auteurs et garde sa propre licence. LogBeamOS les installe sans modification.
+
+Depuis LogBeamOS 1.0.0, qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium, wfview et VoxDMR s'installent à la demande, par le Gestionnaire de logiciels LogBeamOS, pour que l'image soit plus petite : leurs icônes sont là dès le départ.
 
 | Logiciel | Pour quoi | Licence | Page officielle |
 |---|---|---|---|

@@ -8,23 +8,24 @@
 
 *Distribuição Linux para radioamadores*
 
-Este é o manual que acompanha o LogBeamOS (LogBeamOS Update 0.9.0-1).
+Este é o manual que acompanha o LogBeamOS (LogBeamOS Update 1.0.0).
 
 **Português** · [English](manual-en.md) · [Español](manual-es.md) · [Français](manual-fr.md)
 
 - [1. Primeiros passos](#1-primeiros-passos)
 - [2. Ligar o rádio](#2-ligar-o-rádio)
 - [3. Que programa para quê](#3-que-programa-para-quê)
-- [4. Actualizar](#4-actualizar)
-- [5. Ao lado do Windows](#5-instalar-ao-lado-do-windows)
-- [6. Problemas comuns](#6-problemas-comuns)
-- [7. Relatar um problema](#7-relatar-um-problema)
+- [4. Instalar e remover programas](#4-instalar-e-remover-programas)
+- [5. Actualizar](#5-actualizar)
+- [6. Ao lado do Windows](#6-instalar-ao-lado-do-windows)
+- [7. Problemas comuns](#7-problemas-comuns)
+- [8. Relatar um problema](#8-relatar-um-problema)
 
 ## 1. Primeiros passos
 
 - O LogBeamOS arranca da pen sem instalar nada no computador. No primeiro arranque é perguntado se quer um utilizador e uma password próprios; sem eles, a sessão abre sozinha.
 - O que fizer na pen (definições, registos, ficheiros) fica guardado nela e continua lá no arranque seguinte.
-- No ambiente de trabalho: a pasta **Programas Radioamador** (todos os programas), **Rádio e Equipamento**, **Actualizar LogBeamOS**, **LogBeam Uplink** e este manual. Os programas estão também no menu, no grupo *Rádio Amador*.
+- No ambiente de trabalho: a pasta **Programas Radioamador** (todos os programas), **Rádio e Equipamento**, **Actualizar LogBeamOS**, **Gestor de Programas LogBeamOS**, **LogBeam Uplink** e este manual. Os programas estão também no menu, no grupo *Rádio Amador*.
 - Para desligar: menu → botão vermelho. Não retire a pen com o LogBeamOS ligado.
 
 ## 2. Ligar o rádio
@@ -54,15 +55,29 @@ Este é o manual que acompanha o LogBeamOS (LogBeamOS Update 0.9.0-1).
 | Voz digital e imagem | FreeDV · SSTV: QSSTV |
 | Rádios Icom e Kenwood à distância | wfview |
 | Programação de rádios DMR | qdmr |
-| DMR sem rádio (BrandMeister) | VoxDMR (opcional: instala-se pelo *Actualizar LogBeamOS*; pede o ID DMR e a password de hotspot do BrandMeister) |
+| DMR sem rádio (BrandMeister) | VoxDMR (opcional: instala-se pelo *Gestor de Programas LogBeamOS*; pede o ID DMR e a password de hotspot do BrandMeister) |
 | EchoLink | Qtel (o router tem de deixar passar as portas UDP 5198–5199 e TCP 5200, ou use um proxy EchoLink) |
 | WIRES-X (Yaesu) | WIRES-X, através do Wine. Não vem com o LogBeamOS: descarregue-o no site WIRES-X da Yaesu (é preciso entrar com o seu ID), abra o *WIRES-X* e indique o ficheiro .zip descarregado. Depois é indicada a porta COM da HRI-200 ou do rádio (modo PDN), para escolher no ecrã *COM port setting* do WIRES-X. |
 | Simulação de antenas | xnec2c |
 | Análise de espectro e análises académicas do espectro radioeléctrico | 4ham Spectrum Analysis |
 
+> O qdmr, o SatDump, o Not1MM, o Gqrx, o GNU Radio, o GridTracker2, o Decodium e o wfview instalam-se quando se pedem: o ícone está lá e, na primeira vez, é perguntado se quer instalar o programa (é preciso ligação à Internet). Ver [4. Instalar e remover programas](#4-instalar-e-remover-programas).
+
 > No Xastir, antes de transmitir: indique o seu indicativo (o Xastir pergunta-o na primeira vez), mude o *MYCALL* no ficheiro `direwolf.conf` da pasta pessoal e ligue a transmissão em *Interfaces*. Por omissão, o Xastir só recebe.
 
-## 4. Actualizar
+## 4. Instalar e remover programas
+
+- O **Gestor de Programas LogBeamOS** procura, instala e remove programas. Substitui o Gestor de Programas do Linux Mint: serve para os programas de rádio e para todo o outro software.
+- Na página de entrada estão os **Programas Radioamador**, por grupos (modos digitais, logs e concursos, SDR, satélites, APRS e Winlink, voz digital, rádio e utilitários), cada um com o seu estado. Em *Outros programas de rádio* estão os restantes programas de rádio do Ubuntu.
+- Mais abaixo estão as outras categorias, como no Linux Mint: Internet, som e vídeo, gráficos, escritório, jogos, Flatpak, programas instalados, e outras. A procura, no topo, encontra qualquer programa pelo nome ou pela descrição.
+- Cada programa tem a sua página, com a descrição, a versão, a origem, o espaço que ocupa e os botões *Instalar*, *Remover* e *Abrir*.
+- **Programas a pedido:** o qdmr, o SatDump, o Not1MM, o Gqrx, o GNU Radio, o GridTracker2, o Decodium e o wfview não vêm instalados, para a imagem ser mais pequena, mas o ícone está no menu e na pasta **Programas Radioamador**. Ao carregar nele, é perguntado se quer instalá-lo. O botão *Instalar tudo* instala-os todos de uma vez: serve para preparar a pen em casa, antes de uma saída sem rede.
+- Ao remover um programa de rádio, o atalho sai do menu e da pasta (os programas a pedido mantêm o ícone). No 4ham, os dados e as definições ficam guardados em `/var/lib/logbeamos/guardado`.
+- O N1MM+, o Log4OM e o WIRES-X (programas do Windows, através do Wine) também se removem aqui. Para os instalar de novo, o instalador descarrega-se do site oficial e o Gestor instala-o no Wine.
+- No menu, *Desinstalar* num programa de rádio abre o Gestor na página desse programa. As ferramentas do LogBeamOS (Actualizar, Rádio e Equipamento, este manual, TQSL) fazem parte do sistema e não se removem.
+- Na pen, um programa instalado ocupa a parte da pen reservada aos dados; removê-lo depois não liberta o espaço dos programas que vinham na imagem.
+
+## 5. Actualizar
 
 - O **Actualizar LogBeamOS** mostra os programas de rádio e o sistema operativo, com a versão instalada, a disponível e o tamanho a descarregar.
 - O **LogBeamOS Update** (este Actualizar, o **Rádio e Equipamento** e este manual) e o **LogBeam Uplink** também se actualizam aqui. Vêm do repositório do LogBeamOS em logbeam.org, que é assinado. A versão do LogBeamOS e a do LogBeamOS Update aparecem no topo da janela.
@@ -74,7 +89,7 @@ Este é o manual que acompanha o LogBeamOS (LogBeamOS Update 0.9.0-1).
 - Na pen não é pedida password; no LogBeamOS instalado, é pedida a do utilizador.
 - Dez minutos depois de entrar na sessão, se houver actualizações, aparece um aviso.
 
-## 5. Instalar ao lado do Windows
+## 6. Instalar ao lado do Windows
 
 ### Antes, no Windows
 
@@ -96,7 +111,7 @@ Este é o manual que acompanha o LogBeamOS (LogBeamOS Update 0.9.0-1).
    - se existir `S:\EFI\Boot\fbx64.efi`, o instalador trocou o arranque de recurso do disco: `copy /Y S:\EFI\Microsoft\Boot\bootmgfw.efi S:\EFI\Boot\bootx64.efi` e `del S:\EFI\Boot\fbx64.efi S:\EFI\Boot\mmx64.efi`;
    - no fim, `mountvol S: /D`.
 
-## 6. Problemas comuns
+## 7. Problemas comuns
 
 **A pen não arranca: "Unable to find a medium containing a live file system"**  
 Retire a pen, espere 5 segundos, volte a ligá-la e arranque de novo.
@@ -128,7 +143,7 @@ No Rádio e Equipamento → *Configurar os programas…*, escolha o som do rádi
 **O Direwolf fecha-se logo**  
 A janela fica aberta com a explicação. A configuração está no ficheiro `direwolf.conf` da pasta pessoal.
 
-## 7. Relatar um problema
+## 8. Relatar um problema
 
 Quando alguma coisa falhar, um relato com estes três passos chega para se perceber o que aconteceu.
 

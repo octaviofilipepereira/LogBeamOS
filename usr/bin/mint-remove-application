@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+# Code & Powered by: Octávio Filipe Pereira Gonçalves / CT7BFV
+# © 2026 Octávio Filipe Pereira Gonçalves — Todos os direitos reservados
+# Licença GPL v3 (https://www.gnu.org/licenses/gpl-3.0.pt-br.html | https://www.gnu.org/licenses/gpl-3.0.html.en)
+# LogBeamOS: the "Uninstall" of the Cinnamon menu (1.0.0). Installed as /usr/bin/mint-remove-application while the
+# LogBeamOS Update package is installed (dpkg-divert: the Linux Mint one stays as /usr/bin/mint-remove-application.mint;
+# /usr/bin/cinnamon-remove-application, which the menu calls, is a link to this path). One argument: the menu launcher
+# (.desktop path, sometimes without ".desktop").
+# Until 1.0.0 "Uninstall" on a LogBeamOS tool or on WIRES-X offered to remove the whole LogBeamOS Update package, and on
+# the radio programs (launchers of LogBeamOS, owned by no package) it only removed the menu entry.
+# - a program of the LogBeamOS catalogue: the "LogBeamOS Programs" manager opens on its page;
+# - a LogBeamOS tool, or anything whose removal would take LogBeamOS itself with it: a notice, nothing is removed;
+# - anything else: the Linux Mint one, as before.
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, "/usr/local/lib/logbeamos/actualizar")
+import lb_programas as cat  # noqa: E402
+
+MINT = "/usr/bin/mint-remove-application.mint"
+PROTEGIDOS = {"logbeamos-ferramentas", "logbeamos-tqsl", "cinnamon", "cinnamon-core", "wine-stable", "mint-common"}
+TXT = {
+    "pt": ("Faz parte do LogBeamOS", "{nome} faz parte do LogBeamOS e não se remove."),
+    "en": ("Part of LogBeamOS", "{nome} is part of LogBeamOS and cannot be removed."),
+    "es": ("Forma parte de LogBeamOS", "{nome} forma parte de LogBeamOS y no se elimina."),
+    "fr": ("Fait partie de LogBeamOS", "{nome} fait partie de LogBeamOS et ne peut pas être supprimé."),
+}
+
+
+def nome_do_atalho(caminho):
+    """The name of the launcher in the session language (Name[pt]=…), or its plain Name= (1.0.0 test: the notice said
+    "Update LogBeamOS" in a Portuguese session)."""
+    nomes = {}
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as f:
+            for l in f:
+                if l.startswith("[") and nomes:
+                    break   # only the [Desktop Entry] group, not the actions
+                if l.startswith("Name"):
+                    chave, _, valor = l.partition("=")
+                    nomes[chave.strip()] = valor.strip()
+    except OSError:
+        pass
+    return nomes.get(f"Name[{cat.lingua()}]") or nomes.get("Name") or os.path.basename(caminho)
+
+
+def aviso(caminho):
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk
+    titulo, texto = TXT.get(cat.lingua(), TXT["en"])
+    d = Gtk.MessageDialog(message_type=Gtk.MessageType.INFO, buttons=Gtk.ButtonsType.OK, text=titulo)
+    d.format_secondary_text(texto.format(nome=nome_do_atalho(caminho)))
+    d.run()
+    d.destroy()
+
+
+def levaria_o_logbeamos(caminho):
+    """Would removing the package that owns this launcher take LogBeamOS (or the desktop, or Wine) with it?"""
+    r = subprocess.run(["dpkg", "-S", caminho], capture_output=True, text=True)
+    if r.returncode:
+        return False
+    pacotes = [p.strip() for p in r.stdout.split(":", 1)[0].split(",") if p.strip()]
+    if set(pacotes) & PROTEGIDOS:
+        return True
+    s = subprocess.run(["apt-get", "-s", "-q", "remove", *pacotes], capture_output=True, text=True,
+                       env=dict(os.environ, LC_ALL="C"))
+    return any(l.startswith("Remv ") and l.split()[1] in PROTEGIDOS for l in s.stdout.splitlines())
+
+
+def main():
+    if len(sys.argv) < 2:
+        os.execv(MINT, [MINT, *sys.argv[1:]])
+    caminho = sys.argv[1]
+    if not os.path.exists(caminho) and os.path.exists(caminho + ".desktop"):
+        caminho += ".desktop"
+    p = cat.por_lancador(caminho)
+    if p is not None and p["tipo"] != "logbeamos":
+        os.execvp("logbeamos-programas", ["logbeamos-programas", "--programa", p["chave"]])
+    if p is not None or os.path.basename(caminho).startswith("logbeamos-") or levaria_o_logbeamos(caminho):
+        aviso(caminho)
+        return
+    os.execv(MINT, [MINT, *sys.argv[1:]])
+
+
+if __name__ == "__main__":
+    main()

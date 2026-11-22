@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=WavelogGate
+Comment=Amateur radio gateway to Wavelog
+Comment[pt]=Envia os QSOs e a frequência do rádio para o Wavelog
+Comment[es]=Envía los QSO y la frecuencia de la radio a Wavelog
+Comment[fr]=Envoie les QSO et la fréquence de la radio à Wavelog
+Exec=/usr/local/bin/wavelog-gate
+Icon=wavelog-gate
+Type=Application
+Categories=HamRadio;

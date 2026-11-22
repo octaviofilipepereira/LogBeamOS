@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Not1MM
+Exec=logbeamos-abrir not1mm %U
+Icon=/usr/share/logbeamos/programas/not1mm.png
+Comment=Contest logger
+Comment[pt]=Logger de concursos
+Comment[es]=Registro de concursos
+Comment[fr]=Logger de concours
+Terminal=false
+Categories=HamRadio;

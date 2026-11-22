@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=KLog
+GenericName=Amateur radio logging program
+Comment=The free ham radio logging multiplatform program
+Exec=/usr/bin/klog
+Icon=klog
+Terminal=false
+Type=Application
+Categories=HamRadio;
+Keywords=Hamradio;Logger;Ham;Amateur;Log;

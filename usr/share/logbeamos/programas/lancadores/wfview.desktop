@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=wfview
+Exec=logbeamos-abrir wfview %U
+Icon=/usr/share/logbeamos/programas/wfview.png
+Comment=Control of Icom and Kenwood radios
+Comment[pt]=Controlo de rádios Icom e Kenwood
+Comment[es]=Control de radios Icom y Kenwood
+Comment[fr]=Contrôle des radios Icom et Kenwood
+Terminal=false
+Categories=HamRadio;

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GNU Radio Companion
+Comment=Graphical tool for creating signal flow graphs and generating flow-graph source code with the GNU Radio framework
+Exec=logbeamos-abrir gnuradio %U
+Categories=HamRadio;
+Keywords=SDR;Radio;HAM;RF;
+MimeType=application/gnuradio-grc;
+Icon=/usr/share/logbeamos/programas/gnuradio.png
+StartupWMClass=gnuradio-companion

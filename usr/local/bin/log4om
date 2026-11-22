@@ -9,7 +9,9 @@
 . /usr/local/lib/logbeamos/wine-env.sh
 . /usr/local/lib/logbeamos/equipamento/radio-wine.sh
 radio_antes log4om
-cd "$WINEPREFIX/drive_c/Program Files (x86)/IW3HMH/Log4OM NextGen" || { radio_depois; exit 1; }
+# Removed through the "LogBeamOS Programs" manager (1.0.0): the manager opens on its page, to install it again
+cd "$WINEPREFIX/drive_c/Program Files (x86)/IW3HMH/Log4OM NextGen" 2>/dev/null && [ -f L4ONG.exe ] || {
+  radio_depois; exec logbeamos-programas --programa log4om; }
 wine L4ONG.exe "$@"
 r=$?
 radio_depois

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=GridTracker2
+Exec=logbeamos-abrir gridtracker2 %U
+Terminal=false
+Type=Application
+Icon=/usr/share/logbeamos/programas/gridtracker2.png
+StartupWMClass=GridTracker2
+Comment=GridTracker2
+Categories=HamRadio;

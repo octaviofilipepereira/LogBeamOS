@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=VoxDMR
+Exec=logbeamos-abrir voxdmr %U
+Icon=/usr/share/logbeamos/programas/voxdmr.png
+Comment=DMR talkgroups on BrandMeister without a radio (installed by Update LogBeamOS)
+Comment[pt]=Grupos DMR do BrandMeister sem rádio (instala-se pelo Actualizar LogBeamOS)
+Comment[es]=Grupos DMR de BrandMeister sin radio (se instala con Actualizar LogBeamOS)
+Comment[fr]=Groupes DMR de BrandMeister sans radio (s'installe par Mettre à jour LogBeamOS)
+Terminal=false
+Categories=HamRadio;

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Pat (Winlink)
+Exec=pat-web
+Icon=/usr/share/logbeamos/logbeam.png
+Comment=Winlink e-mail over radio
+Comment[pt]=Correio Winlink por rádio
+Comment[es]=Correo Winlink por radio
+Comment[fr]=Courrier Winlink par radio
+Terminal=false
+Categories=HamRadio;

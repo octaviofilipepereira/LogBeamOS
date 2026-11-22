@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Decodium
+Exec=logbeamos-abrir decodium %U
+Icon=/usr/share/logbeamos/programas/decodium.png
+Comment=FT8, FT4, FT2 and other weak-signal modes
+Comment[pt]=FT8, FT4, FT2 e outros modos de sinal fraco
+Comment[es]=FT8, FT4, FT2 y otros modos de señal débil
+Comment[fr]=FT8, FT4, FT2 et autres modes à signal faible
+Terminal=false
+Categories=HamRadio;

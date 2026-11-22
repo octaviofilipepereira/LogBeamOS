@@ -8,23 +8,24 @@
 
 *Distribution Linux pour radioamateurs*
 
-C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 0.9.0-1).
+C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 1.0.0).
 
 [Português](manual-pt.md) · [English](manual-en.md) · [Español](manual-es.md) · **Français**
 
 - [1. Premiers pas](#1-premiers-pas)
 - [2. Brancher la radio](#2-brancher-la-radio)
 - [3. Quel logiciel pour quoi](#3-quel-logiciel-pour-quoi)
-- [4. Mettre à jour](#4-mettre-à-jour)
-- [5. À côté de Windows](#5-installer-à-côté-de-windows)
-- [6. Problèmes courants](#6-problèmes-courants)
-- [7. Signaler un problème](#7-signaler-un-problème)
+- [4. Installer et supprimer des logiciels](#4-installer-et-supprimer-des-logiciels)
+- [5. Mettre à jour](#5-mettre-à-jour)
+- [6. À côté de Windows](#6-installer-à-côté-de-windows)
+- [7. Problèmes courants](#7-problèmes-courants)
+- [8. Signaler un problème](#8-signaler-un-problème)
 
 ## 1. Premiers pas
 
 - LogBeamOS démarre sur la clé USB sans rien installer sur l'ordinateur. Au premier démarrage, il est demandé si vous voulez votre propre utilisateur et mot de passe ; sans eux, la session s'ouvre toute seule.
 - Ce que vous faites sur la clé (réglages, journaux, fichiers) y reste enregistré et s'y retrouve au démarrage suivant.
-- Sur le bureau : le dossier **Logiciels Radioamateur** (tous les logiciels), **Radio et Matériel**, **Mettre à jour LogBeamOS**, **LogBeam Uplink** et ce manuel. Les logiciels sont aussi dans le menu, dans le groupe *Radio amateur*.
+- Sur le bureau : le dossier **Logiciels Radioamateur** (tous les logiciels), **Radio et Matériel**, **Mettre à jour LogBeamOS**, **Gestionnaire de logiciels LogBeamOS**, **LogBeam Uplink** et ce manuel. Les logiciels sont aussi dans le menu, dans le groupe *Radio amateur*.
 - Pour éteindre : menu → bouton rouge. Ne retirez pas la clé pendant que LogBeamOS fonctionne.
 
 ## 2. Brancher la radio
@@ -54,15 +55,29 @@ C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 0.9.0-1).
 | Voix numérique et images | FreeDV · SSTV : QSSTV |
 | Radios Icom et Kenwood à distance | wfview |
 | Programmation des radios DMR | qdmr |
-| DMR sans radio (BrandMeister) | VoxDMR (facultatif : s'installe par *Mettre à jour LogBeamOS* ; demande votre ID DMR et le mot de passe hotspot BrandMeister) |
+| DMR sans radio (BrandMeister) | VoxDMR (facultatif : s'installe par le *Gestionnaire de logiciels LogBeamOS* ; demande votre ID DMR et le mot de passe hotspot BrandMeister) |
 | EchoLink | Qtel (le routeur doit laisser passer les ports UDP 5198–5199 et TCP 5200, ou utilisez un proxy EchoLink) |
 | WIRES-X (Yaesu) | WIRES-X, via Wine. Il n'est pas fourni avec LogBeamOS : téléchargez-le sur le site WIRES-X de Yaesu (une connexion avec votre ID est nécessaire), ouvrez *WIRES-X* et indiquez le fichier .zip téléchargé. Le port COM de la HRI-200 ou de la radio (mode PDN) est ensuite indiqué, à choisir dans l'écran *COM port setting* de WIRES-X. |
 | Simulation d'antennes | xnec2c |
 | Analyse de spectre et analyses académiques du spectre radioélectrique | 4ham Spectrum Analysis |
 
+> qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium et wfview s'installent quand on les demande : l'icône est là et, la première fois, il est demandé si vous voulez installer le logiciel (une connexion à Internet est nécessaire). Voir [4. Installer et supprimer des logiciels](#4-installer-et-supprimer-des-logiciels).
+
 > Dans Xastir, avant d'émettre : indiquez votre indicatif (Xastir le demande la première fois), changez *MYCALL* dans le fichier `direwolf.conf` de votre dossier personnel et activez l'émission dans *Interfaces*. Par défaut, Xastir ne fait que recevoir.
 
-## 4. Mettre à jour
+## 4. Installer et supprimer des logiciels
+
+- Le **Gestionnaire de logiciels LogBeamOS** recherche, installe et supprime des logiciels. Il remplace le Gestionnaire de logiciels de Linux Mint : il sert pour les logiciels radio et pour tous les autres.
+- La page d'accueil présente les **Logiciels Radioamateur**, par groupes (modes numériques, carnets de trafic et concours, SDR, satellites, APRS et Winlink, voix numérique, radio et utilitaires), chacun avec son état. *Autres logiciels radio* regroupe les autres logiciels radio d'Ubuntu.
+- Plus bas se trouvent les autres catégories, comme dans Linux Mint : Internet, son et vidéo, graphisme, bureautique, jeux, Flatpak, logiciels installés et d'autres. La recherche, en haut, trouve n'importe quel logiciel par son nom ou sa description.
+- Chaque logiciel a sa page, avec la description, la version, la source, l'espace occupé et les boutons *Installer*, *Supprimer* et *Ouvrir*.
+- **Logiciels à la demande :** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium et wfview ne sont pas installés, pour que l'image soit plus petite, mais leur icône est dans le menu et dans le dossier **Logiciels Radioamateur**. Un clic dessus demande s'il faut l'installer. Le bouton *Tout installer* les installe tous d'un coup : utile pour préparer la clé USB à la maison, avant une sortie sans réseau.
+- Quand un logiciel radio est supprimé, son lanceur quitte le menu et le dossier (les logiciels à la demande gardent leur icône). Pour 4ham, les données et les réglages sont conservés dans `/var/lib/logbeamos/guardado`.
+- N1MM+, Log4OM et WIRES-X (logiciels Windows, via Wine) se suppriment aussi ici. Pour les réinstaller, l'installateur se télécharge sur le site officiel et le gestionnaire l'installe dans Wine.
+- Dans le menu, *Désinstaller* sur un logiciel radio ouvre le gestionnaire sur la page de ce logiciel. Les outils de LogBeamOS (Mettre à jour, Radio et Matériel, ce manuel, TQSL) font partie du système et ne peuvent pas être supprimés.
+- Sur la clé USB, un logiciel installé occupe la partie de la clé réservée aux données ; le supprimer ensuite ne libère pas l'espace des logiciels qui venaient dans l'image.
+
+## 5. Mettre à jour
 
 - **Mettre à jour LogBeamOS** affiche les logiciels radio et le système d'exploitation, avec la version installée, la version disponible et la taille à télécharger.
 - **LogBeamOS Update** (cet outil de mise à jour, **Radio et Matériel** et ce manuel) et **LogBeam Uplink** se mettent aussi à jour ici. Ils viennent du dépôt de LogBeamOS sur logbeam.org, qui est signé. La version de LogBeamOS et celle de LogBeamOS Update sont affichées en haut de la fenêtre.
@@ -74,7 +89,7 @@ C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 0.9.0-1).
 - Sur la clé USB, aucun mot de passe n'est demandé ; sur LogBeamOS installé, celui de l'utilisateur est demandé.
 - Dix minutes après l'ouverture de la session, un avis apparaît s'il y a des mises à jour.
 
-## 5. Installer à côté de Windows
+## 6. Installer à côté de Windows
 
 ### D'abord, dans Windows
 
@@ -96,7 +111,7 @@ C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 0.9.0-1).
    - si `S:\EFI\Boot\fbx64.efi` existe, l'installateur a remplacé le démarrage de secours du disque : `copy /Y S:\EFI\Microsoft\Boot\bootmgfw.efi S:\EFI\Boot\bootx64.efi` et `del S:\EFI\Boot\fbx64.efi S:\EFI\Boot\mmx64.efi` ;
    - pour finir, `mountvol S: /D`.
 
-## 6. Problèmes courants
+## 7. Problèmes courants
 
 **La clé USB ne démarre pas : « Unable to find a medium containing a live file system »**  
 Retirez la clé, attendez 5 secondes, rebranchez-la et redémarrez.
@@ -128,7 +143,7 @@ Dans Radio et Matériel → *Configurer les logiciels…*, choisissez le son de 
 **Direwolf se ferme tout de suite**  
 La fenêtre reste ouverte avec l'explication. Les réglages sont dans le fichier `direwolf.conf` de votre dossier personnel.
 
-## 7. Signaler un problème
+## 8. Signaler un problème
 
 Quand quelque chose ne fonctionne pas, un signalement fait avec ces trois étapes suffit pour comprendre ce qui s'est passé.
 

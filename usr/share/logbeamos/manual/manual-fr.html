@@ -22,10 +22,11 @@
   <a href="#inicio">1. Premiers pas</a>
   <a href="#radio">2. Brancher la radio</a>
   <a href="#programas">3. Quel logiciel pour quoi</a>
-  <a href="#actualizar">4. Mettre à jour</a>
-  <a href="#windows">5. À côté de Windows</a>
-  <a href="#problemas">6. Problèmes courants</a>
-  <a href="#relatar">7. Signaler un problème</a>
+  <a href="#gestor">4. Installer et supprimer des logiciels</a>
+  <a href="#actualizar">5. Mettre à jour</a>
+  <a href="#windows">6. À côté de Windows</a>
+  <a href="#problemas">7. Problèmes courants</a>
+  <a href="#relatar">8. Signaler un problème</a>
 </nav>
 
 <section id="inicio">
@@ -33,7 +34,7 @@
 <ul>
   <li>LogBeamOS démarre sur la clé USB sans rien installer sur l'ordinateur. Au premier démarrage, il est demandé si vous voulez votre propre utilisateur et mot de passe ; sans eux, la session s'ouvre toute seule.</li>
   <li>Ce que vous faites sur la clé (réglages, journaux, fichiers) y reste enregistré et s'y retrouve au démarrage suivant.</li>
-  <li>Sur le bureau : le dossier <strong>Logiciels Radioamateur</strong> (tous les logiciels), <strong>Radio et Matériel</strong>, <strong>Mettre à jour LogBeamOS</strong>, <strong>LogBeam Uplink</strong> et ce manuel. Les logiciels sont aussi dans le menu, dans le groupe <em>Radio amateur</em>.</li>
+  <li>Sur le bureau : le dossier <strong>Logiciels Radioamateur</strong> (tous les logiciels), <strong>Radio et Matériel</strong>, <strong>Mettre à jour LogBeamOS</strong>, <strong>Gestionnaire de logiciels LogBeamOS</strong>, <strong>LogBeam Uplink</strong> et ce manuel. Les logiciels sont aussi dans le menu, dans le groupe <em>Radio amateur</em>.</li>
   <li>Pour éteindre : menu → bouton rouge. Ne retirez pas la clé pendant que LogBeamOS fonctionne.</li>
 </ul>
 <p><a class="botao" href="logbeamos:programas">Ouvrir les Logiciels Radioamateur</a></p>
@@ -69,18 +70,35 @@
   <tr><td>Voix numérique et images</td><td>FreeDV · SSTV : QSSTV</td></tr>
   <tr><td>Radios Icom et Kenwood à distance</td><td>wfview</td></tr>
   <tr><td>Programmation des radios DMR</td><td>qdmr</td></tr>
-  <tr><td>DMR sans radio (BrandMeister)</td><td>VoxDMR (facultatif : s'installe par <a href="logbeamos:actualizar">Mettre à jour LogBeamOS</a> ; demande votre ID DMR et le mot de passe hotspot BrandMeister)</td></tr>
+  <tr><td>DMR sans radio (BrandMeister)</td><td>VoxDMR (facultatif : s'installe par le <a href="logbeamos:gestor">Gestionnaire de logiciels LogBeamOS</a> ; demande votre ID DMR et le mot de passe hotspot BrandMeister)</td></tr>
   <tr><td>EchoLink</td><td>Qtel (le routeur doit laisser passer les ports UDP 5198–5199 et TCP 5200, ou utilisez un proxy EchoLink)</td></tr>
   <tr><td>WIRES-X (Yaesu)</td><td>WIRES-X, via Wine. Il n'est pas fourni avec LogBeamOS : téléchargez-le sur le site WIRES-X de Yaesu (une connexion avec votre ID est nécessaire), ouvrez <em>WIRES-X</em> et indiquez le fichier .zip téléchargé. Le port COM de la HRI-200 ou de la radio (mode PDN) est ensuite indiqué, à choisir dans l'écran <em>COM port setting</em> de WIRES-X.</td></tr>
   <tr><td>Simulation d'antennes</td><td>xnec2c</td></tr>
   <tr><td>Analyse de spectre et analyses académiques du spectre radioélectrique</td><td>4ham Spectrum Analysis</td></tr>
 </table>
+<p class="nota">qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium et wfview s'installent quand on les demande : l'icône est là et, la première fois, il est demandé si vous voulez installer le logiciel (une connexion à Internet est nécessaire). Voir <a href="#gestor">4. Installer et supprimer des logiciels</a>.</p>
 <p class="nota">Dans Xastir, avant d'émettre : indiquez votre indicatif (Xastir le demande la première fois), changez <em>MYCALL</em> dans le fichier <code>direwolf.conf</code> de votre dossier personnel et activez l'émission dans <em>Interfaces</em>. Par défaut, Xastir ne fait que recevoir.</p>
 <p><a class="botao" href="logbeamos:xastir">Ouvrir Xastir (APRS)</a> <a class="botao" href="logbeamos:programas">Ouvrir les Logiciels Radioamateur</a></p>
 </section>
 
+<section id="gestor">
+<h2>4. Installer et supprimer des logiciels</h2>
+<ul>
+  <li>Le <strong>Gestionnaire de logiciels LogBeamOS</strong> recherche, installe et supprime des logiciels. Il remplace le Gestionnaire de logiciels de Linux Mint : il sert pour les logiciels radio et pour tous les autres.</li>
+  <li>La page d'accueil présente les <strong>Logiciels Radioamateur</strong>, par groupes (modes numériques, carnets de trafic et concours, SDR, satellites, APRS et Winlink, voix numérique, radio et utilitaires), chacun avec son état. <em>Autres logiciels radio</em> regroupe les autres logiciels radio d'Ubuntu.</li>
+  <li>Plus bas se trouvent les autres catégories, comme dans Linux Mint : Internet, son et vidéo, graphisme, bureautique, jeux, Flatpak, logiciels installés et d'autres. La recherche, en haut, trouve n'importe quel logiciel par son nom ou sa description.</li>
+  <li>Chaque logiciel a sa page, avec la description, la version, la source, l'espace occupé et les boutons <em>Installer</em>, <em>Supprimer</em> et <em>Ouvrir</em>.</li>
+  <li><strong>Logiciels à la demande :</strong> qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium et wfview ne sont pas installés, pour que l'image soit plus petite, mais leur icône est dans le menu et dans le dossier <strong>Logiciels Radioamateur</strong>. Un clic dessus demande s'il faut l'installer. Le bouton <em>Tout installer</em> les installe tous d'un coup : utile pour préparer la clé USB à la maison, avant une sortie sans réseau.</li>
+  <li>Quand un logiciel radio est supprimé, son lanceur quitte le menu et le dossier (les logiciels à la demande gardent leur icône). Pour 4ham, les données et les réglages sont conservés dans <code>/var/lib/logbeamos/guardado</code>.</li>
+  <li>N1MM+, Log4OM et WIRES-X (logiciels Windows, via Wine) se suppriment aussi ici. Pour les réinstaller, l'installateur se télécharge sur le site officiel et le gestionnaire l'installe dans Wine.</li>
+  <li>Dans le menu, <em>Désinstaller</em> sur un logiciel radio ouvre le gestionnaire sur la page de ce logiciel. Les outils de LogBeamOS (Mettre à jour, Radio et Matériel, ce manuel, TQSL) font partie du système et ne peuvent pas être supprimés.</li>
+  <li>Sur la clé USB, un logiciel installé occupe la partie de la clé réservée aux données ; le supprimer ensuite ne libère pas l'espace des logiciels qui venaient dans l'image.</li>
+</ul>
+<p><a class="botao" href="logbeamos:gestor">Ouvrir le Gestionnaire de logiciels LogBeamOS</a></p>
+</section>
+
 <section id="actualizar">
-<h2>4. Mettre à jour</h2>
+<h2>5. Mettre à jour</h2>
 <ul>
   <li><strong>Mettre à jour LogBeamOS</strong> affiche les logiciels radio et le système d'exploitation, avec la version installée, la version disponible et la taille à télécharger.</li>
   <li><strong>LogBeamOS Update</strong> (cet outil de mise à jour, <strong>Radio et Matériel</strong> et ce manuel) et <strong>LogBeam Uplink</strong> se mettent aussi à jour ici. Ils viennent du dépôt de LogBeamOS sur logbeam.org, qui est signé. La version de LogBeamOS et celle de LogBeamOS Update sont affichées en haut de la fenêtre.</li>
@@ -96,7 +114,7 @@
 </section>
 
 <section id="windows">
-<h2>5. Installer à côté de Windows</h2>
+<h2>6. Installer à côté de Windows</h2>
 <h3>D'abord, dans Windows</h3>
 <ol>
   <li><strong>Sauvegardez vos données.</strong></li>
@@ -122,7 +140,7 @@
 </section>
 
 <section id="problemas">
-<h2>6. Problèmes courants</h2>
+<h2>7. Problèmes courants</h2>
 <dl>
   <dt>La clé USB ne démarre pas : « Unable to find a medium containing a live file system »</dt>
   <dd>Retirez la clé, attendez 5 secondes, rebranchez-la et redémarrez.</dd>
@@ -149,7 +167,7 @@
 </section>
 
 <section id="relatar">
-<h2>7. Signaler un problème</h2>
+<h2>8. Signaler un problème</h2>
 <p>Quand quelque chose ne fonctionne pas, un signalement fait avec ces trois étapes suffit pour comprendre ce qui s'est passé.</p>
 <ol>
   <li><strong>Notez ce qui s'est passé :</strong> ce que vous faisiez, ce que vous attendiez et ce qui est apparu. S'il y a un message d'erreur, copiez son texte ou photographiez l'écran (touche <em>Impr écran</em>).</li>

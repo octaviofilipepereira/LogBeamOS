@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=LogBeamOS Software Manager
+Name[pt]=Gestor de Programas LogBeamOS
+Name[es]=Gestor de Programas LogBeamOS
+Name[fr]=Gestionnaire de logiciels LogBeamOS
+Comment=Search, install and remove programs: amateur radio first, and all the other software
+Comment[pt]=Procurar, instalar e remover programas: os de radioamador primeiro, e todo o outro software
+Comment[es]=Buscar, instalar y eliminar programas: los de radioaficionado primero, y todo el demás software
+Comment[fr]=Rechercher, installer et supprimer des logiciels : la radio d'abord, puis tous les autres
+Keywords=software;install;remove;programs;flatpak;apt;programas;instalar;remover;logiciels;
+Exec=logbeamos-programas %U
+Icon=/usr/share/logbeamos/programas.png
+Terminal=false
+Categories=HamRadio;System;PackageManager;
+MimeType=application/vnd.flatpak.ref;application/vnd.flatpak.repo;
