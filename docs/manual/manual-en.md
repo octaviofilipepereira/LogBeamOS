@@ -8,7 +8,7 @@
 
 *Linux distribution for radio amateurs*
 
-This is the manual that comes with LogBeamOS (LogBeamOS Update 1.0.0).
+This is the manual that comes with LogBeamOS (LogBeamOS Update 1.0.0-1).
 
 [Português](manual-pt.md) · **English** · [Español](manual-es.md) · [Français](manual-fr.md)
 
@@ -67,11 +67,11 @@ This is the manual that comes with LogBeamOS (LogBeamOS Update 1.0.0).
 
 ## 4. Installing and removing programs
 
-- The **LogBeamOS Software Manager** searches for, installs and removes programs. It replaces the Linux Mint Software Manager: it is for the radio programs and for all the other software.
+- The **LogBeamOS Software Manager** searches for, installs and removes programs: the radio programs and all the other software.
 - The home page shows the **Ham Radio Programs**, in groups (digital modes, logging and contests, SDR, satellites, APRS and Winlink, digital voice, radio and utilities), each with its state. *Other radio programs* holds the remaining radio programs of Ubuntu.
-- Further down are the other categories, as in Linux Mint: Internet, sound and video, graphics, office, games, Flatpak, installed programs and more. The search, at the top, finds any program by its name or description.
+- Further down are the other categories: Internet, sound and video, graphics, office, games, Flatpak, installed programs and more. The search, at the top, finds any program by its name or description.
 - Each program has its own page, with its description, version, source, the space it takes and the *Install*, *Remove* and *Open* buttons.
-- **On-demand programs:** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium and wfview are not installed, so that the image is smaller, but their icon is in the menu and in the **Ham Radio Programs** folder. Clicking it asks whether to install the program. The *Install all* button installs all of them at once: useful to get the USB drive ready at home, before going out without a network.
+- **On-demand programs:** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium and wfview are not installed, so that the image is smaller, but their icon is in the menu and in the **Ham Radio Programs** folder. Clicking it asks whether to install the program. The *Install all* button installs all of them at once, so that they are available even without an Internet connection.
 - When a radio program is removed, its launcher leaves the menu and the folder (the on-demand programs keep their icon). For 4ham, the data and settings are kept in `/var/lib/logbeamos/guardado`.
 - N1MM+, Log4OM and WIRES-X (Windows programs, through Wine) are removed here too. To install them again, the installer is downloaded from the official website and the manager installs it into Wine.
 - In the menu, *Uninstall* on a radio program opens the manager on that program's page. The LogBeamOS tools (Update, Radio and Equipment, this manual, TQSL) are part of the system and cannot be removed.

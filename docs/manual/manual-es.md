@@ -8,7 +8,7 @@
 
 *Distribución Linux para radioaficionados*
 
-Este es el manual que acompaña a LogBeamOS (LogBeamOS Update 1.0.0).
+Este es el manual que acompaña a LogBeamOS (LogBeamOS Update 1.0.0-1).
 
 [Português](manual-pt.md) · [English](manual-en.md) · **Español** · [Français](manual-fr.md)
 
@@ -67,11 +67,11 @@ Este es el manual que acompaña a LogBeamOS (LogBeamOS Update 1.0.0).
 
 ## 4. Instalar y eliminar programas
 
-- El **Gestor de Programas LogBeamOS** busca, instala y elimina programas. Sustituye al Gestor de Programas de Linux Mint: sirve para los programas de radio y para todo el demás software.
+- El **Gestor de Programas LogBeamOS** busca, instala y elimina programas: los programas de radio y todo el demás software.
 - En la página de inicio están los **Programas de Radioaficionado**, por grupos (modos digitales, registro y concursos, SDR, satélites, APRS y Winlink, voz digital, radio y utilidades), cada uno con su estado. En *Otros programas de radio* están los demás programas de radio de Ubuntu.
-- Más abajo están las demás categorías, como en Linux Mint: Internet, sonido y vídeo, gráficos, oficina, juegos, Flatpak, programas instalados y otras. La búsqueda, arriba, encuentra cualquier programa por su nombre o su descripción.
+- Más abajo están las demás categorías: Internet, sonido y vídeo, gráficos, oficina, juegos, Flatpak, programas instalados y otras. La búsqueda, arriba, encuentra cualquier programa por su nombre o su descripción.
 - Cada programa tiene su página, con la descripción, la versión, el origen, el espacio que ocupa y los botones *Instalar*, *Eliminar* y *Abrir*.
-- **Programas bajo demanda:** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium y wfview no vienen instalados, para que la imagen sea más pequeña, pero su icono está en el menú y en la carpeta **Programas de Radioaficionado**. Al pulsarlo, se pregunta si quiere instalarlo. El botón *Instalar todo* los instala todos de una vez: sirve para preparar el USB en casa, antes de salir sin red.
+- **Programas bajo demanda:** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium y wfview no vienen instalados, para que la imagen sea más pequeña, pero su icono está en el menú y en la carpeta **Programas de Radioaficionado**. Al pulsarlo, se pregunta si quiere instalarlo. El botón *Instalar todo* los instala todos de una sola vez, para que estén disponibles incluso sin conexión a Internet.
 - Al eliminar un programa de radio, el acceso directo sale del menú y de la carpeta (los programas bajo demanda mantienen su icono). En 4ham, los datos y la configuración se guardan en `/var/lib/logbeamos/guardado`.
 - N1MM+, Log4OM y WIRES-X (programas de Windows, mediante Wine) también se eliminan aquí. Para volver a instalarlos, el instalador se descarga del sitio web oficial y el gestor lo instala en Wine.
 - En el menú, *Desinstalar* en un programa de radio abre el gestor en la página de ese programa. Las herramientas de LogBeamOS (Actualizar, Radio y Equipo, este manual, TQSL) forman parte del sistema y no se eliminan.

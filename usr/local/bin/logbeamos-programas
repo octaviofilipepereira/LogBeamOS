@@ -37,7 +37,7 @@ TXT = {
         "sem_lista": "A lista dos outros programas não está disponível: {e}",
         "instalado": "Instalado", "por_instalar": "Por instalar", "a_pedido": "Instala-se quando se pede",
         "b_instalar": "Instalar", "b_remover": "Remover", "b_abrir": "Abrir", "b_tudo": "Instalar tudo",
-        "d_tudo": "Instala os {n} programas a pedido que faltam (cerca de {t}). Serve para preparar a pen em casa antes de uma saída sem rede.",
+        "d_tudo": "Instala de uma só vez os {n} programas a pedido que faltam (cerca de {t}), para ficarem disponíveis mesmo sem ligação à Internet.",
         "tudo_feito": "Os programas a pedido estão todos instalados.",
         "versao": "Versão", "origem": "Origem", "espaco": "Espaço", "site": "Site", "livre": "Espaço livre: {t}",
         "cerca": "cerca de {t}",
@@ -75,7 +75,7 @@ TXT = {
         "sem_lista": "The list of the other programs is not available: {e}",
         "instalado": "Installed", "por_instalar": "Not installed", "a_pedido": "Installed when you ask for it",
         "b_instalar": "Install", "b_remover": "Remove", "b_abrir": "Open", "b_tudo": "Install all",
-        "d_tudo": "Installs the {n} on-demand programs still missing (about {t}). Useful to get the USB drive ready at home before going out without a network.",
+        "d_tudo": "Installs at once the {n} on-demand programs still missing (about {t}), so that they are available even without an Internet connection.",
         "tudo_feito": "All the on-demand programs are installed.",
         "versao": "Version", "origem": "Source", "espaco": "Size", "site": "Website", "livre": "Free space: {t}",
         "cerca": "about {t}",
@@ -113,7 +113,7 @@ TXT = {
         "sem_lista": "La lista de los demás programas no está disponible: {e}",
         "instalado": "Instalado", "por_instalar": "No instalado", "a_pedido": "Se instala cuando se pide",
         "b_instalar": "Instalar", "b_remover": "Eliminar", "b_abrir": "Abrir", "b_tudo": "Instalar todo",
-        "d_tudo": "Instala los {n} programas bajo demanda que faltan (unos {t}). Sirve para preparar el USB en casa antes de salir sin red.",
+        "d_tudo": "Instala de una sola vez los {n} programas bajo demanda que faltan (unos {t}), para que estén disponibles incluso sin conexión a Internet.",
         "tudo_feito": "Todos los programas bajo demanda están instalados.",
         "versao": "Versión", "origem": "Origen", "espaco": "Espacio", "site": "Sitio web", "livre": "Espacio libre: {t}",
         "cerca": "unos {t}",
@@ -151,7 +151,7 @@ TXT = {
         "sem_lista": "La liste des autres logiciels n'est pas disponible : {e}",
         "instalado": "Installé", "por_instalar": "Non installé", "a_pedido": "S'installe quand on le demande",
         "b_instalar": "Installer", "b_remover": "Supprimer", "b_abrir": "Ouvrir", "b_tudo": "Tout installer",
-        "d_tudo": "Installe les {n} logiciels à la demande qui manquent (environ {t}). Utile pour préparer la clé USB à la maison avant une sortie sans réseau.",
+        "d_tudo": "Installe d'un coup les {n} logiciels à la demande qui manquent (environ {t}), pour qu'ils soient disponibles même sans connexion à Internet.",
         "tudo_feito": "Tous les logiciels à la demande sont installés.",
         "versao": "Version", "origem": "Source", "espaco": "Espace", "site": "Site web", "livre": "Espace libre : {t}",
         "cerca": "environ {t}",
@@ -240,6 +240,40 @@ def ler_lista(nome):
             return [l.strip() for l in f if l.strip() and not l.startswith("#")]
     except OSError:
         return []
+
+
+def pacotes_com_menu():
+    """The installed apt packages that put a program in the menu (a visible .desktop file in /usr/share/applications),
+    found with one dpkg query."""
+    d = "/usr/share/applications"
+    ficheiros = []
+    try:
+        nomes = sorted(os.listdir(d))
+    except OSError:
+        return set()
+    for f in nomes:
+        if not f.endswith(".desktop"):
+            continue
+        try:
+            texto = open(os.path.join(d, f), encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        if "\nNoDisplay=true" in texto or "\nHidden=true" in texto or "\nExec=" not in texto:
+            continue
+        ficheiros.append(os.path.join(d, f))
+    if not ficheiros:
+        return set()
+    r = subprocess.run(["dpkg-query", "-S", *ficheiros], capture_output=True, text=True, env=dict(os.environ, LC_ALL="C"))
+    pacotes = set()
+    for linha in r.stdout.splitlines():
+        if linha.startswith("diversion by"):
+            continue
+        donos, sep, _ = linha.rpartition(": /")
+        if not sep:
+            continue
+        for dono in donos.split(", "):
+            pacotes.add(dono.split(":")[0].strip())
+    return pacotes
 
 
 def main():
@@ -536,7 +570,8 @@ def main():
             if chave == "flatpak":
                 pk = list(c.get_subset_of_type("f").values())
             elif chave == "instalados":
-                pk = [p for p in c.values() if self.inst.pkginfo_is_installed(p)]
+                self.mostra_instalados()
+                return
             else:
                 vistos = {}
                 for lista in listas:
@@ -554,6 +589,30 @@ def main():
             pk.sort(key=lambda p: p.get_display_name().casefold())
             self.poe_pagina("lista", self.pagina_lista(T["c_" + chave], [("geral", p) for p in pk],
                                                        T["resultados"].format(n=len(pk))))
+
+        def mostra_instalados(self):
+            """The installed programs: the radio programs of the catalogue first, then the other software that has a
+            menu entry and the installed flatpaks. Asking the Mint engine about each of the ~40 000 entries of its
+            cache, as before, froze the window (1.0.0, author's test on an installed disk)."""
+            est = cat.pacotes_estado(sorted({x for p in cat.PROGRAMAS for x in cat.pacotes_de(p)}))
+            radio = sorted((p for p in cat.PROGRAMAS if cat.instalado(p, est)), key=lambda p: p["nome"].casefold())
+            nossos = {x for p in cat.PROGRAMAS for x in cat.pacotes_de(p)}
+            nossos |= {cat._gh(p)[6] for p in cat.PROGRAMAS if p["tipo"] == "github" and cat._gh(p)[5] == "flatpak"}
+            gerais = {}
+            for nome in pacotes_com_menu() - nossos:
+                p = self.inst.find_pkginfo(nome, "a")
+                if p is not None:
+                    gerais[p.pkg_hash] = p
+            for ref in lb.flatpak_refs("app") or ():
+                if ref.split("/")[0] in nossos:
+                    continue
+                p = self.inst.find_pkginfo("app/" + ref, "f")
+                if p is not None:
+                    gerais[p.pkg_hash] = p
+            outros = sorted(gerais.values(), key=lambda p: p.get_display_name().casefold())
+            entradas = [("radio", p) for p in radio] + [("geral", p) for p in outros]
+            self.poe_pagina("lista", self.pagina_lista(T["c_instalados"], entradas,
+                                                       T["resultados"].format(n=len(entradas))))
 
         def ao_procurar(self, entrada):
             if getattr(self, "_procura_id", None):
@@ -884,8 +943,11 @@ def main():
             i = self.inst
             v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, margin=24)
             topo = Gtk.Box(spacing=16)
-            icone = p.get_icon(96, i.get_appstream_pkg_for_pkginfo(p)) if not p.pkg_hash.startswith("a") else \
-                p.get_icon(96, None)
+            try:
+                icone = p.get_icon(96, i.get_appstream_pkg_for_pkginfo(p)) if not p.pkg_hash.startswith("a") else \
+                    p.get_icon(96, None)
+            except Exception:
+                icone = None
             topo.pack_start(imagem(icone or p.name, 96), False, False, 0)
             t = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
             t.pack_start(rotulo(f"<span size='xx-large' weight='bold'>{GLib.markup_escape_text(p.get_display_name())}</span>",
@@ -899,12 +961,16 @@ def main():
             v.pack_start(topo, False, False, 0)
             g = Gtk.Grid(column_spacing=18, row_spacing=6)
             remoto = p.remote if not p.pkg_hash.startswith("a") else ""
-            linhas = [(T["versao"], i.get_installed_version(p) or i.get_version(p) or ""),
-                      (T["origem"], T["o_flatpak"].format(r=remoto) if remoto else T["o_apt"])]
+            versao = self.versao_geral(p)
+            linhas = ([(T["versao"], versao)] if versao else []) + \
+                [(T["origem"], T["o_flatpak"].format(r=remoto) if remoto else T["o_apt"])]
             for n, (a, b) in enumerate(linhas):
                 g.attach(rotulo(f"<b>{GLib.markup_escape_text(a)}</b>", markup=True), 0, n, 1, 1)
                 g.attach(rotulo(b), 1, n, 1, 1)
-            url = i.get_homepage_url(p)
+            try:
+                url = i.get_homepage_url(p)
+            except Exception:
+                url = None
             if url:
                 g.attach(rotulo(f"<b>{GLib.markup_escape_text(T['site'])}</b>", markup=True), 0, len(linhas), 1, 1)
                 g.attach(Gtk.LinkButton(uri=url, label=url, xalign=0), 1, len(linhas), 1, 1)
@@ -921,6 +987,23 @@ def main():
             # The engine works out whether it is an installation or a removal, and what it implies
             i.select_pkginfo(p, self.geral_pronto, self.geral_erro, self.geral_fim, self.geral_progresso,
                              use_mainloop=True, parent_window=self)
+
+        def versao_geral(self, p):
+            """The installed version, or else the one on offer. For a flatpak that is not installed the Mint engine
+            raises instead of answering None, and the page never opened (1.0.0, author's test): ask it only for an
+            installed one."""
+            i = self.inst
+            try:
+                if i.pkginfo_is_installed(p):
+                    v = i.get_installed_version(p)
+                    if v:
+                        return v
+            except Exception:
+                pass
+            try:
+                return i.get_version(p) or ""
+            except Exception:
+                return ""
 
         def geral_pronto(self, tarefa):
             if self.geral_aberto is not tarefa.pkginfo:
@@ -951,8 +1034,11 @@ def main():
             self.g_botoes.show_all()
 
         def comando_geral(self, p):
-            """How to open an installed program of the other software: its own menu launcher (apt), or flatpak run."""
+            """How to open an installed program of the other software: its own menu launcher, as the menu does (a
+            flatpak with no file given may open no window: "flatpak run io.mpv.Mpv", 1.0.0-1 test), or flatpak run."""
             if not p.pkg_hash.startswith("a"):
+                if os.path.exists(f"/var/lib/flatpak/exports/share/applications/{p.name}.desktop"):
+                    return ["gtk-launch", p.name]
                 return ["flatpak", "run", p.name]
             r = subprocess.run(["dpkg", "-L", p.name], capture_output=True, text=True)
             for f in r.stdout.splitlines():

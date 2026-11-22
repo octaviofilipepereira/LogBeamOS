@@ -8,7 +8,7 @@
 
 *Distribution Linux pour radioamateurs*
 
-C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 1.0.0).
+C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 1.0.0-1).
 
 [Português](manual-pt.md) · [English](manual-en.md) · [Español](manual-es.md) · **Français**
 
@@ -67,11 +67,11 @@ C'est le manuel fourni avec LogBeamOS (LogBeamOS Update 1.0.0).
 
 ## 4. Installer et supprimer des logiciels
 
-- Le **Gestionnaire de logiciels LogBeamOS** recherche, installe et supprime des logiciels. Il remplace le Gestionnaire de logiciels de Linux Mint : il sert pour les logiciels radio et pour tous les autres.
+- Le **Gestionnaire de logiciels LogBeamOS** recherche, installe et supprime des logiciels : les logiciels radio et tous les autres.
 - La page d'accueil présente les **Logiciels Radioamateur**, par groupes (modes numériques, carnets de trafic et concours, SDR, satellites, APRS et Winlink, voix numérique, radio et utilitaires), chacun avec son état. *Autres logiciels radio* regroupe les autres logiciels radio d'Ubuntu.
-- Plus bas se trouvent les autres catégories, comme dans Linux Mint : Internet, son et vidéo, graphisme, bureautique, jeux, Flatpak, logiciels installés et d'autres. La recherche, en haut, trouve n'importe quel logiciel par son nom ou sa description.
+- Plus bas se trouvent les autres catégories : Internet, son et vidéo, graphisme, bureautique, jeux, Flatpak, logiciels installés et d'autres. La recherche, en haut, trouve n'importe quel logiciel par son nom ou sa description.
 - Chaque logiciel a sa page, avec la description, la version, la source, l'espace occupé et les boutons *Installer*, *Supprimer* et *Ouvrir*.
-- **Logiciels à la demande :** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium et wfview ne sont pas installés, pour que l'image soit plus petite, mais leur icône est dans le menu et dans le dossier **Logiciels Radioamateur**. Un clic dessus demande s'il faut l'installer. Le bouton *Tout installer* les installe tous d'un coup : utile pour préparer la clé USB à la maison, avant une sortie sans réseau.
+- **Logiciels à la demande :** qdmr, SatDump, Not1MM, Gqrx, GNU Radio, GridTracker2, Decodium et wfview ne sont pas installés, pour que l'image soit plus petite, mais leur icône est dans le menu et dans le dossier **Logiciels Radioamateur**. Un clic dessus demande s'il faut l'installer. Le bouton *Tout installer* les installe tous d'un coup, pour qu'ils soient disponibles même sans connexion à Internet.
 - Quand un logiciel radio est supprimé, son lanceur quitte le menu et le dossier (les logiciels à la demande gardent leur icône). Pour 4ham, les données et les réglages sont conservés dans `/var/lib/logbeamos/guardado`.
 - N1MM+, Log4OM et WIRES-X (logiciels Windows, via Wine) se suppriment aussi ici. Pour les réinstaller, l'installateur se télécharge sur le site officiel et le gestionnaire l'installe dans Wine.
 - Dans le menu, *Désinstaller* sur un logiciel radio ouvre le gestionnaire sur la page de ce logiciel. Les outils de LogBeamOS (Mettre à jour, Radio et Matériel, ce manuel, TQSL) font partie du système et ne peuvent pas être supprimés.
