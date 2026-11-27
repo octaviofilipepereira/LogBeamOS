@@ -6,7 +6,7 @@
 
 ## Português
 
-### Versões suportadas
+### Versões com suporte
 
 Só a versão mais recente do pacote `logbeamos-ferramentas`, distribuída pelo repositório `https://logbeam.org/apt`, recebe correcções de segurança.
 
@@ -16,13 +16,13 @@ Só a versão mais recente do pacote `logbeamos-ferramentas`, distribuída pelo 
 
 Inclua, se possível: a versão do LogBeamOS e das ferramentas, os passos para reproduzir a falha, o efeito e uma proposta de correcção, se a tiver.
 
-A recepção é confirmada em até 7 dias. A correcção é publicada numa versão nova, e a falha só é descrita publicamente depois disso.
+A recepção é confirmada no prazo de 7 dias. A correcção é publicada numa versão nova, e a falha só é descrita publicamente depois disso.
 
-### Boas práticas já seguidas
+### Medidas de segurança já em vigor
 
-- O índice do repositório apt é assinado; a chave privada nunca sai das máquinas do autor.
-- O ajudante do Actualizar, que corre como administrador, nunca recebe endereços da janela: procura-os ele próprio. Os ficheiros descarregados são conferidos pelo SHA-256 publicado pelo autor de cada programa, quando existe, antes de serem instalados.
-- A autorização de administrador passa pelo polkit, com a password do utilizador.
+- O índice do repositório apt é assinado digitalmente; a chave privada nunca sai dos computadores do autor.
+- O ajudante do Actualizar, que funciona com privilégios de administrador, não aceita endereços vindos da janela: é ele próprio que os obtém. Antes de serem instalados, os ficheiros descarregados são verificados com o SHA-256 publicado pelo autor de cada programa, quando este o publica.
+- A autorização de administrador é pedida pelo polkit, com a password do utilizador.
 
 ---
 
