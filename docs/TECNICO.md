@@ -16,7 +16,7 @@ Cada ficheiro está na pasta onde é instalado:
 | `usr/local/lib/logbeamos/` | O que o Actualizar (`actualizar/`) e o Rádio e Equipamento (`equipamento/`) usam |
 | `usr/share/logbeamos/` | Os ícones e o manual nas quatro línguas |
 | `usr/local/share/applications/` | As entradas do menu |
-| `usr/share/polkit-1/actions/` | A autorização do ajudante do Actualizar, que corre como administrador |
+| `usr/share/polkit-1/actions/` | A autorização do assistente do Actualizar, que corre como administrador |
 | `usr/lib/systemd/user/` | A unidade de cada utilizador que põe o certificado do WaveLogGate no Firefox logo que o WaveLogGate o cria |
 | `etc/` | O aviso de actualizações ao entrar na sessão e a regra que afasta os receptores RTL-SDR do controlador de TV do Linux; antes da sessão gráfica, a verificação que impede um ficheiro de marcadores estragado (por exemplo, depois de um corte de corrente) de deixar o Cinnamon sem painel; o acerto da porta do WaveLogGate ao entrar na sessão; a fixação do muffin no repositório do LogBeamOS (`etc/apt/preferences.d/`) |
 | `docs/manual/` | O manual em Markdown, para ler no GitHub; não é instalado. É feito a partir do de `usr/share/logbeamos/manual/` a cada versão das ferramentas |

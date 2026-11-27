@@ -21,7 +21,7 @@ A recepção é confirmada no prazo de 7 dias. A correcção é publicada numa v
 ### Medidas de segurança já em vigor
 
 - O índice do repositório apt é assinado digitalmente; a chave privada nunca sai dos computadores do autor.
-- O ajudante do Actualizar, que funciona com privilégios de administrador, não aceita endereços vindos da janela: é ele próprio que os obtém. Antes de serem instalados, os ficheiros descarregados são verificados com o SHA-256 publicado pelo autor de cada programa, quando este o publica.
+- O assistente do Actualizar, que funciona com privilégios de administrador, não aceita endereços vindos da janela: é ele próprio que os obtém. Antes de serem instalados, os ficheiros descarregados são verificados com o SHA-256 publicado pelo autor de cada programa, quando este o publica.
 - A autorização de administrador é pedida pelo polkit, com a password do utilizador.
 
 ---
