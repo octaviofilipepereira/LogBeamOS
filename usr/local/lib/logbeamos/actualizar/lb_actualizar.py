@@ -803,8 +803,11 @@ def instala_flatpak(ficheiro, alvo, pasta, registo):
     flatpak_desinstala(None, registo, nao_usados=True)  # a base antiga, se a nova mudou
     # The sound socket that the qdmr flatpak lacks (0.3.30: without it qdmr 0.15.1 crashes when it closes its melody
     # player): given here too since 1.0.0, so that a qdmr installed again through the manager has it (until then only the
-    # package postinst gave it, to the qdmr already installed)
-    subprocess.run(["flatpak", "override", "--system", "--socket=pulseaudio", alvo], capture_output=True)
+    # package postinst gave it, to the qdmr already installed). Since 1.0.0-2 also read access to the udev database: in
+    # the sandbox Qt sees no USB VID:PID on the serial ports without it, and qdmr finds no radio on a serial port (OpenGD77,
+    # Anytone, DR-1801UV, DM-32UV)
+    subprocess.run(["flatpak", "override", "--system", "--socket=pulseaudio", "--filesystem=/run/udev:ro", alvo],
+                   capture_output=True)
     regras = glob.glob(f"/var/lib/flatpak/app/{alvo}/current/active/files/OFF/*.rules")
     if regras:  # de.darc.dm3mat.qdmr → /etc/udev/rules.d/60-qdmr.rules (o mesmo nome que o pacote antigo do sistema usava)
         shutil.copyfile(regras[0], f"/etc/udev/rules.d/60-{alvo.rsplit('.', 1)[-1]}.rules")
